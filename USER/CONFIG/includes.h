@@ -315,6 +315,11 @@ extern OS_EVENT	*PtzSem;
 extern signed long gCodeZ;
 extern signed long CodeAB_Last;
 
+extern ZT_INFO_TYPE g_zt_msg;
+extern  RbtState gRbtState;
+
+
+
 #ifndef  __IN__
 #define  __IN__      //参数作为输入
 #endif

@@ -47,7 +47,7 @@ void Task_Weather(void *pdata)
 				case SENSOR_MSG:
 				{
 					//LED2(LED_ON);
-					//Sensor_Collect();
+					Sensor_Collect();
 					break;
 				}
 							

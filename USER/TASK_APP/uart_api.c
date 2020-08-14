@@ -111,29 +111,21 @@ void USART1_Config(void)
   GPIO_InitTypeDef GPIO_InitStructure;
   USART_TypeDef *uart;
   
-  /* 第1步：打开GPIOA和USART1部件的时钟 */
-	RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOB , ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE); //使能GPIOA时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);//使能USART1时钟
   
- /* 第2步：将USART Tx的GPIO配置为推挽复用模式 */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+	//串口1对应引脚复用映射
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource9,GPIO_AF_USART1); //GPIOA9复用为USART1
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource10,GPIO_AF_USART1); //GPIOA10复用为USART1
+	
+ //USART1端口配置
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 | GPIO_Pin_10; //GPIOA9与GPIOA10
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;//复用功能
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	//速度50MHz
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP; //推挽复用输出
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP; //上拉
+	GPIO_Init(GPIOA,&GPIO_InitStructure); //初始化PA9，PA10
 
-	/* 第3步：将USART Rx的GPIO配置为浮空输入模式
-		由于CPU复位后，GPIO缺省都是浮空输入模式，因此下面这个步骤不是必须的
-		但是，我还是建议加上便于阅读，并且防止其它地方修改了这个口线的设置参数
-	*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
-	/*  第3步已经做了，因此这步可以不做
-		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	*/
-
-  /* Enable the USART OverSampling by 8 */
-  USART_OverSampling8Cmd(USART1, ENABLE);  
 
   /* USARTx configuration ----------------------------------------------------*/
   /* USARTx configured as follow:
@@ -154,20 +146,16 @@ void USART1_Config(void)
         - Receive and transmit enabled
   */ 
   /* 第4步：设置串口硬件参数 */
-	uart = USART1;	
-	USART_InitStructure.USART_BaudRate = 115200;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No ;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-	USART_Init(uart, &USART_InitStructure);
-	/* 
-		USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
-		注意: 不要在此处打开发送中断
-		发送中断使能在SendUart()函数打开
-	*/
+	//USART1 初始化设置
+	USART_InitStructure.USART_BaudRate = 115200;//波特率设置
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;//字长为8位数据格式
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;//一个停止位
+	USART_InitStructure.USART_Parity = USART_Parity_No;//无奇偶校验位
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;//无硬件数据流控制
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;	//收发模式
+  USART_Init(USART1, &USART_InitStructure); //初始化串口1
 	
+	 USART_Cmd(USART1, ENABLE);  //使能串口1 
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
@@ -176,14 +164,14 @@ void USART1_Config(void)
 	#if 1
   /* NVIC configuration */
   /* Configure the Priority Group to 2 bits */
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);//开启相关中断
   
-  /* Enable the USARTx Interrupt */
-  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+  //Usart1 NVIC 配置
+  NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;//串口1中断通道
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;//抢占优先级3
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority =3;		//子优先级3
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
+	NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器、
   #endif
 
   
@@ -192,7 +180,7 @@ void USART1_Config(void)
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
 	USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);
-    Usart1Sem = OSSemCreate(1);
+  Usart1Sem = OSSemCreate(1);
 
 	USART_Cmd(uart, ENABLE);		/* 使能串口 */ 
 

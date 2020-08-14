@@ -5,6 +5,7 @@
 OS_EVENT	*log_sem;
 OS_EVENT	*PtzSem;
 
+
 DATA_CONTROL_BLOCK msgBuffer[100];
 OS_MEM		*p_msgBuffer;					//OS_MEM：内存分区数据结构
 
@@ -99,6 +100,24 @@ void *weather_Q[WEATHER_Q_LEN];			//打印输出队列
 void *RemoteRec_Q[REMOTEREC_Q_LEN];		//命令解析队列
 void *Sensor_Data_Collect_Q[SENSOR_DATA_COLLECT_Q_LEN];//传感器采集队列
 
+//高德摄像头参数定义
+u8 CurrentPtzSetCom;
+u8 GTZMHDCmdSetStep1;
+u8 GTZMHDCmdSetStep2;
+u8 GTZMHDCmdSetOk;
+u8 DoGTZMHDCmdSetRet;
+u8 GTZMHDCmdGetStep1;
+u8 GTZMHDCmdGetStep2;
+u8 GTZMHDCmdGetOk;
+u8 DoGTZMHDCmdGetRet;
+
+//从动轮码盘参数定义
+signed short CodeAB_Start;
+char CodeZ_Start;
+signed long gCodeZ;
+signed long CodeAB_Last;
+
+
 /* Private function prototypes -----------------------------------------------*/
 #if (OS_VIEW_MODULE == DEF_ENABLED)
 extern void  App_OSViewTaskCreate   (void);
@@ -115,7 +134,6 @@ int main(void)
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
 	SystemInit();
 	
-
 	
 	delay_init(168);		  //初始化延时函数
 	bsp_Led_Init();		    //初始化LED端口
@@ -156,6 +174,8 @@ void App_TaskStart(void *pdata)
 	#if (OS_VIEW_MODULE == DEF_ENABLED)
 		App_OSViewTaskCreate();
 	#endif
+	
+	//USART1_Config();        //串口1，用于系统打印调试
 	
 	log_sem 	= OSSemCreate(1);
 	

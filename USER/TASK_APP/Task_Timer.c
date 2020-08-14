@@ -7,9 +7,9 @@
 /*************************************************/
 //---------本任务涉及到的消息-----------
 OS_EVENT *timerQueue;
-RbtState gRbtState;
-BatAutoCtrl gBatAutoCtrl;
-SlvMtCfgType     gSlvMtCfg;  		 //配置参数
+//RbtState gRbtState;
+//BatAutoCtrl gBatAutoCtrl;
+//SlvMtCfgType     gSlvMtCfg;  		 //配置参数
 ZT_INFO_TYPE g_zt_msg;
 
 //robot信息结构体
@@ -461,13 +461,13 @@ void Task_Timer(void *pdata)
 				case AM2320_MSG: 		// 2s
 				{
 					//LED2(LED_ON);
-					//AM2320_Get_Data();
+					AM2320_Get_Data();
 					//stprintf(ID_DEBUG,"AM2320 \r\n");				
 				}
 				break;
 				case SYS_LED_MSG: 		// 1s
 				{
-		
+					//LED2(LED_ON);
 					System_State_LED();	
 					
 				}
