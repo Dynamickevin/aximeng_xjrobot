@@ -1,19 +1,61 @@
+
+#define IN_TASK_WEATHER
 #include "includes.h"
 
+//---------本任务涉及到的消息-----------
+OS_EVENT *GetWeatherQueue;			
 
+/******************************************************/
 
-//LED1任务
+extern OS_MEM		*p_msgBuffer;
+
+uint16 BoardTemperature(void); 
+
+//打印输出任务 入口函数
 void Task_Weather(void *pdata)
-{	  
-	while(1)
-	{
-//		LED2(LED_ON);
-//		delay_ms(2000);
-//		LED2(LED_OFF);
-		delay_ms(2000);
-		//printf("led2");
-	};
+{
+	uint8 err;
+	DATA_CONTROL_BLOCK *bp;
+	
+	while ( 1 )
+	{	
+		bp = (DATA_CONTROL_BLOCK*)OSQPend(GetWeatherQueue,0,&err);
+		
+		if ( err == OS_ERR_NONE )
+		{
+			switch(bp->type)
+			{
+				case WEATHER_DEBUG_OUT_MSG_DEBUG:
+				{
+					uart1_send(bp->point, bp->count);
+					OSMemPut(mem160ptr,bp->point);
+					break;
+				}				
+				case WEATHER_DEBUG_OUT_MSG_LINUX:
+				{
+					uart2_send(bp->point, bp->count);
+					OSMemPut(mem160ptr,bp->point);
+					break;
+				}				
+				case WEATHER_DEBUG_OUT_MSG_RF433:
+				{
+					uart3_send(bp->point, bp->count);
+					OSMemPut(mem160ptr,bp->point);
+					break;
+				}
+				
+				case SENSOR_MSG:
+				{
+					//LED2(LED_ON);
+					//Sensor_Collect();
+					break;
+				}
+							
+				default:
+					break;				
+			}
+	 	}
+		OSMemPut(p_msgBuffer,(void *)bp);
+	}
 }
-
-
 

@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\HARDWARE;..\STM32_LIB\inc;..\STM32_LIB\src;..\SYSTEM;..\USER\CONFIG;..\USER\TASK_APP;..\USER\uC-CPU;..\USER\UCOSII\CORE;..\USER\UCOSII\PORT;..\USER;..\USER\uCOS-VIEW\Source;..\USER\uCOS-VIEW\Ports\ARM-Cortex-M3\Realview;..\USER\uC-LIB\Ports\RealView;..\USER\uC-LIB;..\USER\CONFIG;..\USER\HARDWARE</IncludePath>
+              <IncludePath>..\CORE;..\HARDWARE;..\STM32_LIB\inc;..\STM32_LIB\src;..\SYSTEM;..\USER\CONFIG;..\USER\TASK_APP;..\USER\uC-CPU;..\USER\UCOSII\CORE;..\USER\UCOSII\PORT;..\USER;..\USER\uCOS-VIEW\Source;..\USER\uCOS-VIEW\Ports\ARM-Cortex-M3\Realview;..\USER\uC-LIB\Ports\RealView;..\USER\uC-LIB;..\USER\HARDWARE;..\USER\TASK_APP;..\USER\CONFIG</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -411,6 +411,11 @@
               <FileName>Task_Sensor_Data_Collect.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\Task_Sensor_Data_Collect.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart_api.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK_APP\uart_api.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -645,6 +650,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>DRIVERS</GroupName>
+          <Files>
+            <File>
+              <FileName>user_adc_ctrl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK_APP\user_adc_ctrl.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>UCOSII_CONFIG</GroupName>
           <Files>
             <File>
@@ -758,9 +773,6 @@
               <FilePath>..\USER\uC-CPU\cpu_c.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>DRIVERS</GroupName>
         </Group>
         <Group>
           <GroupName>UCOSII/LIB/SOURCE</GroupName>

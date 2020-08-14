@@ -1,5 +1,26 @@
 
 #include "includes.h"
+#include "stm32f4xx.h"                  // Device header file
+
+OS_EVENT	*log_sem;
+OS_EVENT	*PtzSem;
+
+DATA_CONTROL_BLOCK msgBuffer[100];
+OS_MEM		*p_msgBuffer;					//OS_MEM：内存分区数据结构
+
+OS_MEM		*mem160ptr;
+INT8U		 mem_160[MEM160_NUM][220];
+
+OS_EVENT	*mem512_sem;
+OS_MEM		*mem512ptr; 
+INT8U		 mem_512[MEM512_NUM][512];
+
+extern int				 			gui_key;
+extern OS_EVENT  				*uart_q;
+extern void 		    		*RcvUARTQ[Q_MAX_SIZE];
+extern OS_EVENT    	    *sem_time;
+extern RbtState         gRbtState;
+
 
 /////////////////////////UCOSII任务设置///////////////////////////////////
 //START 起始任务
@@ -65,8 +86,26 @@ void Task_Sensor_Data_Collect(void *pdata);
 //static  OS_STK		 TaskStk_Local [LOCAL_LENGH];				//本地任务堆栈
 //static  OS_STK	 TaskStk_Sensor_Data_Collect[SENSOR_DATA_LENGH];//传感器采集任务堆栈
 
+//队列长度
+#define 	REMOTEREC_Q_LEN		32
+#define 	LOCAL_Q_LEN				10
+#define		WEATHER_Q_LEN			32
+#define		TIMER_Q_LEN				32
+#define		SENSOR_DATA_COLLECT_Q_LEN	32
 
+void *local_Q[LOCAL_Q_LEN]; 			//本地队列
+void *timer_Q[TIMER_Q_LEN];				//时间定时器队列
+void *weather_Q[WEATHER_Q_LEN];			//打印输出队列
+void *RemoteRec_Q[REMOTEREC_Q_LEN];		//命令解析队列
+void *Sensor_Data_Collect_Q[SENSOR_DATA_COLLECT_Q_LEN];//传感器采集队列
 
+/* Private function prototypes -----------------------------------------------*/
+#if (OS_VIEW_MODULE == DEF_ENABLED)
+extern void  App_OSViewTaskCreate   (void);
+#endif
+
+static  void  App_TaskStart			(void	*pdata);  
+extern  void  App_TaskCreate        (void);
 
 int main(void)
 { 
@@ -75,6 +114,9 @@ int main(void)
 	os_err = os_err; 
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
 	SystemInit();
+	
+
+	
 	delay_init(168);		  //初始化延时函数
 	bsp_Led_Init();		    //初始化LED端口
 	
@@ -98,18 +140,60 @@ int main(void)
 	OSStart();	
 }
 
- //开始任务
+ //创建开始任务 
 void App_TaskStart(void *pdata)
 {
-  OS_CPU_SR cpu_sr=0;
+  uint8 err;
 	CPU_INT08U  os_err;
 	os_err = os_err; 
 	pdata = pdata;
 	
-  OS_ENTER_CRITICAL();			//进入临界区(无法被中断打断)
+	#if (OS_TASK_STAT_EN > 0)
+    OSStatInit();                                            /* Determine CPU capacity.                              */
+	#endif
 	
- 	//OSTaskCreate(led0_task,(void *)0,(OS_STK*)&LED0_TASK_STK[LED0_STK_SIZE-1],LED0_TASK_PRIO);						   
- 	//OSTaskCreate(led1_task,(void *)0,(OS_STK*)&LED1_TASK_STK[LED1_STK_SIZE-1],LED1_TASK_PRIO);
+	/* Create application tasks.                               */
+	#if (OS_VIEW_MODULE == DEF_ENABLED)
+		App_OSViewTaskCreate();
+	#endif
+	
+	log_sem 	= OSSemCreate(1);
+	
+	//分配内存空间
+  p_msgBuffer = OSMemCreate(msgBuffer,100,sizeof(DATA_CONTROL_BLOCK),&err);
+
+	mem160ptr	= OSMemCreate(mem_160,MEM160_NUM,220,&err);
+	
+	mem512_sem  = OSSemCreate(MEM512_NUM);
+	mem512ptr   = OSMemCreate(mem_512,MEM512_NUM,512,&err);	
+
+	//队列相关
+  GetWeatherQueue = OSQCreate(&weather_Q[0],WEATHER_Q_LEN);
+	RemoteRecQueue = OSQCreate(&RemoteRec_Q[0],TIMER_Q_LEN);
+	timerQueue = OSQCreate(&timer_Q[0],TIMER_Q_LEN);
+	LocalQueue = OSQCreate(&local_Q[0],LOCAL_LENGH);
+	//Sensor_Data_Collect_Queue = OSQCreate(&Sensor_Data_Collect_Q[0],SENSOR_DATA_LENGH);
+	
+  PtzSem = OSSemCreate(1);
+	
+	App_TaskCreate();
+	
+  //UCOS版本号
+	OSVersion();
+	debug_sprintf(ID_DEBUG,"UCOS版本号:");
+	nprintf(ID_DEBUG,OS_VERSION,0,DEC);
+	stprintf(ID_DEBUG,"\r\n");
+					
+}
+
+//创建巡检机器人的具体任务
+static void  App_TaskCreate (void)
+{
+   CPU_INT08U  os_err;
+
+	 os_err = os_err; 
+
+	//OS_ENTER_CRITICAL();			//进入临界区(无法被中断打断)
 	
 	//打印输出任务	 优先级3
     os_err = OSTaskCreateExt((void (*)(void *)) Task_Weather, 		//任务代码的指针	
@@ -169,7 +253,7 @@ void App_TaskStart(void *pdata)
 					(void *)0,								//指向用户附加的数据域的指针
 					OS_TASK_OPT_STK_CHK+OS_TASK_OPT_STK_CLR		//指定是否允许堆栈检验，是否将堆栈清零，任务是否要进行浮点操作等等
 					);
-    #if OS_TASK_NAME_EN > 0
+  #if OS_TASK_NAME_EN > 0
 		OSTaskNameSet(LOCAL_TASK_PRIO, "Task_Local", &os_err);
 	#endif
 		
@@ -188,9 +272,9 @@ void App_TaskStart(void *pdata)
 			OSTaskNameSet(SENSOR_DATA_TASK_PRIO, "Task_Sensor_Data_Collect", &os_err);
 	#endif		
 
-	OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
-					
-} 
+	//OS_EXIT_CRITICAL();				//退出临界区(可以被中断打断)
+
+}	
 
 
 
