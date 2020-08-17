@@ -83,7 +83,8 @@ void SendWHLToLinux(void)
 	buf[13]=(gRbtState.bCX_SwCheck1 || gRbtState.bCX_SwCheck2)? 0x01 : 0x00 ; //利用红外状态判断充电状态
 	buf[14]=0x96;
 
-	//ack_with_debug(ID_LINUX,buf,15);	//将码盘值发送到ID_LINUX串口二
+	ack_with_debug(ID_LINUX,buf,15);	//将码盘值发送到ID_LINUX串口二
+	
 }
 
 
@@ -442,12 +443,12 @@ void Task_Timer(void *pdata)
 	DATA_CONTROL_BLOCK *msg;
 	static s32 nCxCheckMove;
 	
-	//创建定时器1，
-	tmr1_temper_humidi=OSTmrCreate(500,1000,OS_TMR_OPT_PERIODIC,(OS_TMR_CALLBACK)tmr1_temper_humidi_callback,0,"tmr1_temper_humidi",&err);		
+	//创建温湿度定时器1，
+	tmr1_temper_humidi=OSTmrCreate(0,1000,OS_TMR_OPT_PERIODIC,(OS_TMR_CALLBACK)tmr1_temper_humidi_callback,0,"tmr1_temper_humidi",&err);		
 	OSTmrStart(tmr1_temper_humidi,&err);			//启动软件定时器1，2ms*1000执行一次
 	
-	//创建定时器2 
-	tmr2_sys_led=OSTmrCreate(500,500,OS_TMR_OPT_PERIODIC,(OS_TMR_CALLBACK)tmr2_sys_led_callback,0,"tmr2_sys_led",&err);		
+	//创建指示灯定时器2 
+	tmr2_sys_led=OSTmrCreate(0,500,OS_TMR_OPT_PERIODIC,(OS_TMR_CALLBACK)tmr2_sys_led_callback,0,"tmr2_sys_led",&err);		
 	OSTmrStart(tmr2_sys_led,&err);			//启动软件定时器2，2ms*500执行一次
 	
 	while( 1 )

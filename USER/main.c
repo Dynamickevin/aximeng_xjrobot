@@ -6,15 +6,15 @@ OS_EVENT	*log_sem;
 OS_EVENT	*PtzSem;
 
 
-DATA_CONTROL_BLOCK msgBuffer[100];
-OS_MEM		*p_msgBuffer;					//OS_MEM：内存分区数据结构
+DATA_CONTROL_BLOCK 		msgBuffer[100];
+OS_MEM								*p_msgBuffer;					//OS_MEM：内存分区数据结构
 
-OS_MEM		*mem160ptr;
-INT8U		 mem_160[MEM160_NUM][220];
+OS_MEM								*mem160ptr;
+INT8U		 							mem_160[MEM160_NUM][220];
 
-OS_EVENT	*mem512_sem;
-OS_MEM		*mem512ptr; 
-INT8U		 mem_512[MEM512_NUM][512];
+OS_EVENT							*mem512_sem;
+OS_MEM								*mem512ptr; 
+INT8U									 mem_512[MEM512_NUM][512];
 
 extern int				 			gui_key;
 extern OS_EVENT  				*uart_q;
@@ -26,7 +26,7 @@ extern RbtState         gRbtState;
 /////////////////////////UCOSII任务设置///////////////////////////////////
 //START 起始任务
 //设置任务优先级
-//#define APP_TASK_START_PRIO      			0 //开始任务的优先级设置为最低
+//#define APP_TASK_START_PRIO      			0 //开始任务的优先级设置为最高
 //设置任务堆栈大小
 //#define APP_TASK_START_STK_SIZE  				128
 //起始任务 任务堆栈	
@@ -118,6 +118,7 @@ signed long gCodeZ;
 signed long CodeAB_Last;
 
 
+
 /* Private function prototypes -----------------------------------------------*/
 #if (OS_VIEW_MODULE == DEF_ENABLED)
 extern void  App_OSViewTaskCreate   (void);
@@ -136,7 +137,7 @@ int main(void)
 	
 	
 	delay_init(168);		  //初始化延时函数
-	bsp_Led_Init();		    //初始化LED端口
+	bsp_Board_Init();
 	
 	OSInit();   
  	//OSTaskCreate(App_TaskStart,(void *)0,(OS_STK *)&App_TaskStartStk[APP_TASK_START_STK_SIZE-1],APP_TASK_START_PRIO );//创建起始任务
@@ -166,6 +167,9 @@ void App_TaskStart(void *pdata)
 	os_err = os_err; 
 	pdata = pdata;
 	
+	NVIC_SetPriority(SysTick_IRQn, 0x0);
+	__enable_irq();	
+	
 	#if (OS_TASK_STAT_EN > 0)
     OSStatInit();                                            /* Determine CPU capacity.                              */
 	#endif
@@ -175,8 +179,12 @@ void App_TaskStart(void *pdata)
 		App_OSViewTaskCreate();
 	#endif
 	
-	//USART1_Config();        //串口1，用于系统打印调试
-	
+	USART1_Config();        //串口1，用于系统打印调试
+	USART2_Config();        //串口2，用于与LINUX系统通讯
+	USART3_Config();        //串口3，用于与RF433通讯
+	UART4_Config();         //串口4，用于与GPS模块通讯
+	UART5_Config();         //串口5，用于与云台相机通讯
+	//LED2(LED_ON);
 	log_sem 	= OSSemCreate(1);
 	
 	//分配内存空间
@@ -198,7 +206,7 @@ void App_TaskStart(void *pdata)
 	
 	App_TaskCreate();
 	
-  //UCOS版本号
+//  //UCOS版本号
 	OSVersion();
 	debug_sprintf(ID_DEBUG,"UCOS版本号:");
 	nprintf(ID_DEBUG,OS_VERSION,0,DEC);
@@ -214,7 +222,7 @@ static void  App_TaskCreate (void)
 	 os_err = os_err; 
 
 	//OS_ENTER_CRITICAL();			//进入临界区(无法被中断打断)
-	
+	//LED2(LED_ON);
 	//打印输出任务	 优先级3
     os_err = OSTaskCreateExt((void (*)(void *)) Task_Weather, 		//任务代码的指针	
 														(void 		 * ) 0, 						//当任务开始执行时传递给任务的参数的指针

@@ -357,10 +357,8 @@ extern  RbtState gRbtState;
 #include "GpsUart.h"
 //#include "debug.h"
 
-#include "BSP_led.h"
-#include "BSP_limit_SW.h"
-#include "BSP_GPS.h"
-//#include "BSP_RF.h"
+#include  "board.h"
+
 #include "sys.h"
 #include "delay.h"
 #include "usart.h"

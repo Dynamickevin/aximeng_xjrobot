@@ -507,6 +507,31 @@
               <FileType>1</FileType>
               <FilePath>..\USER\HARDWARE\BSP_led.c</FilePath>
             </File>
+            <File>
+              <FileName>board.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\board.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_Limit_SW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_Limit_SW.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_pressure_sensor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_pressure_sensor.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_ADC_Init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_ADC_Init.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_enccoder.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_enccoder.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

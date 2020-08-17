@@ -148,11 +148,16 @@ void ENCCODER_Z_EXTI_Handler(void)
 			dir_Down = ENCCODER_AB_TIM->CR1 & 0X10;
 		}else{
 			dir_Up = ENCCODER_AB_TIM->CR1 & 0X10;
-			if(dir_Up == dir_Down && Time <= Time100ms){
-				Time = Time100ms + 2;
-				if(dir_Up){
+			//if(dir_Up == dir_Down && Time <= Time100ms)
+			if(dir_Up == dir_Down )
+			{
+				//Time = Time100ms + 2;
+				if(dir_Up)
+				{
 					Enccoder_Z_Turns--;
-				}else{
+				}
+				else
+				{
 					Enccoder_Z_Turns++;
 				}
 			}			

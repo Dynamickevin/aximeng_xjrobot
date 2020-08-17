@@ -55,5 +55,6 @@ extern Pluse_Info_Typedef BRD_Pluse_Info;
 void  bsp_BRD_Init(void);
 void bsp_BRD_Pluse(void);
 u16 bsp_BRD_UART_Parse(void);
+
 #endif
 

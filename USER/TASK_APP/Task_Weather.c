@@ -28,6 +28,7 @@ void Task_Weather(void *pdata)
 				case WEATHER_DEBUG_OUT_MSG_DEBUG:
 				{
 					uart1_send(bp->point, bp->count);
+					//LED2(LED_ON);
 					OSMemPut(mem160ptr,bp->point);
 					break;
 				}				
