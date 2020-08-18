@@ -151,7 +151,7 @@ void USART1_Config(void)
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
-	//USART_ClearFlag(USART1, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
+	USART_ClearFlag(USART1, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
   
 	#if 1
   /* NVIC configuration */
@@ -171,13 +171,13 @@ void USART1_Config(void)
 
   /* Enable USART1 */
 	AtCmdFromDebug.counter = 0;
-	//USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);
+	USART_ITConfig(USART1, USART_IT_IDLE, ENABLE);
 	
 	//LED2(LED_ON);
 	
-  //Usart1Sem = OSSemCreate(1);
+  Usart1Sem = OSSemCreate(1);
 
 	USART_Cmd(USART1, ENABLE);		/* 使能串口 */ 
 
@@ -230,7 +230,7 @@ void USART2_Config(void)
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
-	//USART_ClearFlag(USART2, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
+	USART_ClearFlag(USART2, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
   
 	#if 1
   /* NVIC configuration */
@@ -248,10 +248,11 @@ void USART2_Config(void)
   
   /* Enable USART */
 	AtCmdFromLinux.counter = 0;
-	//USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);
-  //Usart2Sem = OSSemCreate(1);
+	USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);
+	
+  Usart2Sem = OSSemCreate(1);
   USART_Cmd(USART2, ENABLE);		/* 使能串口2 */ 
 
 }
@@ -304,7 +305,7 @@ void USART3_Config(void)
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
-	//USART_ClearFlag(USART3, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
+	USART_ClearFlag(USART3, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
   
 	#if 1
   /* NVIC configuration */
@@ -322,11 +323,11 @@ void USART3_Config(void)
   
   /* Enable USART */
 	AtCmdFromRF433.counter = 0;
-	//USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+	USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
 	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);
+	USART_ITConfig(USART3, USART_IT_IDLE, ENABLE);
 	
-   //Usart3Sem = OSSemCreate(1);
+   Usart3Sem = OSSemCreate(1);
    USART_Cmd(USART3, ENABLE);		/* 使能串口 */ 
 	 //LED2(LED_ON);
 
@@ -380,7 +381,7 @@ void UART4_Config(void)
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
-	//USART_ClearFlag(UART4, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
+	USART_ClearFlag(UART4, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
   
 	#if 1
   /* NVIC configuration */
@@ -399,10 +400,11 @@ void UART4_Config(void)
   /* Enable USART */
 	AtCmdFromGPS.counter = 0;
   AtCmdFromGPS.CurRecStatus = COMM_REC_WAITPREFIX;
-  //USART_ITConfig(UART4, USART_IT_TXE, ENABLE);
+  USART_ITConfig(UART4, USART_IT_TXE, ENABLE);
 	USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(UART4, USART_IT_IDLE, ENABLE);
-	//Uart4Sem = OSSemCreate(1);
+	USART_ITConfig(UART4, USART_IT_IDLE, ENABLE);
+	
+	Uart4Sem = OSSemCreate(1);
 	USART_Cmd(UART4, ENABLE);		/* 使能串口4 */ 
 	//LED2(LED_ON);
 }
@@ -454,7 +456,7 @@ void UART5_Config(void)
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
-	//USART_ClearFlag(UART5, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
+	USART_ClearFlag(UART5, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
   
 	#if 1
   /* NVIC configuration */
@@ -472,10 +474,11 @@ void UART5_Config(void)
   
   /* Enable USART */
 	AtCmdFromPTZ.counter = 0;
-	//USART_ITConfig(UART5, USART_IT_TXE, ENABLE);
+	USART_ITConfig(UART5, USART_IT_TXE, ENABLE);
 	USART_ITConfig(UART5, USART_IT_RXNE, ENABLE);
-	//USART_ITConfig(UART5, USART_IT_IDLE, ENABLE);
-  //Uart5Sem = OSSemCreate(1);
+	USART_ITConfig(UART5, USART_IT_IDLE, ENABLE);
+	
+  Uart5Sem = OSSemCreate(1);
   USART_Cmd(UART5, ENABLE);		/* 使能串口5 */ 
 	//LED2(LED_ON);
 
@@ -618,7 +621,8 @@ void USART1_ISR(void)
           /* Disable the USARTx transmit data register empty interrupt */
           USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
           g_zt_msg1.counter = 0;
-		  OSSemPost(Usart1Sem);
+					OSSemPost(Usart1Sem);
+					//LED2(LED_ON);
       }	
 	  else
 	  {

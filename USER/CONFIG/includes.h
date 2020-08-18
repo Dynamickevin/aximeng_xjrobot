@@ -45,7 +45,7 @@
 #endif
 
 #include  <stm32f4xx.h>
-
+#include "stm32f4xx_it.h"
 #include "stm32f4xx_conf.h"
 
 
@@ -176,7 +176,6 @@ extern OS_EVENT  	*log_sem;
 
 extern OS_EVENT *Semaphore1;
 extern OS_EVENT	*Mbox1;
-
 
 
 extern OS_MEM		*p_msgBuffer;
@@ -348,11 +347,9 @@ extern  RbtState gRbtState;
 #include "adc_dma.h"
 #include "str.h"
 #include "cmd_para.h"
-#include "AM2320_By_IIC.h"
 #include "App_cfg.h"
-#include "hard_i2c_driver.h"
-//#include "sc16is752.h"
-//#include "iic_driver.h"
+#include "AM2320_By_IIC.h"
+#include "Wheel_Encode.h"
 //#include "OperationList.h"
 #include "GpsUart.h"
 //#include "debug.h"

@@ -138,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -478,11 +478,6 @@
               <FilePath>..\USER\TASK_APP\TimerPWm_Driver.C</FilePath>
             </File>
             <File>
-              <FileName>hard_i2c_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\hard_i2c_driver.c</FilePath>
-            </File>
-            <File>
               <FileName>AM2320_By_IIC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\AM2320_By_IIC.c</FilePath>
@@ -491,6 +486,11 @@
               <FileName>uart_api.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\uart_api.c</FilePath>
+            </File>
+            <File>
+              <FileName>Wheel_Encode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK_APP\Wheel_Encode.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,205 +1,307 @@
-//#include "box_os_user.h"
-//#include "iic_driver.h"
+
 #include <includes.h>
-#include "hard_i2c_driver.h"
 
 short int gnAM2320_temper = 0;
 short int gnAM2320_humidi = 0;
 
 
-//static SoftTimer gTimerFor_AM2320;
-//static u8 send_to_AM2320[8] = { 0X03 , 0X00 , 0X04 , 0 , 0 , 0 , 0 };
-//static u8 read_from_AM2320[10];
 
-#if 0
-static void AM2320_begin_get_data(void* para); //开始进行一次 温湿度采集函数
-static void IIC_TO_ReadData(void* para)
+
+I2C_INIT_INFO I2C_Info;	///<I2C控制器相关信息
+
+/* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief  硬件I2C初始化 。
+  * @param  I2C_Info I2C初始化信息。
+  * @retval 初始化数据状态。
+  */
+uint8 VT_I2C_HardInit(I2C_INIT_INFO *I2C_Info)
 {
-    if ( (((int)(para))<0X0100) && (0X03 == read_from_AM2320[0]) )
+	I2C_InitTypeDef  I2C_InitStructure;
+   	GPIO_InitTypeDef  GPIO_InitStructure;
+   	if(0 == I2C_Info->channel)
+	{
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1,ENABLE);
+	   	RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOB  , ENABLE);
+	
+	   	/* Configure I2C1 pins: PB6->SCL and PB7->SDA */
+	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6 | GPIO_Pin_7;
+	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	   	GPIO_Init(GPIOB, &GPIO_InitStructure);
+		
+	   	I2C_DeInit(I2C1);
+	   	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+	   	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+	   	I2C_InitStructure.I2C_OwnAddress1 = 0x30;
+	   	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+		if(I2C_Info->slaveAddr>>8)
+		{
+			I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_10bit;
+		}
+		else
+		{
+	   		I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+		}
+	   	I2C_InitStructure.I2C_ClockSpeed = I2C_Info->speed;
+	    
+	   	I2C_Cmd(I2C1, ENABLE);
+	   	I2C_Init(I2C1, &I2C_InitStructure);
+	
+	   	I2C_AcknowledgeConfig(I2C1, ENABLE);
+   	}
+	
+	else
+	{
+		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2,ENABLE);
+	   	RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOB  , ENABLE);
+	
+	   	/* Configure I2C1 pins: PB10->SCL and PB11->SDA */
+	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_10 | GPIO_Pin_11;
+	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	   	GPIO_Init(GPIOB, &GPIO_InitStructure);
+			
+	   	I2C_DeInit(I2C2);
+	   	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+	   	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+	   	I2C_InitStructure.I2C_OwnAddress1 = 0x30;
+	   	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+		if(I2C_Info->slaveAddr>>8)
+		{
+			I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_10bit;
+		}
+		else
+		{
+	   		I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+		}
+	   	I2C_InitStructure.I2C_ClockSpeed = I2C_Info->speed;
+	    
+	   	I2C_Cmd(I2C2, ENABLE);
+	   	I2C_Init(I2C2, &I2C_InitStructure);
+	
+	   	I2C_AcknowledgeConfig(I2C2, ENABLE);
+	}
+	return 0;
+}
+/**
+  * @brief  通过硬件I2C写数据 。
+  * @param  I2Cx 硬件I2C通道。
+  * @param  subaddr 写数据的子地址，若不存在子地址则该数据无意义。
+  * @param  s 需要写的数据缓冲区地址。
+  * @param  num 需要写的数据字节数。
+  * @retval 写数据状态。
+  */
+uint8 VT_I2C_HardWriteNByte(I2C_TypeDef *I2Cx, uint32_t subaddr, uint8_t *s, uint32_t num)
+{
+  	uint32_t subaddrNum=I2C_Info.subAddrWidth;
+	uint32_t retry=0;
+	uint8_t *p_data=s;
+	I2C_GenerateSTART(I2Cx, ENABLE);   //产生一个起始信号
+	retry=0;
+  	while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT))
+	{
+		retry++;
+		if(retry>=1000)
+		{
+			I2C_GenerateSTOP(I2Cx, ENABLE);
+			return MASTER_MODE_SELECT_FAILED;	
+		}
+	}
+	//发送设备地址
+	if(I2C_Info.slaveAddr>>8)
+	{
+  		//I2C_Send7bitAddress(I2Cx, I2C_Addr, I2C_Direction_Transmitter);
+	}
+	else
+	{
+		I2C_Send7bitAddress(I2Cx, I2C_Info.slaveAddr, I2C_Direction_Transmitter);
+		retry=0;
+		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);   //产生一个停止信号
+				return MASTER_TRANSMITTER_MODE_SELECTED_FAILED;	
+			}
+		}
+	}
+  	
+	//发送子地址
+	while(subaddrNum>0)
+	{
+	  	I2C_SendData(I2Cx, subaddr>>((subaddrNum-1)*8));
+		retry=0;
+		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);		//产生一个停止信号
+				return MASTER_BYTE_TRANSMITTED_FAILED;	
+			}
+		}
+		subaddrNum--;
+	}
+	//发送数据
+	while(num--)
+	{
+	  	I2C_SendData(I2Cx, *p_data++); 
+		retry=0;
+  		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);			//产生一个停止信号
+				return MASTER_BYTE_TRANSMITTED_FAILED;	
+			}
+		}
+	}
+	//停止总线
+	I2C_GenerateSTOP(I2Cx, ENABLE);
+	return 0;
+}
+/**
+  * @brief  通过硬件I2C读数据 。
+  * @param  I2Cx 硬件I2C通道。
+  * @param  subaddr 读数据的子地址，若不存在子地址则该数据无意义。
+  * @param  s 需要读的数据存储缓冲区地址。
+  * @param  num 需要读的数据字节数。
+  * @retval 读数据状态。
+  */
+uint8 VT_I2C_HardReadNByte(I2C_TypeDef *I2Cx, uint32_t subaddr,uint8_t *s,uint32_t num)
+{
+  	int32_t	subaddrNum=I2C_Info.subAddrWidth;
+	uint8_t *p_data=s;	
+	uint32_t retry=0;
+	while(I2C_GetFlagStatus(I2Cx, I2C_FLAG_BUSY))
+	{
+		retry++;
+		if(retry>=1000)
+		{
+			I2C_GenerateSTOP(I2Cx, ENABLE);
+			return MASTER_GET_I2C_FLAG_BUSY_FAILED;	
+		}
+	}
+	I2C_AcknowledgeConfig(I2Cx, ENABLE);
+    I2C_GenerateSTART(I2Cx, ENABLE);
+	retry=0;
+    while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT))
+	{
+		retry++;
+		if(retry>=1000)
+		{
+			I2C_GenerateSTOP(I2Cx, ENABLE);
+			return MASTER_MODE_SELECT_FAILED;	
+		}
+	}
+	if(subaddrNum>0)
+	{
+		//发送设备地址
+		if(I2C_Info.slaveAddr>>8)
+		{
+	  		//I2C_Send7bitAddress(I2Cx, I2C_Addr, I2C_Direction_Transmitter);
+		}
+		else
+		{
+			I2C_Send7bitAddress(I2Cx, I2C_Info.slaveAddr, I2C_Direction_Transmitter);
+			retry=0;
+			while (!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED))
+			{
+				retry++;
+				if(retry>=1000)
+				{
+					I2C_GenerateSTOP(I2Cx, ENABLE);
+					return MASTER_TRANSMITTER_MODE_SELECTED_FAILED;	
+				}
+			}
+		} 
+		//发送子地址
+		while(subaddrNum>0)
+		{
+		  	I2C_SendData(I2Cx, subaddr>>((subaddrNum-1)*8));
+			retry=0;
+			while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_TRANSMITTED))
+			{
+				retry++;
+				if(retry>=1000)
+				{
+					I2C_GenerateSTOP(I2Cx, ENABLE);
+					return MASTER_BYTE_TRANSMITTED_FAILED;	
+				}
+			}
+			subaddrNum--;
+		}
+		//重新启动I2C总线
+		I2C_GenerateSTART(I2Cx, ENABLE);
+		retry=0;
+		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_MODE_SELECT))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);
+				return MASTER_MODE_SELECT_FAILED;	
+			}
+		}
+		//发送读设备地址
+		I2C_Send7bitAddress(I2Cx, I2C_Info.slaveAddr, I2C_Direction_Receiver);
+		retry=0;
+		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);
+				return MASTER_RECEIVER_MODE_SELECTED_FAILED;	
+			}
+		}
+	}
+	else
+	{
+		I2C_Send7bitAddress(I2Cx, I2C_Info.slaveAddr, I2C_Direction_Receiver);
+		retry=0;
+		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);
+				return MASTER_RECEIVER_MODE_SELECTED_FAILED;	
+			}
+		}
+	}
+	//读取数据
+    while (num)
     {
-        gnAM2320_temper = read_from_AM2320[4]<<8|read_from_AM2320[5];
-        gnAM2320_humidi = read_from_AM2320[2]<<8|read_from_AM2320[3];
-        //USART_DEBUG_OUT( "IIC R=%d %d %d %d\n" ,para, (int)read_from_AM2320[0] , gnAM2320_temper , gnAM2320_humidi );
-        read_from_AM2320[0] = 0;
+		if(num==1)
+		{
+     		I2C_AcknowledgeConfig(I2Cx, DISABLE);
+    		I2C_GenerateSTOP(I2Cx, ENABLE);
+		}
+	    retry = 0;
+		while(!I2C_CheckEvent(I2Cx, I2C_EVENT_MASTER_BYTE_RECEIVED))
+		{
+			retry++;
+			if(retry>=1000)
+			{
+				I2C_GenerateSTOP(I2Cx, ENABLE);
+				return MASTER_BYTE_RECEIVED_FAILED;	
+			}
+		}
+	    *p_data = I2C_ReceiveData(I2Cx);
+	    p_data++;
+	    /* Decrement the read bytes counter */
+	    num--;
     }
-    else{
-        USART_DEBUG_OUT( "IIC Err=%d\n" , para );
-    }
-    gTimerFor_AM2320.TmrPeriod = OS_TICKS_PER_SEC*2 ;  //每 2 秒进行一次数据采集
-    gTimerFor_AM2320.Callback  = AM2320_begin_get_data ;
-}
-static void IIC_TO_AM2320_waitForGetOK(void* para)
-{
-    iic_timer_read( 0xB8 , read_from_AM2320 , 8 , IIC_TO_ReadData );
-}
-static void IIC_FinCb_WriteData(void* para)
-{
-    //USART_DEBUG_OUT( "IIC W=%d\n" , para );
-    gTimerFor_AM2320.TmrDly    = 0;
-    gTimerFor_AM2320.TmrPeriod = 2;
-    gTimerFor_AM2320.Callback  = IIC_TO_AM2320_waitForGetOK ;
-}
-static void IIC_FinCb_WakeUpEnd(void* para)
-{
-    //USART_DEBUG_OUT( "IIC up=%d\n" , para );
-    //iic_set_ack( 1 );
-    iic_timer_write( 0xB8  , send_to_AM2320 , 3 , IIC_FinCb_WriteData );
+
+	I2C_AcknowledgeConfig(I2Cx, ENABLE);
+	return 0;
 }
 
-static void AM2320_begin_get_data(void* para)
-{
-    iic_set_ack( 0 );
-    iic_timer_write( 0xB8  , send_to_AM2320+4 , 1 , IIC_FinCb_WakeUpEnd ); //0xA0
-}
-
-/************************************************* 
-*Function:		AM2320_and_iic_init
-*Input:			
-*OUTPUT:		void
-*Return:		
-*DESCRIPTION:  AM2320 芯片状态初始化 以及系统初始化
-*************************************************/
-void AM2320_and_iic_init(void)
-{
-    soft_timer_init_timer( &gTimerFor_AM2320 , OS_TICKS_PER_SEC , AM2320_begin_get_data , 0 , 1 );
-    BX_CALL(soft_timer_start)(&gTimerFor_AM2320);
-}
-
-//获取温度值
-short AM2320_get_temper(void)
-{
-    return gnAM2320_temper;
-}
-
-//获取湿度值
-short AM2320_get_humidi(void)
-{
-    return gnAM2320_humidi;
-}
-
-//#else //iic driver by hardware and operate list
-
-IIC_Operation AM2320_IicSend_WakeUp;
-IIC_Operation AM2320_IicSend_GetHM;
-IIC_Operation AM2320_IicReadHM;
-
-static void AM2320_begin_get_data(void* para); //开始进行一次 温湿度采集函数
-static void IIC_TO_ReadData(void* para)
-{
-    if ( (((int)(para))<0X0100) && (0X03 == read_from_AM2320[0]) )
-    {
-        gnAM2320_temper = read_from_AM2320[4]<<8|read_from_AM2320[5];
-        gnAM2320_humidi = read_from_AM2320[2]<<8|read_from_AM2320[3];
-        //USART_DEBUG_OUT( "\nIIC R=%d %d %d %d\n" , (int)para , (int)read_from_AM2320[0] , (int)gnAM2320_temper , (int)gnAM2320_humidi );
-        //uart_send_format( UART_PORT_1 ,"\nIIC R=%d %d %d %d\n" , (int)para , (int)read_from_AM2320[0] , (int)gnAM2320_temper , (int)gnAM2320_humidi );
-        read_from_AM2320[0] = 0;
-    }
-    else{
-        USART_DEBUG_OUT( "IIC Err=%d\n" , para );
-    }
-}
-static void IIC_TO_AM2320_waitForGetOK(void* para)
-{
-    //iic_timer_read( 0xB8 , read_from_AM2320 , 8 , IIC_TO_ReadData );
-    iic_read_data(
-        IIC_PORT_1 ,           //传入 IIC_PORT_1 即可
-        &AM2320_IicReadHM ,      //传入需要进行的操作，在该函数中被配置
-        0X00,            //寄存器地址，也是命令值（部分设备没有使用寄存器地址概念，而是命令）
-        read_from_AM2320 ,        //需要接收的数据
-        8        //需要接收的数据长度
-    );
-    AM2320_IicReadHM.IicOperFlag &= ~IIC_OPER_FLAG_REG ; //不发送reg值
-    
-    gTimerFor_AM2320.TmrPeriod = OS_TICKS_PER_SEC*2 ;  //每 2 秒进行一次数据采集
-    gTimerFor_AM2320.Callback  = AM2320_begin_get_data ;
-}
-
-static void IIC_TO_AM2320_WakeOK(void* para)
-{
-    IIC_SendStop(IIC_PORT_1);
-    iic_send_data(
-        IIC_PORT_1,                //传入 IIC_PORT_1 即可
-        &AM2320_IicSend_GetHM ,    //传入需要进行的操作，在该函数中被配置
-        send_to_AM2320[0] ,        //寄存器地址，也是命令值（部分设备没有使用寄存器地址概念，而是命令）
-        send_to_AM2320+1 ,         //需要发送的数据
-        2                          //需要发送的数据长度
-    );
-    
-    gTimerFor_AM2320.TmrPeriod = 2 ;  //每 2 秒进行一次数据采集
-    gTimerFor_AM2320.Callback  = IIC_TO_AM2320_waitForGetOK ;
-}
-
-static void AM2320_begin_get_data(void* para)
-{
-    //iic_set_ack( 0 );
-    //iic_timer_write( 0xB8  , send_to_AM2320+4 , 1 , IIC_FinCb_WakeUpEnd ); //0xA0
-    
-    iic_send_data(
-        IIC_PORT_1,                //传入 IIC_PORT_1 即可
-        &AM2320_IicSend_WakeUp ,   //传入需要进行的操作，在该函数中被配置
-        0X00 ,                     //寄存器地址，也是命令值（部分设备没有使用寄存器地址概念，而是命令）
-        send_to_AM2320+4 ,         //需要发送的数据
-        0                          //需要发送的数据长度
-     );
-    AM2320_IicSend_WakeUp.IicOperFlag &= ~IIC_OPER_FLAG_REG ; //不发送reg值
-    AM2320_IicSend_WakeUp.IicOperFlag |= IIC_OPER_FLAG_NO_STOP; //不发送 STOP 信号
-    gTimerFor_AM2320.TmrPeriod = 1;
-    gTimerFor_AM2320.Callback  = IIC_TO_AM2320_WakeOK ;
-    //iic_send_data(
-    //    IIC_PORT_1,                //传入 IIC_PORT_1 即可
-    //    &AM2320_IicSend_GetHM ,    //传入需要进行的操作，在该函数中被配置
-    //    send_to_AM2320[0] ,        //寄存器地址，也是命令值（部分设备没有使用寄存器地址概念，而是命令）
-    //    send_to_AM2320+1 ,         //需要发送的数据
-    //    2                          //需要发送的数据长度
-    // );
-}
-
-/************************************************* 
-*Function:		AM2320_and_iic_init
-*Input:			
-*OUTPUT:		void
-*Return:		
-*DESCRIPTION:  AM2320 芯片状态初始化 以及系统初始化
-*************************************************/
-void AM2320_and_iic_init(void)
-{
-    iic_init_operation(
-        &AM2320_IicSend_WakeUp ,     //传入需要进行的操作，必须先进行配置
-        0xB8 ,        //设备地址
-        NULL ,      //操作完成时的回调函数;会在软件中断中被调用
-        NULL   //完成回调函数参数
-    );
-    iic_init_operation(
-        &AM2320_IicSend_GetHM ,     //传入需要进行的操作，必须先进行配置
-        0xB8 ,        //设备地址
-        NULL ,      //操作完成时的回调函数;会在软件中断中被调用
-        NULL   //完成回调函数参数
-    );
-    iic_init_operation(
-        &AM2320_IicReadHM ,     //传入需要进行的操作，必须先进行配置
-        0xB8 ,        //设备地址
-        IIC_TO_ReadData ,      //操作完成时的回调函数;会在软件中断中被调用
-        NULL   //完成回调函数参数
-    );
-    
-    //iic1_init();//zs
-    //soft_timer_init_timer( &gTimerFor_AM2320 , OS_TICKS_PER_SEC/10 , AM2320_begin_get_data , 0 , 1 );//zs
-    //BX_CALL(soft_timer_start)(&gTimerFor_AM2320);//zs
-}
-
-//获取温度值
-short AM2320_get_temper(void)
-{
-    return gnAM2320_temper;
-}
-
-//获取湿度值
-short AM2320_get_humidi(void)
-{
-    return gnAM2320_humidi;
-}
-
-#else
 
 
 
@@ -223,7 +325,6 @@ void Delay(uint32_t Time)
 *************************************************/
 
 extern I2C_INIT_INFO I2C_Info;	///<I2C控制器相关信息
-
 
 
 void AM2320_and_iic_init(void)
@@ -335,5 +436,6 @@ short AM2320_get_humidi(void)
 
 
 
-#endif
+
+
 

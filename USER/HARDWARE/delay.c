@@ -163,6 +163,7 @@ void delay_ms(u16 nms)
 		nms%=fac_ms;						//OS已经无法提供这么小的延时了,采用普通方式延时    
 	}
 	delay_us((u32)(nms*1000));				//普通方式延时
+	//LED2(LED_ON);
 }
 #else  //不用ucos时
 //延时nus

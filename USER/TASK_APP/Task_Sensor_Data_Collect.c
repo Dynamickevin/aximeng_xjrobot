@@ -12,7 +12,7 @@ void Task_Sensor_Data_Collect(void *pdata)
 //		LED2(LED_ON);
 //		delay_ms(2000);
 //		LED2(LED_OFF);
-		delay_ms(2000);
+			delay_ms(100);
 		//printf("led2");
 	};
 }

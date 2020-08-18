@@ -185,8 +185,11 @@ void System_State_LED(void)
 	//∞Â‘ÿ÷∏ æµ∆
    LED1(LED_ON);
 	 delay_ms(200);
+	 
 	 LED1(LED_OFF);
 	 delay_ms(200);
+	
+	
 
 }
 
@@ -462,7 +465,7 @@ void Task_Timer(void *pdata)
 				case AM2320_MSG: 		// 2s
 				{
 					//LED2(LED_ON);
-					AM2320_Get_Data();
+					//AM2320_Get_Data();
 					//stprintf(ID_DEBUG,"AM2320 \r\n");				
 				}
 				break;

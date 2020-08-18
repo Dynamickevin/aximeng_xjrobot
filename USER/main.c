@@ -1,8 +1,9 @@
 
-#include "includes.h"
+#include <includes.h>
 #include "stm32f4xx.h"                  // Device header file
 
 OS_EVENT	*log_sem;
+
 OS_EVENT	*PtzSem;
 
 
@@ -111,11 +112,7 @@ u8 GTZMHDCmdGetStep2;
 u8 GTZMHDCmdGetOk;
 u8 DoGTZMHDCmdGetRet;
 
-//从动轮码盘参数定义
-signed short CodeAB_Start;
-char CodeZ_Start;
-signed long gCodeZ;
-signed long CodeAB_Last;
+
 
 
 
@@ -127,7 +124,7 @@ extern void  App_OSViewTaskCreate   (void);
 static  void  App_TaskStart			(void	*pdata);  
 extern  void  App_TaskCreate        (void);
 
-int main(void)
+INT32S main(void)
 { 
  
 	CPU_INT08U  os_err;
@@ -135,12 +132,10 @@ int main(void)
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
 	SystemInit();
 	
-	
 	delay_init(168);		  //初始化延时函数
-	bsp_Board_Init();
 	
 	OSInit();   
- 	//OSTaskCreate(App_TaskStart,(void *)0,(OS_STK *)&App_TaskStartStk[APP_TASK_START_STK_SIZE-1],APP_TASK_START_PRIO );//创建起始任务
+ 	
 	//创建起始任务
 	os_err = OSTaskCreateExt((void (*)(void *)) App_TaskStart,  /* Create the start task. */
                              (void          * ) 0,
@@ -157,10 +152,13 @@ int main(void)
 #endif
 														 
 	OSStart();	
+														 
+	return (0);			
+														 
 }
 
- //创建开始任务 
-void App_TaskStart(void *pdata)
+ //起始任务
+static void App_TaskStart(void *pdata)
 {
   uint8 err;
 	CPU_INT08U  os_err;
@@ -179,14 +177,18 @@ void App_TaskStart(void *pdata)
 		App_OSViewTaskCreate();
 	#endif
 	
-	USART1_Config();        //串口1，用于系统打印调试
-	USART2_Config();        //串口2，用于与LINUX系统通讯
-	USART3_Config();        //串口3，用于与RF433通讯
-	UART4_Config();         //串口4，用于与GPS模块通讯
-	UART5_Config();         //串口5，用于与云台相机通讯
+	//板载硬件初始化
+	bsp_Board_Init();
+
 	//LED2(LED_ON);
 	log_sem 	= OSSemCreate(1);
 	
+
+	strcpy(gRbtState.RobotName, "Rbt9999");
+	gSlaveMtAnaly.s_SlvMtState = SLAVE_MT_CTRL_HANDLE ;
+	gRbtState.bRf433Mode3 =false;
+	gRbtState.StateSwitchFlag[0] = 'I';	//默认手动模式，通过发指令切换
+		
 	//分配内存空间
   p_msgBuffer = OSMemCreate(msgBuffer,100,sizeof(DATA_CONTROL_BLOCK),&err);
 
@@ -205,12 +207,16 @@ void App_TaskStart(void *pdata)
   PtzSem = OSSemCreate(1);
 	
 	App_TaskCreate();
+	OSTimeDly(OS_TICKS_PER_SEC);
 	
-//  //UCOS版本号
+	
+  //UCOS版本号
 	OSVersion();
+	debug_sprintf(ID_DEBUG,"\r\n");
 	debug_sprintf(ID_DEBUG,"UCOS版本号:");
 	nprintf(ID_DEBUG,OS_VERSION,0,DEC);
-	stprintf(ID_DEBUG,"\r\n");
+	debug_sprintf(ID_DEBUG,"\r\n");
+	
 					
 }
 

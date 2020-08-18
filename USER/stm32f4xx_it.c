@@ -28,14 +28,14 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_it.h"
-#include "includes.h"					//支持OS时，使用
 
-#ifdef 	OS_CRITICAL_METHOD						//OS_CRITICAL_METHOD定义了,说明要支持UCOSII				
-#define delay_osrunning		OSRunning			//OS是否运行标记,0,不运行;1,在运行
-#define delay_ostickspersec	OS_TICKS_PER_SEC	//OS时钟节拍,即每秒调度次数
-#define delay_osintnesting 	OSIntNesting		//中断嵌套级别,即中断嵌套次数
-#endif
+#include <includes.h>				//支持OS时，使用
+
+//#ifdef 	OS_CRITICAL_METHOD						//OS_CRITICAL_METHOD定义了,说明要支持UCOSII				
+//#define delay_osrunning		OSRunning			//OS是否运行标记,0,不运行;1,在运行
+//#define delay_ostickspersec	OS_TICKS_PER_SEC	//OS时钟节拍,即每秒调度次数
+//#define delay_osintnesting 	OSIntNesting		//中断嵌套级别,即中断嵌套次数
+//#endif
 
 /** @addtogroup Template_Project
   * @{
@@ -163,6 +163,7 @@ void SysTick_Handler(void)
 
     OSTimeTick();                                /* Call uC/OS-II's OSTimeTick()                       */
 	
+	
 	counter++;
 
 
@@ -233,6 +234,117 @@ void SysTick_Handler(void)
 }
 
 
+/*******************************************************************************
+* Function Name  : USART1_IRQHandler
+* Description    : This function handles USART1 global interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+
+extern void USART1_ISR(void);
+void USART1_IRQHandler(void)
+{       
+	CPU_SR   cpu_sr;
+
+	OS_ENTER_CRITICAL();                         
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
+	
+	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	USART1_ISR();
+	OSIntExit();
+}
+
+extern void USART2_ISR(void);
+void USART2_IRQHandler(void)
+{       
+	CPU_SR    cpu_sr;
+
+	OS_ENTER_CRITICAL();                         
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
+	
+	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	USART2_ISR();
+	OSIntExit();
+}
+
+extern void USART3_ISR(void);
+void USART3_IRQHandler(void)
+{       
+	CPU_SR    cpu_sr;
+
+	OS_ENTER_CRITICAL();                         
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
+	
+	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	USART3_ISR();
+	OSIntExit();
+}
+
+extern void UART4_ISR(void);
+void UART4_IRQHandler(void)
+{       
+	CPU_SR    cpu_sr;
+
+	OS_ENTER_CRITICAL();                         
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
+	
+	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	UART4_ISR();
+	OSIntExit();
+}
+
+extern void UART5_ISR(void);
+void UART5_IRQHandler(void)
+{       
+	CPU_SR   cpu_sr;
+
+	OS_ENTER_CRITICAL();                         
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
+	
+	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	UART5_ISR();
+	OSIntExit();
+}
+
+
+//extern void EXTI15_10_IRQ_ISR(void);
+void EXTI15_10_IRQHandler(void)
+{
+	CPU_SR         cpu_sr;
+	
+	OS_ENTER_CRITICAL();                         
+	OSIntNesting++;
+	OS_EXIT_CRITICAL();
+
+  #if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	EXTI15_10_IRQ_ISR();
+	
+	OSIntExit();	
+}
 
 
 
