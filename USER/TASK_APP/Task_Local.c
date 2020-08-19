@@ -695,7 +695,7 @@ void flash_write_u32_datas(u32 addr,const void* pds, int u32_cnt)
         pDatas++ ;
         u32_cnt--;
     }
-    //FLASH_WaitForLastOperation(0x00002000);
+    FLASH_WaitForLastOperation();  //待验证
 }
 /************************************************* 
 *Return:		
@@ -710,10 +710,10 @@ void cfg_oper_save_to_flash(void)
         OS_ENTER_CRITICAL();
         //不相同 需要擦除该页，并且写入对应的数据
         FLASH_Unlock();
-        FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGAERR | FLASH_FLAG_WRPERR); 
-        FLASH_EraseSector( BOX_OS_USER_SLV_CFG_ADDR,VoltageRange_3 ); //20200806 caigz add
+        FLASH_ClearFlag( FLASH_FLAG_EOP |  FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+        FLASH_EraseSector( FLASH_Sector_6,VoltageRange_3 ); //20200806 caigz add
         flash_write_u32_datas(BOX_OS_USER_SLV_CFG_ADDR , &gUserAllCfg , (sizeof(gUserAllCfg)+3)/4 );
-        FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGAERR | FLASH_FLAG_WRPERR); 
+        FLASH_ClearFlag( FLASH_FLAG_EOP |  FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
         FLASH_Lock();
         zt_motor_slave_driver_cfg_init();
         OS_EXIT_CRITICAL();

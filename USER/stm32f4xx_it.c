@@ -328,6 +328,7 @@ void UART5_IRQHandler(void)
 }
 
 
+
 //extern void EXTI15_10_IRQ_ISR(void);
 void EXTI15_10_IRQHandler(void)
 {
@@ -344,7 +345,10 @@ void EXTI15_10_IRQHandler(void)
 	EXTI15_10_IRQ_ISR();
 	
 	OSIntExit();	
+	
 }
+
+
 
 
 

@@ -97,28 +97,23 @@ void zt_motor_slave_driver_cfg_init(void)
 *************************************************/
 void zt_motor_slave_driver_init(void)
 {
-    //PA12 从动轮 电机方向控制 
+    //PB12 PB13 从动轮 电机方向控制 
+		//PC4 PB5 限位开关
     //GPIO_InitTypeDef            GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOB , ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOB , ENABLE);
     
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S1);
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S2);
-    GPIO_INIT_OUT_PP(GPIO_CTL_DIR_M1);
-    GPIO_INIT_OUT_PP(GPIO_CTL_DIR_M2);
-    GPIO_INIT_OUT_PP(GPIO_BREAK_MEN );
-    SET_MASTER_MOTOR_CLOSE() ;
     SET_SLAVE_MOTOR_CLOSE()  ;    
-    SET_MT_BREAK_CLOSE       ;
     
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1);
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1 );
     
     
     //编码器值 进行初始化
-    TimerCode_DefaultFunction_Init(3);  //编码器 数据采集初始化 从动轮 TIM3
+    //TimerCode_DefaultFunction_Init(3);  //编码器 数据采集初始化 从动轮 TIM3
 
     memset( &gBatAutoCtrl    , 0 , sizeof(gBatAutoCtrl    ) );
-    memset( &gSpeedAnaly_Mst , 0 , sizeof(SpeedAnalyByCode) );
     memset( &gSpeedAnaly_Slv , 0 , sizeof(SpeedAnalyByCode) );
     memset( &gSpeedAnaly_Whl , 0 , sizeof(SpeedAnalyByCode) );
     memset( &gSlaveMtAnaly   , 0 , sizeof(gSlaveMtAnaly   ) );
@@ -128,11 +123,10 @@ void zt_motor_slave_driver_init(void)
     //各种 配置信息的初始化
     zt_motor_slave_driver_cfg_init();
     
-    SET_MASTER_MOTOR_CLOSE();
     SET_SLAVE_MOTOR_CLOSE() ;
 
-	//从动轮码盘有关参数
-	gSlaveMtAnaly.CodeScale = 2400;
+		//从动轮码盘有关参数
+		gSlaveMtAnaly.CodeScale = 2400;
     gSlaveMtAnaly.curBridgeCodeHalf  = 5000;
     
 }

@@ -65,7 +65,7 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run);
 #define SET_SLAVE_MOTOR_ZZ()    GpioSetH(GPIO_CTL_DIR_S2) ; GpioSetL(GPIO_CTL_DIR_S1)
 #define SET_SLAVE_MOTOR_FZ()    GpioSetL(GPIO_CTL_DIR_S2) ; GpioSetH(GPIO_CTL_DIR_S1)
 
-#define SET_MASTER_MOTOR_PWM  SetPwm_Tim8_CH4
+#define SET_MASTER_MOTOR_PWM  SetPwm_Tim1_CH2
 #define SET_SLAVE_MOTOR_PWM   SetPwm_Tim8_CH3
 //#define SET_SLAVE_MOTOR_PWM(...)
 

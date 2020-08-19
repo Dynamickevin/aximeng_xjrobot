@@ -192,12 +192,12 @@ extern INT8U		 mem_512[MEM512_NUM][512];
 #define MCU_RAM_ADDR_END          (0x20000000+0x30000) //192K
 
 #define MCU_FLASH_ADDR_BEGIN       0x8000000 
-#define MCU_FLASH_ADDR_END        (0x8000000+0x100000) //1024K
+#define MCU_FLASH_ADDR_END        (0x8000000+0x5FFFF) //  FLASH_Sector_6 128K
 
-#define MCU_FLASH_PAGE_SIZE        0x800 //2K
-#define MCU_FLASH_PAGE_CNT         500 //页码删除 页码数量必须小于 500 页
 
-#define BOX_OS_USER_SLV_CFG_ADDR (MCU_FLASH_ADDR_BEGIN+0x68000)
+#define BOX_OS_USER_SLV_CFG_ADDR (MCU_FLASH_ADDR_BEGIN + 0x40000)
+
+
 
 //所有关于机器人的数据都存放在该结构体
 typedef struct{

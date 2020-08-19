@@ -19,21 +19,21 @@
 #define ENCCODER_B_AF                   GPIO_AF_TIM5
 #define ENCCODER_B_SOURCE               GPIO_PinSource1
 
-#define ENCCODER_Z_PIN                  GPIO_Pin_6               
+#define ENCCODER_Z_PIN                  GPIO_Pin_5               
 #define ENCCODER_Z_GPIO_PORT            GPIOA                 
 #define ENCCODER_Z_GPIO_CLK             RCC_AHB1Periph_GPIOA
 
 #define	ENCCODER_Z_EXTI_PORT			EXTI_PortSourceGPIOA
-#define	ENCCODER_Z_EXTI_PIN				EXTI_PinSource6
-#define	ENCCODER_Z_EXTI_LINE			EXTI_Line6
-#define	ENCCODER_Z_IRQn					EXTI9_5_IRQn
+#define	ENCCODER_Z_EXTI_PIN				EXTI_PinSource5
+#define	ENCCODER_Z_EXTI_LINE			EXTI_Line5
+#define	ENCCODER_Z_IRQn						EXTI9_5_IRQn
 
 
 
 #define ENCCODER_AB_TIM           		TIM5
 #define ENCCODER_AB_TIM_CLK       		RCC_APB1Periph_TIM5
 
-#define ENCCODER_AB_TIM_IRQn			TIM5_IRQn
+#define ENCCODER_AB_TIM_IRQn					TIM5_IRQn
 #define ENCCODER_AB_IRQHandler    		TIM5_IRQHandler
 
 

@@ -17,11 +17,22 @@ MotorDriverCtrlType gMstMt;
 *************************************************/
 void zt_motor_master_driver_init(void)
 {
-    SET_MASTER_MOTOR_PWM(0);  			//电机当前速度为 0
+    //PB14 PB15 主动轮 电机方向控制 
+		// 
+		RCC_APB2PeriphClockCmd( RCC_AHB1Periph_GPIOB , ENABLE);
+		GPIO_INIT_OUT_PP(GPIO_CTL_DIR_M1);
+    GPIO_INIT_OUT_PP(GPIO_CTL_DIR_M2);
+    GPIO_INIT_OUT_PP(GPIO_BREAK_MEN );
+		SET_MT_BREAK_CLOSE;
+	
+    SET_MASTER_MOTOR_CLOSE();
+		SET_MASTER_MOTOR_PWM(0);  			//电机当前速度为 0
 
     //编码器值 进行初始化
-    TimerCode_DefaultFunction_Init(2);  //编码器 数据采集初始化 主动轮 TIM2
+    //TimerCode_DefaultFunction_Init(2);  //编码器 数据采集初始化 主动轮 TIM2
     memset( &gMstMt , 0 , sizeof(gMstMt) );
+		memset( &gSpeedAnaly_Mst , 0 , sizeof(SpeedAnalyByCode) );
+	
     gMstMt.limit_speed  = 101*100 ;
     SET_MASTER_MOTOR_CLOSE();
 }
@@ -58,7 +69,7 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
     gMstMt.set_dir   = bFanxiang ;
     gMstMt.set_speed = speed*100 ;  //速度需要乘以 100
 	
-    //SetPwm_Tim8_CH4( speed );  //电机当前速度为 0
+    //SetPwm_Tim1_CH2( speed );  //电机当前速度为 0
     //SET_MASTER_MOTOR_PWM(speed);
     return (bFanxiang)?(-speed):(speed);
 }

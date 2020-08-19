@@ -18,20 +18,21 @@ void TimerCode_DefaultFunction_Init(u32 timer_ID);
 
 //////////////////////////////////////////////////////////////////////////
 //定时器  PWM输出控制初始化 这部分功能需要用户根据实际情况自定义设计
-void PWM_Init_Tim8_CH3_CH4(void);
+void MST_PWM_Init_Tim1_CH2(void);   //主动轮PWM PB14
+void SLV_PWM_Init_Tim8_CH3(void);		//从动轮PWM PB15
 
 //使用下面的 函数，可以增加代码执行效率，不需要执行参数是否正确的判断
 //设置 从动轮 速度
+static __inline void SetPwm_Tim1_CH2(uint16_t Compare2)
+{
+    //TIM_SetCompare2( TIM1 , Compare2 );
+    TIM1->CCR2 = Compare2;
+}
+//设置 主动轮 速度
 static __inline void SetPwm_Tim8_CH3(uint16_t Compare3)
 {
     //TIM_SetCompare3( TIM8 , Compare3 );
     TIM8->CCR3 = Compare3;
-}
-//设置 主动轮 速度
-static __inline void SetPwm_Tim8_CH4(uint16_t Compare4)
-{
-    //TIM_SetCompare4( TIM8 , Compare4 );
-    TIM8->CCR4 = Compare4;
 }
 
 

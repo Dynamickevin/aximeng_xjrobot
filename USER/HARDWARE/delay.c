@@ -5,19 +5,7 @@
 #if SYSTEM_SUPPORT_OS
 #include "includes.h"					//支持OS时，使用	  
 #endif
-//////////////////////////////////////////////////////////////////////////////////  
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK STM32F407开发板
-//使用SysTick的普通计数模式对延迟进行管理(支持OS)
-//包括delay_us,delay_ms
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//创建日期:2014/5/2
-//版本：V1.3
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2014-2024
-//All rights reserved
-//********************************************************************************
+
 //修改说明
 //V1.1 20140803 
 //1,delay_us,添加参数等于0判断,如果参数等于0,则直接退出. 
@@ -46,20 +34,13 @@ static u16 fac_ms=0;							//ms延时倍乘数,在os下,代表每个节拍的ms数
 //delay_osschedunlock:用于解锁OS任务调度,重新开启调度
 //    delay_ostimedly:用于OS延时,可以引起任务调度.
 
-//本例程仅作UCOSII和UCOSIII的支持,其他OS,请自行参考着移植
+
 //支持UCOSII
 #ifdef 	OS_CRITICAL_METHOD						//OS_CRITICAL_METHOD定义了,说明要支持UCOSII				
 #define delay_osrunning		OSRunning			//OS是否运行标记,0,不运行;1,在运行
 #define delay_ostickspersec	OS_TICKS_PER_SEC	//OS时钟节拍,即每秒调度次数
 #define delay_osintnesting 	OSIntNesting		//中断嵌套级别,即中断嵌套次数
 #endif
-
-////支持UCOSIII
-//#ifdef 	CPU_CFG_CRITICAL_METHOD					//CPU_CFG_CRITICAL_METHOD定义了,说明要支持UCOSIII	
-//#define delay_osrunning		OSRunning			//OS是否运行标记,0,不运行;1,在运行
-//#define delay_ostickspersec	OSCfg_TickRate_Hz	//OS时钟节拍,即每秒调度次数
-//#define delay_osintnesting 	OSIntNestingCtr		//中断嵌套级别,即中断嵌套次数
-//#endif
 
 
 //us级延时时,关闭任务调度(防止打断us级延迟)
@@ -86,17 +67,6 @@ void delay_ostimedly(u32 ticks)
 	OSTimeDly(ticks);						//UCOSII延时
 
 }
- 
-////systick中断服务函数,使用OS时用到
-//void SysTick_Handler(void)
-//{	
-//	if(delay_osrunning==1)					//OS开始跑了,才执行正常的调度处理
-//	{
-//		OSIntEnter();						//进入中断
-//		OSTimeTick();       				//调用ucos的时钟服务程序               
-//		OSIntExit();       	 				//触发任务切换软中断
-//	}
-//}
 
 #endif
 			   

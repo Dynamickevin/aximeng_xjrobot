@@ -1,4 +1,4 @@
-//#include "box_os_user.h"
+
 #include <includes.h>
 
 TIM_TypeDef* const gHardTimerList[MAX_HARD_TIMER_CNT+1] = {
@@ -112,28 +112,89 @@ void TimerCode_DefaultFunction_Init(u32 timer_ID)
 
 
 /************************************************* 
-*Function:	 PWM_Init_Tim8_CH3_CH4	
+*Function:	 MST_PWM_Init_Tim1_CH2	
 *Input:			
 *OUTPUT:		    
 *Return:		
-*DESCRIPTION:电机PWM波初始化配置函数
-*           PC8 – 65 – MT_CTL_PWM1 – TIM8_CH3 – 主动轮PWM控制
-*           PC9 – 66 – MT_CTL_PWM2 – TIM8_CH4 – 从动轮PWM控制
+*DESCRIPTION:主动轮电机PWM波初始化配置函数
+*           PB14 –35 – MT_CTL_PWM1 – TIM1_CH2 – 主动轮PWM控制
 *************************************************/
-void PWM_Init_Tim8_CH3_CH4(void)
+void MST_PWM_Init_Tim1_CH2(void)
 {
     GPIO_InitTypeDef            GPIO_InitStructure;
     TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
     TIM_OCInitTypeDef           TIM_OCInitStructure;
 
-    RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOC,ENABLE); //打开C组GPIO时钟
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE); //打开B组GPIO时钟
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);  // 打开定时器1时钟
+	
+		/* 定时器通道引脚复用 */
+		GPIO_PinAFConfig(GPIOB,GPIO_PinSource14,GPIO_AF_TIM1); 
+	
+    /* 定时器通道引脚配置 */															   
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;	
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    
+		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+		GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
+		GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+    //   TIM_TimeBaseStructure.TIM_RepetitionCounter=1;  . 
+    TIM_TimeBaseStructure.TIM_ClockDivision=0;
+    TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up; //向上计数
+    TIM_TimeBaseStructure.TIM_Period=100;
+    TIM_TimeBaseStructure.TIM_Prescaler=360;
+    TIM_TimeBaseInit(TIM1,&TIM_TimeBaseStructure);
+    //ARR的周期值对应   TIM_TimeBaseStructure.TIM_Period  的设置值
+    //PSC的分频值对应   TIM_TimeBaseStructure.TIM_Prescaler 的设置值
+    //PWM频率=（72000K/（PSC+1））/ ARR = 2k
+
+    TIM_OCInitStructure.TIM_OCMode      = TIM_OCMode_PWM2        ;
+    TIM_OCInitStructure.TIM_OCPolarity  = TIM_OCPolarity_Low     ;
+    TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_Low    ;
+    TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable ;
+    TIM_OCInitStructure.TIM_Pulse       = 0                      ;
+    //占空比值/100 = 设置值/ARR       设置值 =（占空比值/100）* ARR 
+
+    TIM_OCInitStructure.TIM_OutputNState    = TIM_OutputNState_Disable;
+    TIM_OCInitStructure.TIM_OCNIdleState    = TIM_OCNIdleState_Reset;
+    TIM_OCInitStructure.TIM_OCIdleState     = TIM_OCIdleState_Reset ;
+
+    TIM_OC2Init(TIM1,&TIM_OCInitStructure);
+    TIM_OC2PreloadConfig(TIM1,TIM_OCPreload_Enable); //TIM_1---->通道2[PB14] 
+
+    TIM_CtrlPWMOutputs(TIM1,ENABLE);
+    TIM_Cmd(TIM1,ENABLE);
+}
+
+/************************************************* 
+*Function:	 SLV_PWM_Init_Tim8_CH3	
+*Input:			
+*OUTPUT:		    
+*Return:		
+*DESCRIPTION:电机PWM波初始化配置函数
+*           PB15 – 36 – MT_CTL_PWM2 – TIM8_CH3 – 从动轮PWM控制
+*************************************************/
+void SLV_PWM_Init_Tim8_CH3(void)
+{
+    GPIO_InitTypeDef            GPIO_InitStructure;
+    TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
+    TIM_OCInitTypeDef           TIM_OCInitStructure;
+
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE); //打开B组GPIO时钟
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8,ENABLE);  // 打开定时器8时钟
 
-    GPIO_InitStructure.GPIO_Pin=GPIO_Pin_8|GPIO_Pin_9;//
-    GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF;  
-    GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;   
-    GPIO_Init(GPIOC,&GPIO_InitStructure);
-
+		/* 定时器通道引脚复用 */
+		GPIO_PinAFConfig(GPIOB,GPIO_PinSource15,GPIO_AF_TIM8); 
+	
+		/* 定时器通道引脚配置 */															   
+		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;	
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    
+		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+		GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
+		GPIO_Init(GPIOB, &GPIO_InitStructure);
+	
 
     //   TIM_TimeBaseStructure.TIM_RepetitionCounter=1;  . 
     TIM_TimeBaseStructure.TIM_ClockDivision=0;
@@ -157,14 +218,12 @@ void PWM_Init_Tim8_CH3_CH4(void)
     TIM_OCInitStructure.TIM_OCIdleState     = TIM_OCIdleState_Reset ;
 
     TIM_OC3Init(TIM8,&TIM_OCInitStructure);
-    TIM_OC3PreloadConfig(TIM8,TIM_OCPreload_Enable); //TIM_8---->通道3[PC8] 
-
-    TIM_OC4Init(TIM8,&TIM_OCInitStructure);
-    TIM_OC4PreloadConfig(TIM8,TIM_OCPreload_Enable); 
+    TIM_OC3PreloadConfig(TIM8,TIM_OCPreload_Enable); //TIM_8---->通道3[PB15]  
 
     TIM_CtrlPWMOutputs(TIM8,ENABLE);
     TIM_Cmd(TIM8,ENABLE);
 }
+
 
 
 void timer1_8_pwm_init(TIM_TypeDef* TIMx,uint16_t Prescaler,uint16_t Period)
