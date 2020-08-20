@@ -452,7 +452,7 @@ Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=..\obj\lib_mem_a.d -o..\obj\lib_mem_a.o -I.\RTE\_xjrobot -IC:\K
 eil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.14.0\Drivers\CMSIS\Device\ST\STM32F4xx\Inc
 lude -IC:\Keil_v5\ARM\CMSIS\Include --predefine="__UVISION_VERSION SETA 528" --
-predefine="STM32F407xx SETA 1" --list=.\listings\lib_mem_a.lst ..\USER\uC-LIB\P
+predefine="STM32F405xx SETA 1" --list=.\listings\lib_mem_a.lst ..\USER\uC-LIB\P
 
 
 

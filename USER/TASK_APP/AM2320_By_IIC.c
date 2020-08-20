@@ -22,16 +22,22 @@ uint8 VT_I2C_HardInit(I2C_INIT_INFO *I2C_Info)
    	GPIO_InitTypeDef  GPIO_InitStructure;
    	if(0 == I2C_Info->channel)
 	{
-		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1,ENABLE);
-	   	RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOB  , ENABLE);
+			//  I2C3_SCL:PA8 I2C3_SDA：PC9;
+	   	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA | RCC_AHB1Periph_GPIOC , ENABLE);
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C3,ENABLE);
 	
-	   	/* Configure I2C1 pins: PB6->SCL and PB7->SDA */
-	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_6 | GPIO_Pin_7;
+	   	/* Configure I2C3 pins: PA8->SCL and PC9->SDA */
+	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8;
 	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
 	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	   	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	   	GPIO_Init(GPIOA, &GPIO_InitStructure);
+			
+			GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_9;
+	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	   	GPIO_Init(GPIOC, &GPIO_InitStructure);
 		
-	   	I2C_DeInit(I2C1);
+	   	I2C_DeInit(I2C3);
 	   	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
 	   	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
 	   	I2C_InitStructure.I2C_OwnAddress1 = 0x30;
@@ -46,42 +52,42 @@ uint8 VT_I2C_HardInit(I2C_INIT_INFO *I2C_Info)
 		}
 	   	I2C_InitStructure.I2C_ClockSpeed = I2C_Info->speed;
 	    
-	   	I2C_Cmd(I2C1, ENABLE);
-	   	I2C_Init(I2C1, &I2C_InitStructure);
+	   	I2C_Cmd(I2C3, ENABLE);
+	   	I2C_Init(I2C3, &I2C_InitStructure);
 	
-	   	I2C_AcknowledgeConfig(I2C1, ENABLE);
+	   	I2C_AcknowledgeConfig(I2C3, ENABLE);
    	}
 	
 	else
 	{
-		RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2,ENABLE);
-	   	RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOB  , ENABLE);
-	
-	   	/* Configure I2C1 pins: PB10->SCL and PB11->SDA */
-	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_10 | GPIO_Pin_11;
-	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
-	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	   	GPIO_Init(GPIOB, &GPIO_InitStructure);
-			
-	   	I2C_DeInit(I2C2);
-	   	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
-	   	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
-	   	I2C_InitStructure.I2C_OwnAddress1 = 0x30;
-	   	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
-		if(I2C_Info->slaveAddr>>8)
-		{
-			I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_10bit;
-		}
-		else
-		{
-	   		I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
-		}
-	   	I2C_InitStructure.I2C_ClockSpeed = I2C_Info->speed;
-	    
-	   	I2C_Cmd(I2C2, ENABLE);
-	   	I2C_Init(I2C2, &I2C_InitStructure);
-	
-	   	I2C_AcknowledgeConfig(I2C2, ENABLE);
+//			RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C2,ENABLE);
+//			RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB  , ENABLE);
+//	
+//	   	/* Configure I2C1 pins: PB10->SCL and PB11->SDA */
+//	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_10 | GPIO_Pin_11;
+//	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+//	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+//	   	GPIO_Init(GPIOB, &GPIO_InitStructure);
+//			
+//	   	I2C_DeInit(I2C2);
+//	   	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
+//	   	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
+//	   	I2C_InitStructure.I2C_OwnAddress1 = 0x30;
+//	   	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+//		if(I2C_Info->slaveAddr>>8)
+//		{
+//			I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_10bit;
+//		}
+//		else
+//		{
+//	   		I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit;
+//		}
+//	   	I2C_InitStructure.I2C_ClockSpeed = I2C_Info->speed;
+//	    
+//	   	I2C_Cmd(I2C2, ENABLE);
+//	   	I2C_Init(I2C2, &I2C_InitStructure);
+//	
+//	   	I2C_AcknowledgeConfig(I2C2, ENABLE);
 	}
 	return 0;
 }
@@ -341,7 +347,7 @@ void AM2320_and_iic_init(void)
 	I2C_Info.subAddrMode=2;			//无子地址模式
 	I2C_Info.subAddrWidth=0;		//子地址为0字节宽度
 	I2C_Info.slaveAddr=AM2320_ADDRESS;		//AM2320传感器I2C地址
-	I2C_Info.channel=0;				//使用I2C1
+	I2C_Info.channel=0;				//使用I2C3
 	VT_I2C_HardInit(&I2C_Info);
 		
 }
@@ -356,13 +362,13 @@ void AM2320_Get_Data(void)
 	uint8   Read_from_AM2320Data[10];
 	
 	AM2320Wake[0] = 0x00;
-	VT_I2C_HardWriteNByte(I2C1,0,AM2320Wake,1);//随便发送一个数据出去，将传感器从睡眠中唤醒
+	VT_I2C_HardWriteNByte(I2C3,0,AM2320Wake,1);//随便发送一个数据出去，将传感器从睡眠中唤醒
 	//OSTimeDly(1);
 		
 	Send_to_AM2320Data[0]=0x03;
 	Send_to_AM2320Data[1]=0x00;
 	Send_to_AM2320Data[2]=0x04;
-	ret = VT_I2C_HardWriteNByte(I2C1,0,Send_to_AM2320Data,3);//发送读取温度和湿度的指令
+	ret = VT_I2C_HardWriteNByte(I2C3,0,Send_to_AM2320Data,3);//发送读取温度和湿度的指令
 	if(ret)
 	{
 		stprintf(ID_DEBUG,"I2C写数据错误:  ");
@@ -373,7 +379,7 @@ void AM2320_Get_Data(void)
 	OSTimeDly(2);
 	//Delay(100000);//必须加这个延时，否则传感器没准备好数据会出现读数据错误
 	//GpioSetL(GPIO_LED_SHOW1);
-	ret = VT_I2C_HardReadNByte(I2C1,0,Read_from_AM2320Data,8);//读取温度和湿度
+	ret = VT_I2C_HardReadNByte(I2C3,0,Read_from_AM2320Data,8);//读取温度和湿度
 	if(ret)
 	{
 		stprintf(ID_DEBUG,"I2C写数据错误:  ");

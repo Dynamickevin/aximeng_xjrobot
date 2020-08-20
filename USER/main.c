@@ -130,12 +130,18 @@ INT32S main(void)
 	CPU_INT08U  os_err;
 	os_err = os_err; 
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
+	
+	//delay_ms(5); 
+	OSTimeDly(OS_TICKS_PER_SEC/50);//解决更新程序后，无法识别芯片问题
+	
 	SystemInit();
 	
 	delay_init(168);		  //初始化延时函数
 	
 	OSInit();   
  	
+	
+	
 	//创建起始任务
 	os_err = OSTaskCreateExt((void (*)(void *)) App_TaskStart,  /* Create the start task. */
                              (void          * ) 0,

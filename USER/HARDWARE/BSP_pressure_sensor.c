@@ -53,17 +53,16 @@ float Pressure_Sensor_Get_Voltage(void)
 }
 
 
-
 /*
   * @brief  获取当前重量 
   * @param  无
-  * @retval 返回重量值（单位g）
+  * @retval 返回压力值（单位牛顿N）
 */
 
-float bsp_Pressure_Sensor_Get_Weight(void)
+int bsp_Pressure_Sensor_Get_Newton(void)
 {
 	float Voltage;
 	Voltage = Pressure_Sensor_Get_Voltage();
-	return Voltage/(IN_VOLTAGE_MAX)*PRESSURE_SENSOR_SPAN_MAX;
+	return (int)Voltage/(IN_VOLTAGE_MAX)*PRESSURE_SENSOR_SPAN_MAX;
 }
 

@@ -187,15 +187,15 @@ extern OS_EVENT 	*mem512_sem;
 extern OS_MEM		*mem512ptr;
 extern INT8U		 mem_512[MEM512_NUM][512];
 
-#define MCU_RAM_ADDR_BEGIN         0x20000000
-#define MCU_RAM_ADDR_USER_BEGIN   (0x20000000+0x1000) //4K  用户RAM允许的最小值
-#define MCU_RAM_ADDR_END          (0x20000000+0x30000) //192K
+//#define MCU_RAM_ADDR_BEGIN         0x20000000
+//#define MCU_RAM_ADDR_USER_BEGIN   (0x20000000+0x1000) //4K  用户RAM允许的最小值
+//#define MCU_RAM_ADDR_END          (0x20000000+0x30000) //192K
 
 #define MCU_FLASH_ADDR_BEGIN       0x8000000 
 #define MCU_FLASH_ADDR_END        (0x8000000+0x5FFFF) //  FLASH_Sector_6 128K
 
 
-#define BOX_OS_USER_SLV_CFG_ADDR (MCU_FLASH_ADDR_BEGIN + 0x40000)
+#define BOX_OS_USER_SLV_CFG_ADDR (MCU_FLASH_ADDR_BEGIN + 0x40000) //  FLASH_Sector_6
 
 
 
@@ -354,6 +354,7 @@ extern  RbtState gRbtState;
 #include "GpsUart.h"
 //#include "debug.h"
 
+#include "BSP_motor_cal_speed.h"
 #include  "board.h"
 
 #include "sys.h"

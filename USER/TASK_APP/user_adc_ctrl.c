@@ -17,7 +17,7 @@ u16 gUserAdcTransDatas[ADC_TYPE_ID_USING_CNT];
 *************************************************/
 void adc_dma_init_gpio(void)
 {
-    RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOC,ENABLE); 
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOC,ENABLE); 
     
     GPIO_INIT_AIN( GPIO_CHK_PRS_VOL1 );
     GPIO_INIT_AIN( GPIO_CHK_PRS_VOL2 );

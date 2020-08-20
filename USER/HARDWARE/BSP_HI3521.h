@@ -36,7 +36,7 @@
 
 #define	HI3521_NTC_ADC_CHANNEL    	ADC_Channel_13	
 
-#define HI3521_NTC_ADC_INDEX		1
+#define HI3521_NTC_ADC_INDEX		3
 
 #define	HI3521_NTC_RES					100000				//100K
 #define HI3521_LIMIT_TEMP_MIN				-5

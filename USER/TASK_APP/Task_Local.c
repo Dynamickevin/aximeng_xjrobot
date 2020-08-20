@@ -796,13 +796,13 @@ bool OpenOrCloseDevOperate(char* devName,bool bOpen)
         GpioSetBit(GPIO_12V_EN,bGpioVal);
     }
     else if(box_str_cmp( devName , "CamSW" )== 0){
-        GpioSetBit(GPIO_CTR_CAM_AV_SW,bGpioVal);
+        //GpioSetBit(GPIO_CTR_CAM_AV_SW,bGpioVal);
     }
 	else  if(box_str_cmp( devName , "ALL" )== 0)//处理所有的外设电源
 	{
         GpioSetBit(GPIO_MOTOR_PWR_EN,bGpioVal);//电机驱动板
         GpioSetBit(GPIO_CAM_AV_EN,bGpioVal);//图传
-        GpioSetBit(GPIO_CTR_CAM_AV_SW,bGpioVal);//视频编码器
+        //GpioSetBit(GPIO_CTR_CAM_AV_SW,bGpioVal);//视频编码器
         GpioSetBit(GPIO_CAM_EN,bGpioVal);//主摄像头
 	}
     else

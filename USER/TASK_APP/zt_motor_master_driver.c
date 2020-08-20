@@ -19,7 +19,7 @@ void zt_motor_master_driver_init(void)
 {
     //PB14 PB15 主动轮 电机方向控制 
 		// 
-		RCC_APB2PeriphClockCmd( RCC_AHB1Periph_GPIOB , ENABLE);
+		RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOB , ENABLE);
 		GPIO_INIT_OUT_PP(GPIO_CTL_DIR_M1);
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_M2);
     GPIO_INIT_OUT_PP(GPIO_BREAK_MEN );

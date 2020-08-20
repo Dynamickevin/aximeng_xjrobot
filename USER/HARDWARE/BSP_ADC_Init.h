@@ -16,10 +16,10 @@
 #define ADC_DMA_CHANNEL  	DMA_Channel_0
 #define ADC_DMA_STREAM   	DMA2_Stream0
 
-#define ADC_USE				ADC1
+#define ADC_USE						ADC1
 #define ADC_CLK         	RCC_APB2Periph_ADC1
 
-#define ADC_CHANNEL_NUM		2	
+#define ADC_CHANNEL_NUM		4	
 /*******************************************************/
 
 #define ADC_BUFFSIZE	20* ADC_CHANNEL_NUM    //20 平均滤波 个数

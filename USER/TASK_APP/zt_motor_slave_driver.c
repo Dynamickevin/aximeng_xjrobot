@@ -100,7 +100,7 @@ void zt_motor_slave_driver_init(void)
     //PB12 PB13 从动轮 电机方向控制 
 		//PC4 PB5 限位开关
     //GPIO_InitTypeDef            GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOB , ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOB , ENABLE);
     
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S1);
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S2);

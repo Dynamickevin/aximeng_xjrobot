@@ -177,17 +177,16 @@ void Battery(void)
 }
 
 
-
 void System_State_LED(void)
 
 {
 	
 	//∞Â‘ÿ÷∏ æµ∆
    LED1(LED_ON);
-	 delay_ms(200);
+	 OSTimeDly(OS_TICKS_PER_SEC/4);
 	 
 	 LED1(LED_OFF);
-	 delay_ms(200);
+	 OSTimeDly(OS_TICKS_PER_SEC/4);
 	
 	
 

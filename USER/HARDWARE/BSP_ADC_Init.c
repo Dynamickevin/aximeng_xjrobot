@@ -96,8 +96,12 @@ void bsp_ADC_Init(void)
 	ADC_Init(ADC_USE, &ADC_InitStructure);
 	//---------------------------------------------------------------------------
 
-	ADC_RegularChannelConfig(ADC_USE, PRESSURE_SENSOR_ADC_CHANNEL, 1, ADC_SampleTime_56Cycles);
-	ADC_RegularChannelConfig(ADC_USE, HI3521_NTC_ADC_CHANNEL, 2, ADC_SampleTime_56Cycles);
+	ADC_RegularChannelConfig(ADC_USE, SLAVE_MOTOR_SPEED_ADC_CHANNEL, 1, ADC_SampleTime_56Cycles);
+	ADC_RegularChannelConfig(ADC_USE, MASTER_MOTOR_SPEED_ADC_CHANNEL, 2, ADC_SampleTime_56Cycles);
+	
+	ADC_RegularChannelConfig(ADC_USE, PRESSURE_SENSOR_ADC_CHANNEL, 3, ADC_SampleTime_56Cycles);
+	ADC_RegularChannelConfig(ADC_USE, HI3521_NTC_ADC_CHANNEL, 4, ADC_SampleTime_56Cycles);
+	
 	
 	ADC_DMARequestAfterLastTransferCmd(ADC_USE, ENABLE);
 	ADC_DMACmd(ADC_USE, ENABLE);

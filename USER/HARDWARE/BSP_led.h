@@ -11,18 +11,18 @@
 #define LED1_GPIO_PORT            GPIOF                      
 #define LED1_GPIO_CLK             RCC_AHB1Periph_GPIOF
 
-#define LED2_PIN                  GPIO_Pin_10                
-#define LED2_GPIO_PORT            GPIOF                      
-#define LED2_GPIO_CLK             RCC_AHB1Periph_GPIOF
+#define LED2_PIN                  GPIO_Pin_3                
+#define LED2_GPIO_PORT            GPIOB                      
+#define LED2_GPIO_CLK             RCC_AHB1Periph_GPIOB
 
 
-#define LED_EXT1_PIN                  GPIO_Pin_1                 
-#define LED_EXT1_GPIO_PORT            GPIOB                      
-#define LED_EXT1_GPIO_CLK             RCC_AHB1Periph_GPIOB
+#define LED_EXT1_PIN              GPIO_Pin_1                 
+#define LED_EXT1_GPIO_PORT        GPIOB                      
+#define LED_EXT1_GPIO_CLK         RCC_AHB1Periph_GPIOB
 
-#define LED_EXT2_PIN                  GPIO_Pin_0                 
-#define LED_EXT2_GPIO_PORT            GPIOB                      
-#define LED_EXT2_GPIO_CLK             RCC_AHB1Periph_GPIOB
+#define LED_EXT2_PIN              GPIO_Pin_0                 
+#define LED_EXT2_GPIO_PORT        GPIOB                      
+#define LED_EXT2_GPIO_CLK         RCC_AHB1Periph_GPIOB
 
 
 
