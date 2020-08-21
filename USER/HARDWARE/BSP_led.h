@@ -7,9 +7,9 @@
 
 //Òý½Å¶¨Òå
 /*******************************************************/
-#define LED1_PIN                  GPIO_Pin_9                 
-#define LED1_GPIO_PORT            GPIOF                      
-#define LED1_GPIO_CLK             RCC_AHB1Periph_GPIOF
+#define LED1_PIN                  GPIO_Pin_8                 
+#define LED1_GPIO_PORT            GPIOB                      
+#define LED1_GPIO_CLK             RCC_AHB1Periph_GPIOB
 
 #define LED2_PIN                  GPIO_Pin_3                
 #define LED2_GPIO_PORT            GPIOB                      

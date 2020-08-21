@@ -9,7 +9,6 @@ void bsp_Board_Init(void)
 {
 	
 	//NVIC_Configuration();	
-	
 	bsp_Led_Init();   
 	bsp_Pressure_Sensor_Init();
 	//bsp_HI3521_GPIO_Init();	
@@ -26,11 +25,11 @@ void bsp_Board_Init(void)
 	
 	wheel_encode_Init();		//从动轮轮子编码器
 	//AM2320_and_iic_init();	//温湿度传感器模块初始化
-	USART1_Config();        //串口1，用于系统打印调试
-	USART2_Config();        //串口2，用于与LINUX系统通讯
-	USART3_Config();        //串口3，用于与RF433通讯
-	UART4_Config();         //串口4，用于与GPS模块通讯
-	UART5_Config();         //串口5，用于与云台相机通讯
+	USART1_Config();        //串口1，用于LORA模块，本地无线通讯
+	USART2_Config();        //串口2，用于与电源板通信
+	USART3_Config();        //串口3，用于与海思芯片LINUX系统通讯
+	UART4_Config();         //串口4，用于与GPS模块TTL通讯
+	UART5_Config();         //串口5，用于与GPS模块RS232通讯
 	
 	//TimerCode_DefaultFunction_Init(4);  //从动轮轮子编码器 定时器、数据采集初始化
 	MST_PWM_Init_Tim1_CH2();			//主动轮电机PWM波初始化配置函数

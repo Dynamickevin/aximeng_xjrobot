@@ -40,7 +40,7 @@ void App_TaskStart(void *pdata);
 //设置任务堆栈大小
 //#define WEATHER_LENGH								100	
 //打印输出任务 任务堆栈	
-OS_STK TaskStk_Weather[WEATHER_LENGH];
+static OS_STK TaskStk_Weather[WEATHER_LENGH];
 //打印输出任务函数
 void Task_Weather(void *pdata);
 
@@ -49,7 +49,7 @@ void Task_Weather(void *pdata);
 //设置任务堆栈大小
 //#define REMOTE_REC_LENGH								200	
 //命令解析任务 任务堆栈	
- OS_STK TaskStk_Remote_Rec[REMOTE_REC_LENGH];
+static  OS_STK TaskStk_Remote_Rec[REMOTE_REC_LENGH];
 //命令解析任务函数
 void Task_Remote_Rec(void *pdata);
 
@@ -58,7 +58,7 @@ void Task_Remote_Rec(void *pdata);
 //设置任务堆栈大小
 //#define TIMER_LENGH								100	
 //时间定时器任务堆栈	
- OS_STK TaskStk_Timer[TIMER_LENGH];
+static OS_STK TaskStk_Timer[TIMER_LENGH];
 //时间定时器任务函数
 void Task_Timer(void *pdata);
 
@@ -67,7 +67,7 @@ void Task_Timer(void *pdata);
 //设置任务堆栈大小
 //#define LOCAL_LENGH								200	
 //本地任务 任务堆栈	
- OS_STK TaskStk_Local[LOCAL_LENGH];
+static  OS_STK TaskStk_Local[LOCAL_LENGH];
 //本地任务函数
 void Task_Local(void *pdata);
 
@@ -76,17 +76,10 @@ void Task_Local(void *pdata);
 //设置任务堆栈大小
 //#define SENSOR_DATA_LENGH								100	
 //传感器采集任务任务 任务堆栈	
- OS_STK TaskStk_Sensor_Data_Collect[SENSOR_DATA_LENGH];
+ static OS_STK TaskStk_Sensor_Data_Collect[SENSOR_DATA_LENGH];
 //传感器采集任务函数
 void Task_Sensor_Data_Collect(void *pdata);	
  
-////任务堆栈空间分配
-//static  OS_STK     App_TaskStartStk[APP_TASK_START_STK_SIZE]; //起始任务堆栈
-//static  OS_STK		 TaskStk_Weather [WEATHER_LENGH];			//打印输出任务堆栈
-//static  OS_STK		 TaskStk_Remote_Rec [REMOTE_REC_LENGH];		//命令解析任务堆栈
-//static  OS_STK		 TaskStk_Timer [TIMER_LENGH];				//时间定时器任务堆栈
-//static  OS_STK		 TaskStk_Local [LOCAL_LENGH];				//本地任务堆栈
-//static  OS_STK	 TaskStk_Sensor_Data_Collect[SENSOR_DATA_LENGH];//传感器采集任务堆栈
 
 //队列长度
 #define 	REMOTEREC_Q_LEN		32
@@ -95,9 +88,9 @@ void Task_Sensor_Data_Collect(void *pdata);
 #define		TIMER_Q_LEN				32
 #define		SENSOR_DATA_COLLECT_Q_LEN	32
 
-void *local_Q[LOCAL_Q_LEN]; 			//本地队列
-void *timer_Q[TIMER_Q_LEN];				//时间定时器队列
-void *weather_Q[WEATHER_Q_LEN];			//打印输出队列
+void *local_Q[LOCAL_Q_LEN]; 					//本地队列
+void *timer_Q[TIMER_Q_LEN];						//时间定时器队列
+void *weather_Q[WEATHER_Q_LEN];				//打印输出队列
 void *RemoteRec_Q[REMOTEREC_Q_LEN];		//命令解析队列
 void *Sensor_Data_Collect_Q[SENSOR_DATA_COLLECT_Q_LEN];//传感器采集队列
 
@@ -126,13 +119,13 @@ extern  void  App_TaskCreate        (void);
 
 INT32S main(void)
 { 
- 
 	CPU_INT08U  os_err;
-	os_err = os_err; 
+	
+		os_err = os_err; 
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
 	
-	//delay_ms(5); 
-	OSTimeDly(OS_TICKS_PER_SEC/50);//解决更新程序后，无法识别芯片问题
+	
+	//OSTimeDly(OS_TICKS_PER_SEC/50);//解决更新程序后，无法识别芯片问题
 	
 	SystemInit();
 	
@@ -140,7 +133,6 @@ INT32S main(void)
 	
 	OSInit();   
  	
-	
 	
 	//创建起始任务
 	os_err = OSTaskCreateExt((void (*)(void *)) App_TaskStart,  /* Create the start task. */
@@ -211,6 +203,7 @@ static void App_TaskStart(void *pdata)
 	//Sensor_Data_Collect_Queue = OSQCreate(&Sensor_Data_Collect_Q[0],SENSOR_DATA_LENGH);
 	
   PtzSem = OSSemCreate(1);
+	
 	
 	App_TaskCreate();
 	OSTimeDly(OS_TICKS_PER_SEC);

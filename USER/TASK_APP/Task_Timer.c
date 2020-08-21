@@ -93,7 +93,7 @@ void SendWHLToLinux(void)
 void DoBatUsingGetFilter(void)
 {
     static u8  iVolId = 0;
-    static u16 nVolValues[5]={0,0,0,0,0} ; 
+    static u16 nVolValues[5]={0,0,0,0,0}; 
     static u16 nVolAll=0; //
     //static u8  iCurId = 0;
     static u16 nCurValues[5]={0,0,0,0,0} ; 
@@ -437,6 +437,32 @@ void debug_nprintf(uint8 com,uint32 num,uint8 mul,uint8 typ)
 	 }
 }
 
+//SWD模式下载初始化函数，系统启动后，
+//需要加入此函数，不然无法使用SWD模式下载。
+void SWD_Download_init(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE); /*使能GPIOA时钟*/
+	//开启下载功能，复用引脚
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource13, GPIO_AF_SWJ);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource14, GPIO_AF_SWJ);
+	//GPIO 初始化 
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
+   
+  //配置PA13引脚为复用功能
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+   
+  //配置PA14引脚为复用功能
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+}
+
 
 //时间 定时器任务入口函数
 void Task_Timer(void *pdata)
@@ -452,6 +478,9 @@ void Task_Timer(void *pdata)
 	//创建指示灯定时器2 
 	tmr2_sys_led=OSTmrCreate(0,500,OS_TMR_OPT_PERIODIC,(OS_TMR_CALLBACK)tmr2_sys_led_callback,0,"tmr2_sys_led",&err);		
 	OSTmrStart(tmr2_sys_led,&err);			//启动软件定时器2，2ms*500执行一次
+	
+	//SWD模式下载初始化函数，系统启动后，需要加如此函数，不然无法使用SWD模式下载。
+	SWD_Download_init();		
 	
 	while( 1 )
 	{

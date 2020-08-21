@@ -20,8 +20,10 @@ void TimerCode_And_Gpio_Init_TIM2(void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 ,ENABLE);    /*使能TIM2 时钟*/
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB , ENABLE); /*使能GPIOA/GPIOB 时钟*/
 
-    //GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable ,ENABLE);  //先将PA15作为普通IO口
-    //GPIO_PinRemapConfig( GPIO_PartialRemap1_TIM2 ,ENABLE);  //将定时器管脚映射到pb3 pa15引脚
+		//开启下载功能，复用引脚
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource13 | GPIO_PinSource14, GPIO_AF_SWJ);
+	
+		GPIO_PinAFConfig(GPIOA, GPIO_PinSource15, GPIO_AF_TIM2); //将定时器管脚映射到pb3 pa15引脚
 
     GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -43,6 +45,8 @@ void TimerCode_And_Gpio_Init_TIM3(void)
     GPIO_InitTypeDef GPIO_InitStructure;
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);    /*使能TIM3时钟*/
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE);   /*使能GPIOB时钟*/
+	
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource3 | GPIO_PinSource4, GPIO_AF_TIM3);
     //GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3,ENABLE);   //将定时器管脚映射到pb4、pb3引脚
 
     GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
@@ -60,6 +64,8 @@ void TimerCode_And_Gpio_Init_TIM4(void)
     GPIO_InitTypeDef GPIO_InitStructure;
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,ENABLE);    /*使能TIM4时钟*/
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);   /*使能GPIOD时钟*/
+	
+		GPIO_PinAFConfig(GPIOD, GPIO_PinSource12 | GPIO_PinSource13, GPIO_AF_TIM3);
     //GPIO_PinRemapConfig(GPIO_Remap_TIM4,ENABLE);  		  //将定时器管脚映射到pd12 13引脚
 
     GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
