@@ -7,14 +7,8 @@
 /*************************************************/
 //---------本任务涉及到的消息-----------
 OS_EVENT *timerQueue;
-//RbtState gRbtState;
-//BatAutoCtrl gBatAutoCtrl;
-//SlvMtCfgType     gSlvMtCfg;  		 //配置参数
-ZT_INFO_TYPE g_zt_msg;
 
-//robot信息结构体
-//int  gCmdParaVal_Ints[8];
-//CmdParaInfo gCmdParaInfos;
+ZT_INFO_TYPE g_zt_msg;
 
 OS_TMR   * tmr1_temper_humidi;			//软件定时器1 温湿度采集	
 OS_TMR   * tmr2_sys_led;			      //软件定时器2 系统指示灯
@@ -169,7 +163,7 @@ void Battery(void)
     g_zt_msg.nTimeForNoLinuxHeartIn++;
 	
     //zt_build_send_state_string(BUILD_STATE_FLAG_ALL);//zs 1116 del
-    //uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );//zs 1116 del
+    //uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );//zs 1116 del
 	
     //uart1_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
     //stprintf(ID_DEBUG,"send to linux=ok\r\n");
@@ -191,13 +185,6 @@ void System_State_LED(void)
 	
 
 }
-
-enum
-{
-    LINUX_CMD50_HEAD            = 0X00,						//帧头位
-    LINUX_CMD50_PKG_LEN         ,
-};
-
 
 
 /*==================================
@@ -493,14 +480,15 @@ void Task_Timer(void *pdata)
 				case AM2320_MSG: 		// 2s
 				{
 					//LED2(LED_ON);
-					//AM2320_Get_Data();
-					//stprintf(ID_DEBUG,"AM2320 \r\n");				
+					AM2320_Get_Data();
+					//stprintf(ID_RF433,"AM2320 \r\n");				
 				}
 				break;
 				case SYS_LED_MSG: 		// 1s
 				{
 					//LED2(LED_ON);
-					System_State_LED();	
+					System_State_LED();
+					//stprintf(ID_LINUX,"LED \r\n");		
 					
 				}
 				break;
@@ -522,6 +510,13 @@ void Task_Timer(void *pdata)
 						}					
 				 }
 				break;
+				 case SENSOR_MSG: 		//4ms
+				{
+					//LED2(LED_ON);
+					Sensor_Collect();
+					break;
+				}
+				 
 				default:
 				break;
 			 }		

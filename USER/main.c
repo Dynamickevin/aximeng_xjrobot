@@ -1,4 +1,5 @@
 
+
 #include <includes.h>
 #include "stm32f4xx.h"                  // Device header file
 
@@ -7,21 +8,21 @@ OS_EVENT	*log_sem;
 OS_EVENT	*PtzSem;
 
 
-DATA_CONTROL_BLOCK 		msgBuffer[100];
-OS_MEM								*p_msgBuffer;					//OS_MEM：内存分区数据结构
+DATA_CONTROL_BLOCK 			 msgBuffer[100];
+OS_MEM									*p_msgBuffer;					//OS_MEM：内存分区数据结构
 
-OS_MEM								*mem160ptr;
-INT8U		 							mem_160[MEM160_NUM][220];
+OS_MEM									*mem160ptr;
+INT8U		 								 mem_160[MEM160_NUM][220];
 
-OS_EVENT							*mem512_sem;
-OS_MEM								*mem512ptr; 
-INT8U									 mem_512[MEM512_NUM][512];
+OS_EVENT								*mem512_sem;
+OS_MEM									*mem512ptr; 
+INT8U										 mem_512[MEM512_NUM][512];
 
-extern int				 			gui_key;
+extern int				 			 gui_key;
 extern OS_EVENT  				*uart_q;
 extern void 		    		*RcvUARTQ[Q_MAX_SIZE];
 extern OS_EVENT    	    *sem_time;
-extern RbtState         gRbtState;
+extern RbtState          gRbtState;
 
 
 /////////////////////////UCOSII任务设置///////////////////////////////////
@@ -203,7 +204,6 @@ static void App_TaskStart(void *pdata)
 	//Sensor_Data_Collect_Queue = OSQCreate(&Sensor_Data_Collect_Q[0],SENSOR_DATA_LENGH);
 	
   PtzSem = OSSemCreate(1);
-	
 	
 	App_TaskCreate();
 	OSTimeDly(OS_TICKS_PER_SEC);

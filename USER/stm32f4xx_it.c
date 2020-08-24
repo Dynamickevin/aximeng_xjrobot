@@ -181,7 +181,7 @@ void SysTick_Handler(void)
 		if(OS_NO_ERR == err)
 		{
 			((DATA_CONTROL_BLOCK *)dp1)->type = SENSOR_MSG; 
-			if(OS_NO_ERR != OSQPost(GetWeatherQueue,(void*)dp1))     
+			if(OS_NO_ERR != OSQPost(timerQueue,(void*)dp1))     
 			{
 				OSMemPut(p_msgBuffer,dp1);
 			}
@@ -293,39 +293,42 @@ void USART3_IRQHandler(void)
 	OSIntExit();
 }
 
-extern void UART4_ISR(void);
-void UART4_IRQHandler(void)
-{       
-	CPU_SR    cpu_sr;
+//extern void UART4_ISR(void);
+//void UART4_IRQHandler(void)
+//{       
+//	CPU_SR    cpu_sr;
 
-	OS_ENTER_CRITICAL();                         
-  OSIntNesting++;
-  OS_EXIT_CRITICAL();
-	
-	#if ( OS_VIEW_MODULE == DEF_ENABLED )
-		OSView_RxTxISRHandler();
-	#endif
-	
-	UART4_ISR();
-	OSIntExit();
-}
+//	OS_ENTER_CRITICAL();                         
+//  OSIntNesting++;
+//  OS_EXIT_CRITICAL();
+//	
+//	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+//		OSView_RxTxISRHandler();
+//	#endif
+//	
+//	UART4_ISR();
+//	OSIntExit();
+//}
 
-extern void UART5_ISR(void);
-void UART5_IRQHandler(void)
-{       
-	CPU_SR   cpu_sr;
+//extern void UART5_ISR(void);
+//void UART5_IRQHandler(void)
+//{       
+//	CPU_SR   cpu_sr;
 
-	OS_ENTER_CRITICAL();                         
-  OSIntNesting++;
-  OS_EXIT_CRITICAL();
-	
-	#if ( OS_VIEW_MODULE == DEF_ENABLED )
-		OSView_RxTxISRHandler();
-	#endif
-	
-	UART5_ISR();
-	OSIntExit();
-}
+//	OS_ENTER_CRITICAL();                         
+//  OSIntNesting++;
+//  OS_EXIT_CRITICAL();
+//	
+//	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+//		OSView_RxTxISRHandler();
+//	#endif
+//	
+//	UART5_ISR();
+//	OSIntExit();
+//}
+
+
+
 
 
 

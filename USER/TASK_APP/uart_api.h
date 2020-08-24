@@ -6,12 +6,6 @@
 
 #define RX_LENGTH  254
 
-#define COMM_REC_IDLE					0
-#define COMM_REC_WAITPREFIX				1
-#define COMM_REC_RECEIVING				2
-#define COMM_REC_OVER					3
-#define COMM_REC_GNRMC				    4
-#define COMM_REC_GNGGA				    5
 
 #define COMM_SEND_IDLE					0
 #define COMM_SEND_DATA					1
@@ -56,7 +50,7 @@ typedef enum
 void UART_Configuration(unsigned int bauds);
 void comSendBuf(uint8_t _ucPort, uint8_t *_ucaBuf, uint16_t _usLen);
 void comSendChar(uint8_t _ucPort, uint8_t _ucByte);
-uint8_t comGetChar(uint8_t _ucPort, uint8_t *_pByte);
+
 
 void USART1_IRQHandler(void);
 extern void USART1_Config(void);
@@ -70,18 +64,12 @@ void USART3_IRQHandler(void);
 extern void USART3_Config(void);
 extern void uart3_send(uint8 *sp,uint16 len) ;
 
-void UART4_IRQHandler(void);
-extern void UART4_Config(void);
+//void UART4_IRQHandler(void);
+//extern void UART4_Config(void);
 
-void UART5_IRQHandler(void);
-extern void UART5_Config(void);
-extern void uart5_send(uint8 *sp,uint8 len) ;
-uint8 GetGTZMHDCmdXOR(void);
-uint8 CheckGTZMHDRecXOR(void);
-void SetState1GTZMHD(void);
-void SetState2GTZMHD(void);
-void SendGTZMHDCmdSetRet(u8 ret);
-void GetState1GTZMHD(void);
-void GetState2GTZMHD(void);
-void SendGTZMHDCmdGetRet(u8 ret);
+//void UART5_IRQHandler(void);
+//extern void UART5_Config(void);
+//extern void uart5_send(uint8 *sp,uint8 len) ;
+
+
 #endif

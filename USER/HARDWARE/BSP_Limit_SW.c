@@ -172,8 +172,6 @@ LIMIT_SW_Flag_Typedef Nest_SW_Get_Event(void)
 
 
 
-//gRbtState.bCX_SwCheck1 = !SW_GpioGet(GPIO_CHK_LIMIT1) ;
-
 
 
 

@@ -49,8 +49,6 @@
 #include "stm32f4xx_conf.h"
 
 
-//#define SYSTEM_SUPPORT_OS		1		//定义系统文件夹是否支持UCOS
-
 #define Q_MAX_SIZE		2
 extern void Delay(u32 nCount);
 
@@ -88,15 +86,13 @@ typedef struct {
 #define LOCAL_DEBUG_IN_MSG_DEBUG       0x81
 #define LOCAL_DEBUG_IN_MSG_LINUX       0x82
 #define LOCAL_DEBUG_IN_MSG_RF433       0x83
-//#define LOCAL_DEBUG_IN_MSG_GPS        0x84
-#define LOCAL_DEBUG_IN_MSG_PTZ         0x85
-#define LOCAL_DEBUG_IN_MSG_GPS_GNRMC   0x86
-#define LOCAL_DEBUG_IN_MSG_GPS_GNGGA   0x87
+
 
 //打印输出串口识别号
-#define ID_DEBUG                1               
-#define ID_LINUX                2
-#define ID_RF433                3
+#define ID_RF433                1
+#define ID_DEBUG                2               
+#define ID_LINUX                3
+
 
 //开启或者关闭电机性能测试
 //开启电机性能测试后，主动轮与从动轮控制方式修改为，外部命令控制

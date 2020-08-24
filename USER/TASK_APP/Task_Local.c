@@ -9,15 +9,7 @@ int  gCmdParaVal_Ints[8];
 float gCmdParaVal_floats[3];
 extern RbtState gRbtState;
 CmdParaInfo gCmdParaInfos;
-//SlaveMotorAnaly  gSlaveMtAnaly;
-//MotorDriverCtrlType gMstMt;
 UserCfgType gUserAllCfg;
-//StateGPS gGPS;
-//PressFilterCtrl gPressFilter;
-//SpeedAnalyByCode gSpeedAnaly_Mst;    //MST  master 缩写
-//SpeedAnalyByCode gSpeedAnaly_Slv;    //从动轮控制电机 编码器
-//SpeedAnalyByCode gSpeedAnaly_Whl;    //从动轮 码盘wheel,  Whl -- 缩写
-
 CamSet GTZMHD_Set;
 CamGet GTZMHD_Get;
 extern AtCmdInfo AtCmdFromGPS;
@@ -32,15 +24,15 @@ char Frame_No_Rf433[4];
 *************************************************/
 void ack_with_debug(uint8 com,uint8 *buf, uint16 len)
 {
-	if( com== ID_DEBUG)
+	if( com== ID_RF433)
 	{
         uart1_send(buf,len);
 	}
-	else if( com== ID_LINUX)
+	else if( com== ID_DEBUG)
 	{
         uart2_send(buf,len);
 	}
-	else if( com== ID_RF433)
+	else if( com== ID_LINUX)
 	{
        uart3_send(buf,len);
 	}
@@ -555,7 +547,7 @@ void Ptz_SetRst_string(uint8 id,uint8 rst)
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 
 	
@@ -622,7 +614,7 @@ void Ptz_GetRst_string(uint8 rst)
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
@@ -662,7 +654,7 @@ void rt_get_SlvCFG(uint8 com)
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
@@ -744,7 +736,7 @@ void rt_get_BatCFG(uint8 com)
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
@@ -1051,7 +1043,7 @@ void SetSlaveMotor(uint8 com,uint8* cmd)       //4
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
@@ -1166,7 +1158,7 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
@@ -1276,7 +1268,7 @@ void Hello(uint8 com,uint8* cmd)   			 //6
 		
 			
 		zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);//zs 1116  add
-        uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );//zs 1116 add
+        uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );//zs 1116 add
     }
 }
 
@@ -1426,7 +1418,7 @@ void OpenDev(uint8 com,uint8* cmd)				//12
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 }
 
@@ -1438,7 +1430,7 @@ void CloseDev(uint8 com,uint8* cmd)				//13
 	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
 	gRbtState.StateSwitchFlag[0] = 'H' ;
 	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 }
 
@@ -1650,7 +1642,7 @@ void StateSw(uint8 com,uint8* cmd)				//21
 
 		   //接收到手动指令后，发一条信息给妙算UART2	
 		   zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-           uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+           uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 
 		   //延迟1s,恢复到空闲状态 Idel
 		   //OSTimeDly(OS_TICKS_PER_SEC);
@@ -1665,7 +1657,7 @@ void StateSw(uint8 com,uint8* cmd)				//21
 
 			//接收到自动指令后，发一条信息给妙算UART2	
 		    zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-        	uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+        	uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 			
 			//延迟1s,恢复到空闲状态 Idel
 			//OSTimeDly(OS_TICKS_PER_SEC);
@@ -1677,9 +1669,9 @@ void StateSw(uint8 com,uint8* cmd)				//21
 			str = cmd_para_build_para_string_str( str , "AT+StateSw" , "ChgBk" );
 			//str = cmd_para_build_para_string_str( str , "StateSw" , gRbtState.StateSwitchFlag );
 
-			//接收到返回充电指令后，发一条信息给妙算UART2	
+			//接收到返回充电指令后，发一条信息给妙算UART3
 		    zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-        	uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+        	uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 			
 			//延迟1s,恢复到空闲状态 Idel
 			//OSTimeDly(OS_TICKS_PER_SEC);
@@ -1945,11 +1937,11 @@ void CommDebug(uint8 id,uint8 *sp,uint16 length)
 				break;	
 			case 18:
 				//OSSemPost(PtzSem);
-				PtzSet(com);			//设置云台参数：AT+PtzSet=90,-20,0,10 方位角、俯仰角、横滚角、焦距
+				//PtzSet(com);			//设置云台参数：AT+PtzSet=90,-20,0,10 方位角、俯仰角、横滚角、焦距
 				break;
 			case 19:
 				//OSSemPost(PtzSem);
-				PtzGet(com);			//获取云台参数：AT+PtzGet=1 name=Rbt9999
+				//PtzGet(com);			//获取云台参数：AT+PtzGet=1 name=Rbt9999
 			  break;
 			case 20:
 				SlvCFG2(com,dp);		//AT+CFG2=16,10,40,6 从动轮参数 过桥速度，加速度，减速度，过桥时间
@@ -1963,108 +1955,6 @@ void CommDebug(uint8 id,uint8 *sp,uint16 length)
 	}
 
 	OSMemPut(mem512ptr,dp);             //释放内存块  
-	OSSemPost(mem512_sem);
-}
-
-//云台命令解析函数
-void GTZMHDDebug(uint8 *sp,uint16 length)
-{
-    uint8 err;
-	uint8 *dp;
-
-	OSSemPend(mem512_sem,0,&err);
-	dp = OSMemGet(mem512ptr,&err);	//分配512字节的内存
-	if(OS_ERR_NONE != err)
-	{
-		OSSemPost(mem512_sem);		//分配不成功时，发送信号
-		return;
-	}
-	           
-    Clear_Buffer(dp,512); 			//清空内存
-	CopyBuffer(sp,dp,length);		//将sp的内容复制到dp
-	
-	if((*dp==0xbb)&&(*(dp+4)==0x1a)&&(*(dp+5)==0x44))//设置时返回指令
-	{
-		GTZMHDCmdSetOk = 1;			//设置云台数据正确标志
-	}
-
-	if(GTZMHDCmdGetStep1==1)//读取姿态时返回指令 方位角、俯仰角
-	{
-		GTZMHD_Get.directAngle=((s16)(*(dp+1))<<8)|(s16)(*(dp+2));
-		GTZMHD_Get.pitchAngle=((s16)(*(dp+3))<<8)|(s16)(*(dp+4));
-    }
-
-	if(GTZMHDCmdGetStep2==1)//读取焦距时返回指令 焦距
-	{
-		GTZMHD_Get.nVisibleFocalDis=((s16)(*(dp+1))<<8)|((s16)(*(dp+2)));
-		if(GTZMHD_Get.nVisibleFocalDis != 0)
-		{
-			GTZMHDCmdGetOk = 1;		//读取云台数据正确标志
-		}
-    }
-
-	OSMemPut(mem512ptr,dp);  //释放内存块  
-	OSSemPost(mem512_sem);
-}
-
-//从GPS获取时间信息函数
-void GPSGnrmcDebug(uint8 *sp,uint16 length)
-{
-    uint8 err;
-	uint8 *dp;
-
-    //stprintf(1, "\r\n串口4接收到的数据\r\n");
-	//uart1_send(sp,length);//打印收到的命令串
-	
-	OSSemPend(mem512_sem,0,&err);
-	dp = OSMemGet(mem512ptr,&err);
-	if(OS_ERR_NONE != err)
-	{
-		OSSemPost(mem512_sem);
-		return;
-	}
-	           
-    Clear_Buffer(dp,512); 
-	CopyBuffer(sp,dp,length);
-	
-    gGPS.bCurGetTime=GpsParaTimeDateForGNRMC((char *)dp);
-    AtCmdFromGPS.CurRecStatus = COMM_REC_WAITPREFIX;
-	AtCmdFromGPS.recv_buf[4]=0;
-	AtCmdFromGPS.recv_buf[5]=0;
-	AtCmdFromGPS.counter = 0;
-	
-	OSMemPut(mem512ptr,dp);  //释放内存块  
-	OSSemPost(mem512_sem);
-}
-
-//从GPS获取位置信息函数
-void GPSGnggaDebug(uint8 * sp, uint16 length)
-{
-    uint8 err;
-	uint8 *dp;
-
-    //stprintf(1, "\r\n串口4接收到的数据\r\n");
-	//uart1_send(sp,length);//打印收到的命令串
-	
-	OSSemPend(mem512_sem,0,&err);
-	dp = OSMemGet(mem512ptr,&err);//分配内存块
-	if(OS_ERR_NONE != err)
-	{
-		OSSemPost(mem512_sem);
-		return;
-	}
-	           
-    Clear_Buffer(dp,512); 
-	CopyBuffer(sp,dp,length);
-	
-    gGPS.bCurGetPos=GpsParaPosDateFromGNGGA((char *)dp);
-    AtCmdFromGPS.CurRecStatus = COMM_REC_WAITPREFIX;
-	AtCmdFromGPS.recv_buf[4]=0;
-	AtCmdFromGPS.recv_buf[5]=0;
-	AtCmdFromGPS.counter = 0;
-	
-	
-	OSMemPut(mem512ptr,dp);  //释放内存块  
 	OSSemPost(mem512_sem);
 }
 

@@ -1,6 +1,7 @@
+
+
 #ifndef _TASK_LOCAL_H_
 
-//extern uint16 OSVersion(void);
 
 enum{
 	DEC = 0,		// 十进制
@@ -31,19 +32,10 @@ enum{
 
 
 extern void Task_Local(void *pdata);
-extern void DisplayTime(uint8 type);
-extern void StoreWithProtect(uint8 *sp,uint16 CRC_result,uint16 length,uint32 StoreAddr,uint32 StoreBackAddr);
+
 extern OS_EVENT *LocalQueue;		//串口0接收数据邮箱
 extern void CommDebug(uint8 id,uint8 *sp,uint16 length);
-extern void GTZMHDDebug(uint8 *sp,uint16 length);
-extern void GPSGnrmcDebug(uint8 *sp,uint16 length);
-extern void GPSGnggaDebug(uint8 *sp,uint16 length);
 extern void ShowSystemInformation(void);
-extern void write_log(INT16U taskID,uint16 err_code);
-extern void ShowLogs(void);
-extern uint8 vib_err_counter;
-extern void BaseShutUp(void);
-
 extern void debug_nprintf(uint8 com,uint32 num,uint8 mul,uint8 typ);
 #define nprintf(com,p,m,n) debug_nprintf(com,p, m, n)
 extern void debug_sprintf(uint8 com,char *str);
@@ -87,8 +79,6 @@ void zt_slv_mt_determine_need_move(void);
 
 void SLV_AUTO_SPEED_UP(void);
 void SLV_AUTO_SPEED_DOWN(void);
-
-
 
 
 

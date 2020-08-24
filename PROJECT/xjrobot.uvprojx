@@ -458,11 +458,6 @@
               <FilePath>..\USER\TASK_APP\str.c</FilePath>
             </File>
             <File>
-              <FileName>GpsUart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\GpsUart.c</FilePath>
-            </File>
-            <File>
               <FileName>zt_motor_master_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\zt_motor_master_driver.c</FilePath>
@@ -491,6 +486,11 @@
               <FileName>Wheel_Encode.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\Wheel_Encode.c</FilePath>
+            </File>
+            <File>
+              <FileName>GpsUart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK_APP\GpsUart.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -536,6 +536,21 @@
               <FileName>BSP_motor_cal_speed.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\HARDWARE\BSP_motor_cal_speed.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_GPS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_GPS.c</FilePath>
+            </File>
+            <File>
+              <FileName>NVIC_IRQ.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\NVIC_IRQ.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_Video_TRANS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_Video_TRANS.c</FilePath>
             </File>
           </Files>
         </Group>

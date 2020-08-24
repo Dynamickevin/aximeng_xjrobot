@@ -57,7 +57,7 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run);
 
 //驱动器设置为 低电平使能 高电平关闭
 //->BSRR to set io=1  ->BRR to set io=0
-#define SET_MASTER_MOTOR_CLOSE() GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2)
+#define SET_MASTER_MOTOR_CLOSE() GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2);SET_MASTER_MOTOR_PWM(0)
 #define SET_SLAVE_MOTOR_CLOSE()  GpioSetH(GPIO_CTL_DIR_S1) ; GpioSetH(GPIO_CTL_DIR_S2) ; SET_SLAVE_MOTOR_PWM(0)
 
 #define SET_MASTER_MOTOR_ZZ()   GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetL(GPIO_CTL_DIR_M2)

@@ -67,8 +67,6 @@ typedef struct
     
     bool	motor_master_wheel_slippage_state;	//主动轮打滑状态标志
 
-	   
-	
 }MotorDriverCtrlType;
 
 extern MotorDriverCtrlType gMstMt;

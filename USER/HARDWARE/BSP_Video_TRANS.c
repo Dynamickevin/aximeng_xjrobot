@@ -20,7 +20,7 @@ void  bsp_Video_Trans_PWR_Init(void)
 	/*定义一个GPIO_InitTypeDef类型的结构体*/
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	/*开启LED相关的GPIO外设时钟*/
+	/*开启图传电源控制相关的GPIO外设时钟和IO口*/
 	RCC_AHB1PeriphClockCmd ( VEDIO_TRANS_PWR_EN_GPIO_CLK, ENABLE); 														   
 	GPIO_InitStructure.GPIO_Pin = VEDIO_TRANS_PWR_EN_PIN;	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
@@ -34,9 +34,12 @@ void  bsp_Video_Trans_PWR_Init(void)
 
 void bsp_Video_Trans_PWR(FunctionalState NewSta)
 {
-	if(NewSta == ENABLE){
+	if(NewSta == ENABLE)
+	{
 		GPIO_SetBits(VEDIO_TRANS_PWR_EN_PORT,VEDIO_TRANS_PWR_EN_PIN);
-	}else{	
+	}
+	else
+	{	
 		GPIO_ResetBits(VEDIO_TRANS_PWR_EN_PORT,VEDIO_TRANS_PWR_EN_PIN);
 	}
 }

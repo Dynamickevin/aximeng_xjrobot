@@ -232,65 +232,7 @@ void SLV_PWM_Init_Tim8_CH3(void)
 
 
 
-void timer1_8_pwm_init(TIM_TypeDef* TIMx,uint16_t Prescaler,uint16_t Period)
-{
-    TIM_TimeBaseInitTypeDef     TIM_TimeBaseStructure;
-    TIM_DeInit(TIMx);
-    //   TIM_TimeBaseStructure.TIM_RepetitionCounter=1;
-    TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_ClockDivision = 0;
-    TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up; //向上计数
-    TIM_TimeBaseStructure.TIM_Period   = Period;
-    TIM_TimeBaseStructure.TIM_Prescaler= Prescaler ;
-    TIM_TimeBaseInit(TIMx,&TIM_TimeBaseStructure);
-    TIM_CtrlPWMOutputs(TIMx,ENABLE);
-}
-
-void timer2_3_4_5_pwm_init(TIM_TypeDef* TIMx,uint16_t Prescaler,uint16_t Period)
-{
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-    //RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    TIM_DeInit(TIMx);
-    ////TIM_InternalClockConfig(TIMx);
-    TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-    TIM_TimeBaseStructure.TIM_ClockDivision=0;
-    TIM_TimeBaseStructure.TIM_Period   = Period ;//;//ARR的值周期10K
-    TIM_TimeBaseStructure.TIM_Prescaler= Prescaler ;
-    TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up; //向上计数模式
-    TIM_TimeBaseInit(TIMx, &TIM_TimeBaseStructure);
-}
 
 
-void timer2_3_4_5_pwm_channel_init(TIM_TypeDef* TIMx,tim_ocX_init ocX_init)
-{
-    TIM_OCInitTypeDef TIMOCInitStructure;
-    TIMOCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; //PWM模式1输出
-    TIMOCInitStructure.TIM_Pulse = TIMx->ARR/2 ; //  0;//占空比=(CCRx/ARR)*100%
-    TIMOCInitStructure.TIM_OCPolarity  = TIM_OCPolarity_High;//TIM输出比较极性高
-    TIMOCInitStructure.TIM_OutputState = TIM_OutputState_Enable;//使能输出状态
-    ocX_init(TIMx, &TIMOCInitStructure);//TIM3的CH2输出 TIM_OC2Init
-}
-void timer1_8_pwm_channel_init(
-    TIM_TypeDef*            TIMx,
-    tim_ocX_init            ocX_init,
-    tim_ocX_preload_init    ocX_preload_init
-)
-{
-    TIM_OCInitTypeDef TIMOCInitStructure;
-        
-    //TIMOCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; //PWM模式1输出
-    TIMOCInitStructure.TIM_Pulse       = TIMx->ARR/2            ; //  0;//占空比=(CCRx/ARR)*100%
-    TIMOCInitStructure.TIM_OCMode      = TIM_OCMode_PWM1        ;
-    TIMOCInitStructure.TIM_OCPolarity  = TIM_OCPolarity_Low     ;
-    TIMOCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_Low    ;
-    TIMOCInitStructure.TIM_OutputState = TIM_OutputState_Enable ;
-
-    TIMOCInitStructure.TIM_OutputNState    = TIM_OutputNState_Disable;
-    TIMOCInitStructure.TIM_OCNIdleState    = TIM_OCNIdleState_Reset;
-    TIMOCInitStructure.TIM_OCIdleState     = TIM_OCIdleState_Reset ;
-
-    ocX_init( TIMx ,&TIMOCInitStructure);
-    ocX_preload_init( TIMx , TIM_OCPreload_Enable ); //TIM_8---->通道3[PC8] 
-}
 
 

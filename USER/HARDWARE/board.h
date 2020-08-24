@@ -9,6 +9,8 @@
 
 #include "bsp_general_tim.h"
 #include "BSP_enccoder.h"
+#include "NVIC_IRQ.h"
+#include "BSP_Video_TRANS.h"
 
 //#include "BSP_BRD.h"
 void bsp_Board_Init(void);

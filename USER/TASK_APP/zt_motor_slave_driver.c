@@ -1,4 +1,4 @@
-//#include "box_os_user.h"
+
 #include <includes.h>
 
 extern ZT_INFO_TYPE g_zt_msg;
@@ -100,11 +100,11 @@ void zt_motor_slave_driver_init(void)
     //PB12 PB13 从动轮 电机方向控制 
 		//PC4 PB5 限位开关
     //GPIO_InitTypeDef            GPIO_InitStructure;
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOB , ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC , ENABLE);
     
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S1);
     GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S2);
-    SET_SLAVE_MOTOR_CLOSE()  ;    
+    SET_SLAVE_MOTOR_CLOSE();    
     
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1);
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1 );
@@ -529,7 +529,7 @@ static __inline void DoPressFilter(void)
     gPressFilter.val = (gPressFilter.press_sum_all+(PRESS_FILTER_CNT_ONE/2)) / PRESS_FILTER_CNT_ONE;
 }
 
-//或者最近 new_cnt 个压力数据平均值
+//获取最近 new_cnt 个压力数据平均值
 u8 GetPressNewFilter(u16 new_cnt)
 {
     u16 i = gPressFilter.cur_press_change ;
@@ -745,7 +745,7 @@ void DoSetSlaveMtSpeedByCurSpeed(void)
 void Sensor_Collect(void)
 {
 	//电机状态更新，不需要频率太高，降低些频率
-	DoPressFilter();       			//压力传感器采集值滤波
+		DoPressFilter();       			//压力传感器采集值滤波
     DoSpeedAnalyByCode();  			//各种需要进行的状态更新；速度分析更新
     UpdateFastBatChargingState();	//电池管理，充电状态更新
 }
@@ -833,7 +833,7 @@ void UpdateFastBatChargingState(void)
 			
 			//遇到红外遮挡时，发一条信息给妙算UART2	zs 0306 add
             zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-            uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+            uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
            
 			//zt_motor_master_driver_set_speed( 0 , 50000 ); //需要停止主电机///新增20181221
 			
@@ -905,7 +905,7 @@ void UpdateFastBatChargingState(void)
 
 			//离开红外遮挡时，发一条信息给妙算UART2	caigz 0531 add
             zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-            uart2_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+            uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
 			
 			zt_motor_master_driver_set_speed( 0 , 50000 ); //需要停止主电机一次
             gBatAutoCtrl.nCxCheckMove = 0; //离开桥的编码器值/比例系数

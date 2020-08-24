@@ -43,22 +43,6 @@ void Task_Remote_Rec(void *pdata)
 					CommDebug(ID_LINUX,msg->point,msg->count);
 				}
 				break;
-				case LOCAL_DEBUG_IN_MSG_PTZ:	
-				{
-					GTZMHDDebug(msg->point,msg->count);
-				}
-				break;
-				case LOCAL_DEBUG_IN_MSG_GPS_GNRMC:	
-				{
-					GPSGnrmcDebug(msg->point,msg->count);
-				}
-				break;
-				case LOCAL_DEBUG_IN_MSG_GPS_GNGGA:	
-				{
-					GPSGnggaDebug(msg->point,msg->count);
-				}
-				break;
-				
 				default:
 				break;
 			}

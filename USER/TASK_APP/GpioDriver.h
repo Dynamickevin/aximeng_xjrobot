@@ -4,14 +4,14 @@
 #include <includes.h>
 
 static __inline void GpioInit(
-	uint32_t RCC_APB2Periph     ,   //需要使能的总线，一般为 RCC_APB2Periph_GPIOX
+	uint32_t RCC_AHB1Periph     ,   //需要使能的总线，一般为 RCC_AHB1Periph_GPIOX
 	GPIO_TypeDef* GPIOx         ,   //GPIOA~F
 	uint16_t GPIO_Pin           ,   //管脚  GPIO_Pin_0~15
 	GPIOMode_TypeDef GPIO_Mode      //模式  GPIO_Mode_Out_OD ...
 )
 {
     GPIO_InitTypeDef            GPIO_InitStructure;
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph , ENABLE);
+    RCC_AHB1PeriphClockCmd( RCC_AHB1Periph , ENABLE);
 
     GPIO_InitStructure.GPIO_Pin   = GPIO_Pin ; 
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;

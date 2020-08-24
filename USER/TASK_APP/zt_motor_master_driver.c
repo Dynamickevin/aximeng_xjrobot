@@ -25,8 +25,8 @@ void zt_motor_master_driver_init(void)
     GPIO_INIT_OUT_PP(GPIO_BREAK_MEN );
 		SET_MT_BREAK_CLOSE;
 	
-    SET_MASTER_MOTOR_CLOSE();
-		SET_MASTER_MOTOR_PWM(0);  			//电机当前速度为 0
+    SET_MASTER_MOTOR_CLOSE();  //电机当前速度为 0
+		  			
 
     //编码器值 进行初始化
     //TimerCode_DefaultFunction_Init(2);  //编码器 数据采集初始化 主动轮 TIM2
