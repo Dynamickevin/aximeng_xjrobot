@@ -295,6 +295,10 @@ void debug_sprintf(uint8 com,char *str)
  	 {
 		 dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
  	 }
+	 else if(com==ID_POWER_BOARD)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_POWER_BOARD;
+ 	 }
 	 dp1->point =  (uint8 *)dp;
 	 dp1->count =  StringLen(str);
 	 if(OS_ERR_NONE != OSQPost(GetWeatherQueue,(void*)dp1))
@@ -369,6 +373,10 @@ void debug_nprintf(uint8 com,uint32 num,uint8 mul,uint8 typ)
 	 	{
 			dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
 	 	}
+		else if(com==ID_POWER_BOARD)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_POWER_BOARD;
+ 	 }
 		dp1->point =  (uint8 *)dp;
 		dp1->count =  StringLen(cp);
 		
@@ -410,6 +418,10 @@ void debug_nprintf(uint8 com,uint32 num,uint8 mul,uint8 typ)
 	 	{
 			dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
 	 	}
+		else if(com==ID_POWER_BOARD)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_POWER_BOARD;
+ 	 }
 		dp1->point =  (uint8 *)dp;
 		dp1->count =  StringLen(cp);
 		if(OS_ERR_NONE != OSQPost(GetWeatherQueue,(void*)dp1))

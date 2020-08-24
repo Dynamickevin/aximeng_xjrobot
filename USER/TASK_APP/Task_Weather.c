@@ -32,7 +32,7 @@ void Task_Weather(void *pdata)
 					OSMemPut(mem160ptr,bp->point);
 					break;
 				}				
-				case WEATHER_DEBUG_OUT_MSG_DEBUG:
+				case WEATHER_DEBUG_OUT_MSG_POWER_BOARD:
 				{
 					uart2_send(bp->point, bp->count);
 					OSMemPut(mem160ptr,bp->point);
@@ -43,7 +43,13 @@ void Task_Weather(void *pdata)
 					uart3_send(bp->point, bp->count);
 					OSMemPut(mem160ptr,bp->point);
 					break;
-				}					
+				}	
+				case WEATHER_DEBUG_OUT_MSG_DEBUG:
+				{
+					uart4_send(bp->point, bp->count);
+					OSMemPut(mem160ptr,bp->point);
+					break;
+				}		
 				default:
 					break;				
 			}

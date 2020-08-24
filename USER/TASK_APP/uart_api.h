@@ -64,8 +64,9 @@ void USART3_IRQHandler(void);
 extern void USART3_Config(void);
 extern void uart3_send(uint8 *sp,uint16 len) ;
 
-//void UART4_IRQHandler(void);
-//extern void UART4_Config(void);
+void UART4_IRQHandler(void);
+extern void UART4_Config(void);
+extern void uart4_send(uint8 *sp,uint16 len) ;
 
 //void UART5_IRQHandler(void);
 //extern void UART5_Config(void);

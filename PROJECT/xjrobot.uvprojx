@@ -552,6 +552,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\HARDWARE\BSP_Video_TRANS.c</FilePath>
             </File>
+            <File>
+              <FileName>BSP_HI3521.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_HI3521.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -16,7 +16,7 @@ extern AtCmdInfo AtCmdFromGPS;
 char Frame_No_Debug[4];
 char Frame_No_Linux[4];
 char Frame_No_Rf433[4];
-
+char Frame_No_POWER[4];
 
 /************************************************* 
 *Return:     
@@ -24,17 +24,21 @@ char Frame_No_Rf433[4];
 *************************************************/
 void ack_with_debug(uint8 com,uint8 *buf, uint16 len)
 {
-	if( com== ID_RF433)
+	if( com == ID_RF433)
 	{
         uart1_send(buf,len);
 	}
-	else if( com== ID_DEBUG)
+	else if( com == ID_POWER_BOARD)
 	{
         uart2_send(buf,len);
 	}
-	else if( com== ID_LINUX)
+	else if( com == ID_LINUX)
 	{
        uart3_send(buf,len);
+	}
+	else if( com == ID_DEBUG )
+	{
+       uart4_send(buf,len);
 	}
 }
 
@@ -91,7 +95,10 @@ static void at_build_mtSetBk_string(uint8 com,uint8 rst,uint8 kind)
     {
     	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_Rf433);
     }
-	
+	else if(com==ID_POWER_BOARD)
+    {
+    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_POWER);
+    }
 	str = cmd_para_build_para_string_str(str , "dName" , gRbtState.RobotName);
 	
 	
@@ -161,6 +168,10 @@ static void at_build_PowerCtl_string(uint8 com,uint8 kind)
 	else if(com==ID_RF433)
     {
     	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_Rf433);
+    }
+		else if(com==ID_POWER_BOARD)
+    {
+    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_POWER);
     }
 	str = cmd_para_build_para_string_str(str , "Name" , gRbtState.RobotName);
 	
@@ -481,6 +492,10 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
 	    {
 	    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_Rf433);
 	    }
+			else if(com==ID_POWER_BOARD)
+    {
+    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_POWER);
+    }
 	}
 	str = cmd_para_build_para_string_str(str , "Name" , gRbtState.RobotName);
 	//*str++ =  ' ';
@@ -531,6 +546,10 @@ void Ptz_SetRst_string(uint8 id,uint8 rst)
 	else if(com==ID_RF433)
     {
     	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_Rf433);
+    }
+		else if(com==ID_POWER_BOARD)
+    {
+    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_POWER);
     }
 	str = cmd_para_build_para_string_str(str , "Name" , gRbtState.RobotName);
     
@@ -598,6 +617,10 @@ void Ptz_GetRst_string(uint8 rst)
 	else if(CurrentPtzSetCom==ID_RF433)
     {
     	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_Rf433);
+    }
+		else if(CurrentPtzSetCom==ID_POWER_BOARD)
+    {
+    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_POWER);
     }
 	str = cmd_para_build_para_string_str(str , "Name" , gRbtState.RobotName);
     
@@ -1434,6 +1457,7 @@ void CloseDev(uint8 com,uint8* cmd)				//13
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 }
 
+
 //AT+LinuxRst
 void LinuxRst(uint8 com)						//14
 {
@@ -1475,14 +1499,14 @@ void Rf433Set(uint8 com,uint8* cmd)					//16
 	nprintf(ID_DEBUG, bytes, 0, HEX);
     if( bytes>0 )
 	{
-		uart3_send(vals, bytes);		//发送设置指令至RF433模块
+		uart1_send(vals, bytes);		//发送设置指令至RF433模块
         OSTimeDly(OS_TICKS_PER_SEC/2);
     }
 	//发送参数查询指令 0xc1 0xc1 0xc1
 	vals[0]=0xc1;
 	vals[1]=0xc1;
 	vals[2]=0xc1;
-	uart3_send(vals,3);
+	uart1_send(vals,3);
 	stprintf(ID_DEBUG,"\r\nRf433Cfg success \r\n");
 }
 
@@ -1696,6 +1720,10 @@ void StateSw(uint8 com,uint8* cmd)				//21
     {
     	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_Rf433);
     }
+		else if(com==ID_POWER_BOARD)
+    {
+    	str = cmd_para_build_para_string_str( str , "FN" , Frame_No_POWER);
+    }
 	str = cmd_para_build_para_string_str(str , "dName" , gRbtState.RobotName);
 	
     *str++ = '\r';
@@ -1816,7 +1844,7 @@ void CommDebug(uint8 id,uint8 *sp,uint16 length)
     cmd_para_get_all_items( (char*)(str) , &gCmdParaInfos);
 	
     //if(com == ID_RF433)
-   // if((com == ID_RF433)||(com == ID_LINUX)||(com == ID_DEBUG))
+   // if((com == ID_RF433)||(com == ID_LINUX)||(com == ID_DEBUG ||(com == ID_POWER))
     {   
 		if( (gCmdParaInfos.item_cnt>1) && (box_str_cmp("dName",gCmdParaInfos.items[gCmdParaInfos.item_cnt-2].name)==0) )
 	    {

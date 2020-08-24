@@ -6,8 +6,7 @@
 #include "BSP_GPS.h"
 #include "bsp_pressure_sensor.h"
 #include  "BSP_HI3521.h"
-
-#include "bsp_general_tim.h"
+//#include "bsp_general_tim.h"
 #include "BSP_enccoder.h"
 #include "NVIC_IRQ.h"
 #include "BSP_Video_TRANS.h"

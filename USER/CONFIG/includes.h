@@ -79,20 +79,21 @@ typedef struct {
 #define SEN_DATA_MSG         12
 
 
-#define WEATHER_DEBUG_OUT_MSG_DEBUG    0xf1
-#define WEATHER_DEBUG_OUT_MSG_LINUX    0xf2
-#define WEATHER_DEBUG_OUT_MSG_RF433    0xf3
+#define WEATHER_DEBUG_OUT_MSG_DEBUG   			 0xf1
+#define WEATHER_DEBUG_OUT_MSG_LINUX   			 0xf2
+#define WEATHER_DEBUG_OUT_MSG_RF433    			 0xf3
+#define WEATHER_DEBUG_OUT_MSG_POWER_BOARD    0xf4
 
-#define LOCAL_DEBUG_IN_MSG_DEBUG       0x81
-#define LOCAL_DEBUG_IN_MSG_LINUX       0x82
-#define LOCAL_DEBUG_IN_MSG_RF433       0x83
-
+#define LOCAL_DEBUG_IN_MSG_DEBUG       				0x81
+#define LOCAL_DEBUG_IN_MSG_LINUX      			 	0x82
+#define LOCAL_DEBUG_IN_MSG_RF433      			 	0x83
+#define LOCAL_DEBUG_IN_MSG_POWER_BOARD       	0x84
 
 //打印输出串口识别号
-#define ID_RF433                1
-#define ID_DEBUG                2               
-#define ID_LINUX                3
-
+#define ID_RF433               				1
+#define ID_POWER_BOARD                2               
+#define ID_LINUX               			  3
+#define ID_DEBUG               			  4
 
 //开启或者关闭电机性能测试
 //开启电机性能测试后，主动轮与从动轮控制方式修改为，外部命令控制
@@ -304,6 +305,7 @@ extern u8 DoGTZMHDCmdGetRet;
 extern char Frame_No_Debug[4];
 extern char Frame_No_Linux[4];
 extern char Frame_No_Rf433[4];
+extern char Frame_No_POWER[4];
 extern signed short CodeAB_Start;
 extern char CodeZ_Start;
 extern OS_EVENT	*PtzSem;

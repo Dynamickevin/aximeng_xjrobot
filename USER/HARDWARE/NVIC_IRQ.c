@@ -21,7 +21,7 @@ void NVIC_Configuration(void)
 	/*  配置串口2中断源 Enable the USART2 Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 	
@@ -51,12 +51,13 @@ void NVIC_Configuration(void)
 //	NVIC_Init(&NVIC_InitStructure);//配置
 //	
 	
-		  /* 配置串口4中断源 */
-	NVIC_InitStructure.NVIC_IRQChannel = GPS_TTL_UART_IRQ; 
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = GPS_TTL_UART_PreemptionPriority;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = GPS_TTL_UART_SubPriority;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_Init(&NVIC_InitStructure);
+
+/*  配置串口4中断源 Enable the UART4 Interrupt */
+  NVIC_InitStructure.NVIC_IRQChannel = UART4_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 	
 			  /* 配置串口5中断源 */
 	NVIC_InitStructure.NVIC_IRQChannel = GPS_RS232_UART_IRQ; 

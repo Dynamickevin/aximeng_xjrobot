@@ -7,6 +7,7 @@
 	***********************************************************************
 ***/
 
+#define  SLAVE_WHEEL_CODE_SCALE         2400		//ÂëÅÌ»»Ëã±ÈÀýÏµÊý
 
 extern uint32_t Time100ms;
 
@@ -110,7 +111,7 @@ static void ENCCODER_AB_Config(void)
 */
  int32_t bsp_Enccoder_AB_GET_Cnt(void)
 {
-	return (ENCCODER_AB_TIM->CNT/4 + Enccoder_AB_Turns*200);
+	return (ENCCODER_AB_TIM->CNT/4 + Enccoder_AB_Turns * SLAVE_WHEEL_CODE_SCALE);
 }
 
 
@@ -125,9 +126,12 @@ void  ENCCODER_AB_IRQHandler (void)
 {
 	if ( TIM_GetITStatus( ENCCODER_AB_TIM, TIM_IT_Update) != RESET ) 
 	{	
-		if(ENCCODER_AB_TIM->CR1 & 0X10){
+		if(ENCCODER_AB_TIM->CR1 & 0X10)
+		{
 			Enccoder_AB_Turns--;
-		}else{
+		}
+		else
+		{
 			Enccoder_AB_Turns++;
 		}
 		TIM_ClearITPendingBit(ENCCODER_AB_TIM , TIM_IT_Update);  		 
@@ -144,9 +148,12 @@ void ENCCODER_Z_EXTI_Handler(void)
 	static u32 Time;
 	if(EXTI_GetITStatus(ENCCODER_Z_EXTI_LINE) != RESET) 
 	{
-		if(GPIO_ReadInputDataBit(ENCCODER_Z_GPIO_PORT,ENCCODER_Z_PIN) == 0){
+		if(GPIO_ReadInputDataBit(ENCCODER_Z_GPIO_PORT,ENCCODER_Z_PIN) == 0)
+		{
 			dir_Down = ENCCODER_AB_TIM->CR1 & 0X10;
-		}else{
+		}
+		else
+		{
 			dir_Up = ENCCODER_AB_TIM->CR1 & 0X10;
 			//if(dir_Up == dir_Down && Time <= Time100ms)
 			if(dir_Up == dir_Down )

@@ -11,14 +11,14 @@ void bsp_Board_Init(void)
 	NVIC_Configuration();	
 	bsp_Led_Init();   
 	bsp_Pressure_Sensor_Init();
-	//bsp_HI3521_GPIO_Init();	
+	bsp_HI3521_GPIO_Init();	
 	bsp_Video_Trans_PWR_Init();
 	bsp_Limit_SW_Init();
 	//bsp_motor_Init();
 	bsp_enccoder_Init();
 	//GENERAL_TIM_Configuration();
 	//bsp_BRD_Init();
-	bsp_GPS_Init(GPS_TTL);
+	bsp_GPS_Init(GPS_RS232);
 	bsp_GPS_cmd(ENABLE);
 	//bsp_RF_Init();
 	bsp_ADC_Init();
@@ -28,7 +28,8 @@ void bsp_Board_Init(void)
 	USART1_Config();        //串口1，用于LORA模块，本地无线通讯
 	USART2_Config();        //串口2，用于与电源板通信
 	USART3_Config();        //串口3，用于与海思芯片LINUX系统通讯
-	//UART4_Config();         //串口4，用于与GPS模块TTL通讯
+	UART4_Config();					//串口4，用于与打印输出
+	//UART4_Config();         
 	//UART5_Config();         //串口5，用于与GPS模块RS232通讯
 	//UART6_Config();       //串口6，预留，用于电机485控制
 	

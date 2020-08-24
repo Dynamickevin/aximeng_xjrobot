@@ -39,8 +39,8 @@
 #define GPS_TTL_UART_TX_AF                       GPIO_AF_UART4
 #define GPS_TTL_UART_TX_SOURCE                   GPIO_PinSource11
 
-#define GPS_TTL_UART_IRQHandler                  UART4_IRQHandler
-#define GPS_TTL_UART_IRQ                 				 UART4_IRQn
+//#define GPS_TTL_UART_IRQHandler                  UART4_IRQHandler
+//#define GPS_TTL_UART_IRQ                 				 UART4_IRQn
 	
 
 #define GPS_RS232_UART                             UART5
