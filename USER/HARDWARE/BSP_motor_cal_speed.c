@@ -53,7 +53,8 @@ float Master_Cal_Speed_Get_Voltage(void)
 	u8 i;
 	u32 Adc_Sum = 0;
 	float tmp;
-	for(i = 0 ; i < ADC_BUFFSIZE/ADC_CHANNEL_NUM ; i++){
+	for(i = 0 ; i < ADC_BUFFSIZE / ADC_CHANNEL_NUM ; i++)
+	{
 		Adc_Sum += ADC_Value[MASTER_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
 	}
 	tmp = Adc_Sum/(ADC_BUFFSIZE/ADC_CHANNEL_NUM) *3300/4096;
@@ -70,7 +71,8 @@ float Slave_Cal_Speed_Get_Voltage(void)
 	u8 i;
 	u32 Adc_Sum = 0;
 	float tmp;
-	for(i = 0 ; i < ADC_BUFFSIZE/ADC_CHANNEL_NUM ; i++){
+	for(i = 0 ; i < ADC_BUFFSIZE/ADC_CHANNEL_NUM ; i++)
+	{
 		Adc_Sum += ADC_Value[SLAVE_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
 	}
 	tmp = Adc_Sum/(ADC_BUFFSIZE/ADC_CHANNEL_NUM) *3300/4096;
@@ -80,12 +82,12 @@ float Slave_Cal_Speed_Get_Voltage(void)
 /*
   * @brief  获取当前主电机速度值 
   * @param  无
-  * @retval 返回速度值
+  * @retval 返回速度值（单位转）
 */
 
-float bsp_master_voltage_get_speed(void)
+int bsp_master_voltage_get_speed(void)
 {
-	float Master_Voltage;
+	int Master_Voltage;
 	Master_Voltage = Master_Cal_Speed_Get_Voltage();
 	return Master_Voltage/(MASTER_MOTOR_IN_VOLTAGE_MAX)*SLAVE_MOTOR_SPEED_SPAN_MAX;
 	
@@ -94,12 +96,12 @@ float bsp_master_voltage_get_speed(void)
 /*
   * @brief  获取当前从电机速度值 
   * @param  无
-  * @retval 返回重量值（单位g）
+  * @retval 返回速度值（单位转）
 */
 
-float bsp_slave_voltage_get_speed(void)
+int bsp_slave_voltage_get_speed(void)
 {
-	float Slave_Voltage;
+	int Slave_Voltage;
 	Slave_Voltage = Slave_Cal_Speed_Get_Voltage();
 	return Slave_Voltage/(SLAVE_MOTOR_IN_VOLTAGE_MAX)*SLAVE_MOTOR_SPEED_SPAN_MAX;
 	

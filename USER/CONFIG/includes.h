@@ -89,7 +89,7 @@ typedef struct {
 #define LOCAL_DEBUG_IN_MSG_RF433      			 	0x83
 #define LOCAL_DEBUG_IN_MSG_POWER_BOARD       	0x84
 
-//打印输出串口识别号
+//串口识别号
 #define ID_RF433               				1
 #define ID_POWER_BOARD                2               
 #define ID_LINUX               			  3
@@ -352,6 +352,7 @@ extern  RbtState gRbtState;
 #include "GpsUart.h"
 //#include "debug.h"
 
+#include "BSP_enccoder.h"
 #include "BSP_motor_cal_speed.h"
 #include  "board.h"
 

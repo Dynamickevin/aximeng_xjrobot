@@ -34,12 +34,13 @@ void bsp_Board_Init(void)
 	//UART6_Config();       //串口6，预留，用于电机485控制
 	
 	//TimerCode_DefaultFunction_Init(4);  //从动轮轮子编码器 定时器、数据采集初始化
+	zt_motor_slave_driver_init();     //从动轮电机  		   初始化 
+  zt_motor_master_driver_init();    //主动轮电机  		   初始化
 	MST_PWM_Init_Tim1_CH2();			//主动轮电机PWM波初始化配置函数
 	SLV_PWM_Init_Tim8_CH3();				//从动轮电机PWM波初始化配置函数
 	SetPwm_Tim1_CH2(0); 
 	SetPwm_Tim8_CH3(0);
-	zt_motor_slave_driver_init();     //从动轮电机  		   初始化 
-  zt_motor_master_driver_init();    //主动轮电机  		   初始化
+	
 	
 }
 	

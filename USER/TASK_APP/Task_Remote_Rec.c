@@ -29,18 +29,22 @@ void Task_Remote_Rec(void *pdata)
 				case LOCAL_DEBUG_IN_MSG_RF433:
 				{   
 						//LED2(LED_ON);
-				    CommDebug(ID_RF433,msg->point,msg->count);
+				  CommDebug(ID_RF433,msg->point,msg->count);
 				}
-				break;	
-				case LOCAL_DEBUG_IN_MSG_DEBUG:
+				break;
+				case LOCAL_DEBUG_IN_MSG_POWER_BOARD:	
 				{
-					//GpioSetL(GPIO_LED_SHOW1);
-					CommDebug(ID_DEBUG,msg->point,msg->count);
+					CommDebug(ID_POWER_BOARD,msg->point,msg->count);
 				}
 				break;	
 				case LOCAL_DEBUG_IN_MSG_LINUX:	
 				{
 					CommDebug(ID_LINUX,msg->point,msg->count);
+				}
+				break;
+				case LOCAL_DEBUG_IN_MSG_DEBUG:
+				{
+					CommDebug(ID_DEBUG,msg->point,msg->count);
 				}
 				break;
 				default:

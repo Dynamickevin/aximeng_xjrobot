@@ -133,20 +133,6 @@ void DebugMon_Handler(void)
 
  
 ////systick中断服务函数,使用OS时用到
-//void SysTick_Handler(void)
-//{	
-//	static uint16 counter;
-//	INT8U  err;
-//	DATA_CONTROL_BLOCK  *dp0,*dp1,*dp2,*dp8;
-//	
-//	if(delay_osrunning==1)					//OS开始跑了,才执行正常的调度处理
-//	{
-//		OSIntEnter();						//进入中断
-//		OSTimeTick();       				//调用ucos的时钟服务程序               
-//		OSIntExit();       	 				//触发任务切换软中断
-//	}
-//}
- 
 void SysTick_Handler(void)
 {
     static uint16 counter;
@@ -155,19 +141,15 @@ void SysTick_Handler(void)
 	
 	//OS_EVENT *Semaphore1;
 
-	
 	CPU_SR         cpu_sr;
 	OS_ENTER_CRITICAL();                         /* Tell uC/OS-II that we are starting an ISR          */
-    OSIntNesting++;
-    OS_EXIT_CRITICAL();
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
 
-    OSTimeTick();                                /* Call uC/OS-II's OSTimeTick()                       */
-	
+  OSTimeTick();                                /* Call uC/OS-II's OSTimeTick()                       */
 	
 	counter++;
 
-
-	//if ( (counter&0x03E8)==0 )		//2s
 	if ( counter>=200 )		//400ms
 	
 	{
@@ -189,7 +171,6 @@ void SysTick_Handler(void)
 	}
 
 	if ( (counter&0x07)==0 )//16ms
-	//if ( (counter&0x000F)==0 )//32ms
 	{
 		dp2 = OSMemGet(p_msgBuffer,&err);
 		if(OS_NO_ERR == err)
@@ -217,9 +198,8 @@ void SysTick_Handler(void)
 	
 	if((counter&0x0080)==0)//256ms
 	{
-		//counter = 0;
 
-        dp0 = OSMemGet(p_msgBuffer,&err);
+    dp0 = OSMemGet(p_msgBuffer,&err);
 		if(OS_NO_ERR == err)
 		{
 			((DATA_CONTROL_BLOCK *)dp0)->type = BATTERY_MSG; 
@@ -328,7 +308,17 @@ void UART4_IRQHandler(void)
 //}
 
 
-
+/*
+  * @brief  EXTI9_5，中断处理函数
+  * @param  无
+  * @retval 无
+*/
+void EXTI9_5_IRQHandler(void)
+{
+	//LIMIT_SW2_EXTI_Handler();
+	ENCCODER_AB_IRQHandler ();
+	ENCCODER_Z_EXTI_Handler();	
+}
 
 
 

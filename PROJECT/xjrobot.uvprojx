@@ -483,14 +483,14 @@
               <FilePath>..\USER\TASK_APP\uart_api.c</FilePath>
             </File>
             <File>
-              <FileName>Wheel_Encode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\Wheel_Encode.c</FilePath>
-            </File>
-            <File>
               <FileName>GpsUart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\GpsUart.c</FilePath>
+            </File>
+            <File>
+              <FileName>Wheel_Encode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\TASK_APP\Wheel_Encode.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -29,7 +29,7 @@
 
 //从电机模拟速度引脚定义
 /*******************************************************/
-#define SLAVE_MOTOR_SPEED_GPIO_PORT			GPIOC
+#define SLAVE_MOTOR_SPEED_GPIO_PORT				GPIOC
 #define SLAVE_MOTOR_SPEED_GPIO_PIN				GPIO_Pin_0
 #define SLAVE_MOTOR_SPEED_GPIO_CLK				RCC_AHB1Periph_GPIOC
 #define	SLAVE_MOTOR_SPEED_ADC_CHANNEL     ADC_Channel_10	
@@ -44,6 +44,10 @@ void bsp_slave_cal_speed_Init(void);							//从动轮模拟速度计算初始化
 float Master_Cal_Speed_Get_Voltage(void);
 	
 float Slave_Cal_Speed_Get_Voltage(void);
+
+int  bsp_master_voltage_get_speed(void);
+
+int bsp_slave_voltage_get_speed(void);
 
 #endif
 

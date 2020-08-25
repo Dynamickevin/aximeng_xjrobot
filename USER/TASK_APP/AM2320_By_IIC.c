@@ -27,21 +27,37 @@ uint8 VT_I2C_HardInit(I2C_INIT_INFO *I2C_Info)
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C3,ENABLE);
 	
 	   	/* Configure I2C3 pins: PA8->SCL and PC9->SDA */
-	   	GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8;
-	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
-	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+			GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;
+	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//普通输出模式
+			GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;//推挽输出
+			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//50MHz
+			//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
 	   	GPIO_Init(GPIOA, &GPIO_InitStructure);
 			
-			GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_9;
-	   	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_25MHz;
-	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+			GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
+	   	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//普通输出模式
+			GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;//推挽输出
+			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;//50MHz
+			//GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
 	   	GPIO_Init(GPIOC, &GPIO_InitStructure);
+		
+			//配置iic3端口复用
+			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+			GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8; // SCL
+			GPIO_Init(GPIOA, &GPIO_InitStructure);
+			GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_9; // SDA
+			GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+			//端口重映射
+			GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_I2C3);
+			GPIO_PinAFConfig(GPIOC, GPIO_PinSource9, GPIO_AF_I2C3);
 		
 	   	I2C_DeInit(I2C3);
 	   	I2C_InitStructure.I2C_Mode = I2C_Mode_I2C;
 	   	I2C_InitStructure.I2C_DutyCycle = I2C_DutyCycle_2;
 	   	I2C_InitStructure.I2C_OwnAddress1 = 0x30;
 	   	I2C_InitStructure.I2C_Ack = I2C_Ack_Enable;
+			
 		if(I2C_Info->slaveAddr>>8)
 		{
 			I2C_InitStructure.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_10bit;
@@ -377,12 +393,12 @@ void AM2320_Get_Data(void)
 		
 	}
 	OSTimeDly(2);
-	//Delay(100000);//必须加这个延时，否则传感器没准备好数据会出现读数据错误
-	//GpioSetL(GPIO_LED_SHOW1);
+	Delay(100000);//必须加这个延时，否则传感器没准备好数据会出现读数据错误
+	
 	ret = VT_I2C_HardReadNByte(I2C3,0,Read_from_AM2320Data,8);//读取温度和湿度
 	if(ret)
 	{
-		stprintf(ID_DEBUG,"I2C写数据错误:  ");
+		stprintf(ID_DEBUG,"I2C读数据错误:  ");
 		nprintf(ID_DEBUG,ret,0,DEC);
 		stprintf(ID_DEBUG,"\r\n");
 		

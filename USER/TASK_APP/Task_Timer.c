@@ -3,6 +3,19 @@
 
 #include "includes.h"
 
+//打印输出函数
+#define  DEBUG   1  
+#if DEBUG
+#define DBG_PRINTF(fmt, args...)\
+do\
+{\
+	printf("<<File:%s  Line:%d  Function:%s Date:%s Time:%s >> ", __FILE__, __LINE__, __FUNCTION__,__DATE__,__TIME__);\
+	printf(fmt, ##args);\
+}while(0)
+#else
+  #define DBG_PRINTF(fmt, args...)   
+#endif
+
 
 /*************************************************/
 //---------本任务涉及到的消息-----------
@@ -69,7 +82,7 @@ void SendWHLToLinux(void)
 	buf[5]=(temp0 & 0x000000ff);
 	buf[6]=(temp0 & 0x0000ff00)>>8;
 	buf[7]=(temp0 & 0x00ff0000)>>16;
-    buf[8]=(temp0 & 0xff000000)>>24;
+  buf[8]=(temp0 & 0xff000000)>>24;
 	buf[9]=(fn  & 0x000000ff);
 	buf[10]=(fn & 0x0000ff00)>>8;
 	buf[11]=(fn & 0x00ff0000)>>16;
@@ -77,7 +90,7 @@ void SendWHLToLinux(void)
 	buf[13]=(gRbtState.bCX_SwCheck1 || gRbtState.bCX_SwCheck2)? 0x01 : 0x00 ; //利用红外状态判断充电状态
 	buf[14]=0x96;
 
-	ack_with_debug(ID_LINUX,buf,15);	//将码盘值发送到ID_LINUX串口二
+	ack_with_debug(ID_LINUX,buf,15);	//将码盘值发送到ID_LINUX串口3
 	
 }
 
@@ -283,15 +296,7 @@ void debug_sprintf(uint8 com,char *str)
 	 
 	 CopyBuffer(str, dp, StringLen(str));
 
-	 if(com==ID_DEBUG)
- 	 {
-		 dp1->type = WEATHER_DEBUG_OUT_MSG_DEBUG;
- 	 }
-	 else if(com==ID_LINUX)
- 	 {
-		 dp1->type = WEATHER_DEBUG_OUT_MSG_LINUX;
- 	 }
-     else if(com==ID_RF433)
+	 if(com==ID_RF433)
  	 {
 		 dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
  	 }
@@ -299,11 +304,19 @@ void debug_sprintf(uint8 com,char *str)
  	 {
 		 dp1->type = WEATHER_DEBUG_OUT_MSG_POWER_BOARD;
  	 }
+	 else if(com==ID_LINUX)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_LINUX;
+ 	 }
+     else if(com==ID_DEBUG)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_DEBUG;
+ 	 }
+	 
 	 dp1->point =  (uint8 *)dp;
 	 dp1->count =  StringLen(str);
 	 if(OS_ERR_NONE != OSQPost(GetWeatherQueue,(void*)dp1))
 	 {
-     //GpioSetL(GPIO_LED_OUT_SHOW1);
 		 OSMemPut(mem160ptr,dp);
 		 OSMemPut(p_msgBuffer,dp1);
 	 }
@@ -361,21 +374,21 @@ void debug_nprintf(uint8 com,uint32 num,uint8 mul,uint8 typ)
 		if( *cp=='.'|| *cp=='\0')  cp--;
 	  	CopyBuffer(cp,dp,StringLen(cp));
 		
-		if(com==ID_DEBUG)
-	 	{
-			dp1->type = WEATHER_DEBUG_OUT_MSG_DEBUG;
-	 	}
-		else if(com==ID_LINUX)
-	 	{
-			dp1->type = WEATHER_DEBUG_OUT_MSG_LINUX;
-	 	}
-	    else if(com==ID_RF433)
-	 	{
-			dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
-	 	}
-		else if(com==ID_POWER_BOARD)
+		if(com==ID_RF433)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
+ 	 }
+	 else if(com==ID_POWER_BOARD)
  	 {
 		 dp1->type = WEATHER_DEBUG_OUT_MSG_POWER_BOARD;
+ 	 }
+	 else if(com==ID_LINUX)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_LINUX;
+ 	 }
+     else if(com==ID_DEBUG)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_DEBUG;
  	 }
 		dp1->point =  (uint8 *)dp;
 		dp1->count =  StringLen(cp);
@@ -406,21 +419,21 @@ void debug_nprintf(uint8 com,uint32 num,uint8 mul,uint8 typ)
 		*cp='\0';					  //加字符串结束标志
 		cp=dp;
 		CopyBuffer(cp,dp,StringLen(cp));
-		if(com==ID_DEBUG)
-	 	{
-			dp1->type = WEATHER_DEBUG_OUT_MSG_DEBUG;
-	 	}
-		else if(com==ID_LINUX)
-	 	{
-			dp1->type = WEATHER_DEBUG_OUT_MSG_LINUX;
-	 	}
-	    else if(com==ID_RF433)
-	 	{
-			dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
-	 	}
-		else if(com==ID_POWER_BOARD)
+		if(com==ID_RF433)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_RF433;
+ 	 }
+	 else if(com==ID_POWER_BOARD)
  	 {
 		 dp1->type = WEATHER_DEBUG_OUT_MSG_POWER_BOARD;
+ 	 }
+	 else if(com==ID_LINUX)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_LINUX;
+ 	 }
+     else if(com==ID_DEBUG)
+ 	 {
+		 dp1->type = WEATHER_DEBUG_OUT_MSG_DEBUG;
  	 }
 		dp1->point =  (uint8 *)dp;
 		dp1->count =  StringLen(cp);
@@ -468,6 +481,8 @@ void Task_Timer(void *pdata)
 {
 	uint8 err;
 	DATA_CONTROL_BLOCK *msg;
+	
+	//static int gPress_Newton;
 	static s32 nCxCheckMove;
 	
 	//创建温湿度定时器1，
@@ -493,14 +508,18 @@ void Task_Timer(void *pdata)
 				{
 					//LED2(LED_ON);
 					AM2320_Get_Data();
-					//stprintf(ID_RF433,"AM2320 \r\n");				
+					//stprintf(ID_DEBUG,"AM2320 \r\n");	
 				}
 				break;
 				case SYS_LED_MSG: 		// 1s
 				{
 					//LED2(LED_ON);
 					System_State_LED();
-					//stprintf(ID_LINUX,"LED \r\n");		
+					
+					//gPress_Newton = bsp_Enccoder_AB_GET_Cnt();
+					//nprintf(ID_DEBUG,gPress_Newton,0,DEC);
+					//stprintf(ID_LINUX,"LED \r\n");
+					//DBG_PRINTF("Hello World");
 					
 				}
 				break;

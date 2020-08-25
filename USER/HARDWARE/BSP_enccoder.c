@@ -7,7 +7,7 @@
 	***********************************************************************
 ***/
 
-#define  SLAVE_WHEEL_CODE_SCALE         2400		//码盘换算比例系数
+#define  SLAVE_WHEEL_CODE_SCALE         800		//码盘换算比例系数
 
 extern uint32_t Time100ms;
 

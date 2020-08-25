@@ -25,7 +25,7 @@
 #define GPS_TTL_UART                             UART4
 #define GPS_TTL_UART_CLK                         RCC_APB1Periph_UART4
 
-#define GPS_TTL_UART_BAUDRATE                    9600	
+#define GPS_TTL_UART_BAUDRATE                    115200	
 
 #define GPS_TTL_UART_RX_GPIO_PORT                GPIOC
 #define GPS_TTL_UART_RX_GPIO_CLK                 RCC_AHB1Periph_GPIOC

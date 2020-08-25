@@ -1863,6 +1863,11 @@ void CommDebug(uint8 id,uint8 *sp,uint16 length)
 					Frame_No_Rf433[i]= gCmdParaInfos.items[gCmdParaInfos.item_cnt-3].value[i];
 					//GpioSetL(GPIO_LED_SHOW1);
 				}
+				else if(com == ID_POWER_BOARD)
+				{
+					Frame_No_POWER[i]= gCmdParaInfos.items[gCmdParaInfos.item_cnt-3].value[i];
+					//GpioSetL(GPIO_LED_SHOW1);
+				}
 			} 
 
 

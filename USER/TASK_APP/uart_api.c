@@ -193,7 +193,7 @@ void USART2_Config(void)
 	USART_ClearFlag(USART2, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
 
   /* Enable USART */
-	AtCmdFromDebug.counter = 0;
+	AtCmdFromPowerBoard.counter = 0;
 	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
 	USART_ITConfig(USART2, USART_IT_IDLE, ENABLE);
@@ -278,7 +278,7 @@ void UART4_Config(void)
 	/* 连接 PC10 到 USARTx_Tx*/
 	GPIO_PinAFConfig(GPIOC,GPIO_PinSource10,GPIO_AF_UART4);
 
-	/*  连接 PXx 到 USARTx__Rx*/
+	/*  连接 PC11x 到 USARTx__Rx*/
 	GPIO_PinAFConfig(GPIOC,GPIO_PinSource11,GPIO_AF_UART4);
 	
  /* 配置Tx引脚为复用功能  */
@@ -297,22 +297,22 @@ void UART4_Config(void)
 
  
   /* 设置串口硬件参数 */
-	//USART3 初始化设置
+	//UART4 初始化设置
 	USART_InitStructure.USART_BaudRate = 115200;//波特率设置
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;//字长为8位数据格式
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;//一个停止位
 	USART_InitStructure.USART_Parity = USART_Parity_No;//无奇偶校验位
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;//无硬件数据流控制
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;	//收发模式
-  USART_Init(UART4, &USART_InitStructure); //初始化串口3
+  USART_Init(UART4, &USART_InitStructure); //初始化串口4
 
 	/* CPU的小缺陷：串口配置好，如果直接Send，则第1个字节发送不出去
 		如下语句解决第1个字节无法正确发送出去的问题 */
 	USART_ClearFlag(UART4, USART_FLAG_TC);     /* 清发送外城标志，Transmission Complete flag */
 
   
-  /* Enable USART */
-	AtCmdFromLinux.counter = 0;
+  /* Enable UART4 */
+	AtCmdFromDebug.counter = 0;
 	USART_ITConfig(UART4, USART_IT_TXE, ENABLE);
 	USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
 	USART_ITConfig(UART4, USART_IT_IDLE, ENABLE);
@@ -468,7 +468,7 @@ void USART2_ISR(void)
 		  /* Disable the USARTx transmit data register empty interrupt */
           USART_ITConfig(USART2, USART_IT_TXE, DISABLE);
           g_zt_msg2.counter = 0;
-		  OSSemPost(Usart2Sem);
+					OSSemPost(Usart2Sem);
       }	
 	  else
 	  {
@@ -508,20 +508,20 @@ void USART2_ISR(void)
 				OSMemPut(mem160ptr,dp1);
 			}
 		}
-		AtCmdFromDebug.counter = 0;
+		AtCmdFromPowerBoard.counter = 0;
 	}
 	
   /* USART in mode Receiver --------------------------------------------------*/
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
     {
-	    AtCmdFromDebug.recv_buf[AtCmdFromDebug.counter++] = USART_ReceiveData(USART2);
-	    AtCmdFromDebug.counter %= RX_LENGTH; 			
+	    AtCmdFromPowerBoard.recv_buf[AtCmdFromPowerBoard.counter++] = USART_ReceiveData(USART2);
+	    AtCmdFromPowerBoard.counter %= RX_LENGTH; 			
     }   
 }
 
 
 /****************************************************************************
-* 函数名: USART3_ISR   USART3 = RF433
+* 函数名: USART3_ISR   USART3 = LINUX_PORT
 * 功  能: USART3中断服务程序
 * 输  入: 无
 * 输  出: 无
@@ -545,7 +545,7 @@ void USART3_ISR(void)
           /* Disable the USARTx transmit data register empty interrupt */
           USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
           g_zt_msg3.counter = 0;
-		  OSSemPost(Usart3Sem);
+					OSSemPost(Usart3Sem);
       }	
 	  else
 	  {
@@ -618,11 +618,11 @@ void UART4_ISR(void)
 	  
       if (g_zt_msg4.counter >= g_zt_msg4.icmd_len)
       {			
-          //GpioSetL(GPIO_LED_SHOW1);
-		  /* Disable the USARTx transmit data register empty interrupt */
+       
+				/* Disable the USARTx transmit data register empty interrupt */
           USART_ITConfig(UART4, USART_IT_TXE, DISABLE);
           g_zt_msg4.counter = 0;
-		  OSSemPost(Uart4Sem);
+					OSSemPost(Uart4Sem);
       }	
 	  else
 	  {
@@ -665,7 +665,7 @@ void UART4_ISR(void)
 		AtCmdFromDebug.counter = 0;
 	}
 	
-  /* USART in mode Receiver --------------------------------------------------*/
+  /* USART4 in mode Receiver --------------------------------------------------*/
 	if (USART_GetITStatus(UART4, USART_IT_RXNE) == SET)
     {
 	    AtCmdFromDebug.recv_buf[AtCmdFromDebug.counter++] = USART_ReceiveData(UART4);

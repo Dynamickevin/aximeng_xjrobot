@@ -59,10 +59,10 @@ float Pressure_Sensor_Get_Voltage(void)
   * @retval 返回压力值（单位牛顿N）
 */
 
-int bsp_Pressure_Sensor_Get_Newton(void)
+float bsp_Pressure_Sensor_Get_Newton(void)
 {
 	float Voltage;
 	Voltage = Pressure_Sensor_Get_Voltage();
-	return (int)Voltage/(IN_VOLTAGE_MAX)*PRESSURE_SENSOR_SPAN_MAX;
+	return Voltage/(IN_VOLTAGE_MAX)*PRESSURE_SENSOR_SPAN_MAX;
 }
 
