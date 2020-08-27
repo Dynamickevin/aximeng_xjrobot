@@ -105,6 +105,16 @@ static void ENCCODER_AB_Config(void)
 }
 
  /*
+  * @brief  获取编码器定时器寄存器值
+  * @param  无
+  * @retval 编码值
+*/
+ void Enccoder_AB_GET_Clear_Cnt(void)
+{
+		ENCCODER_AB_TIM->CNT = 0;
+}
+
+ /*
   * @brief  编码器 获取编码值
   * @param  无
   * @retval 编码值

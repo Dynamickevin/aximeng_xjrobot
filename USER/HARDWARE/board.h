@@ -11,6 +11,7 @@
 #include "NVIC_IRQ.h"
 #include "BSP_Video_TRANS.h"
 #include "BSP_Debug.h"
+#include "BSP_MOTOR.h"
 //#include "BSP_BRD.h"
 void bsp_Board_Init(void);
 

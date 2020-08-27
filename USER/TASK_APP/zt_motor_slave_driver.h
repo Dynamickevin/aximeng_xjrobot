@@ -7,6 +7,54 @@
 #ifndef _ZT_MOTOR_SLAVE_DRIVER_H_
 #define _ZT_MOTOR_SLAVE_DRIVER_H_
 
+
+#include "stm32f4xx.h"
+
+
+
+#define MOTOR2_EN_PIN          			GPIO_Pin_12              
+#define MOTOR2_EN_GPIO_PORT    			GPIOB                      
+#define MOTOR2_EN_GPIO_CLK      		RCC_AHB1Periph_GPIOB
+
+#define MOTOR2_DIR_PIN          		GPIO_Pin_13              
+#define MOTOR2_DIR_GPIO_PORT    		GPIOB                      
+#define MOTOR2_DIR_GPIO_CLK      		RCC_AHB1Periph_GPIOB
+
+#define MOTOR2_OCPWM_PIN          	GPIO_Pin_15             
+#define MOTOR2_OCPWM_GPIO_PORT    	GPIOB                     
+#define MOTOR2_OCPWM_GPIO_CLK      	RCC_AHB1Periph_GPIOB
+#define MOTOR2_OCPWM_PINSOURCE			GPIO_PinSource15
+#define MOTOR2_OCPWM_AF							GPIO_AF_TIM8
+
+
+#define	MOTOR2_TIM           				TIM8
+#define MOTOR2_TIM_CLK       				RCC_APB2Periph_TIM8
+
+#define MOTOR2_TIM_OC_INIT					TIM_OC3Init
+#define	MOTOR2_TIM_Period						10000			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period   分辨率为MOTOR1_TIM_Period
+#define	MOTOR2_TIM_PSC							210
+#define	MOTOR2_SetCompare						TIM_SetCompare3
+/*******************************************************/
+
+typedef enum {MOTOR_CCW = 0,MOTOR_CW}MOTOR_DIR;
+
+typedef struct{
+	FunctionalState NewState;		//ENABLE / DISABLE
+	int16_t 		Speed;			
+}MOTOR_CTRL_TYPEDRF;
+
+// motor控制调用函数
+/*********************************************************/
+			
+void bsp_slave_motor_Init(void);		//从电机驱动初始化
+		
+void bsp_Slave_motor2_cmd(FunctionalState NewState);		// 电机使能/失能命令
+
+void bsp_Slave_motor2_Set_Speed(u16 NewSpeed);			// 电机速度设置  1000~9000
+
+
+
+
 #define SLV_DIR_TO_PRESS_UP    0XFF   //速度为- 为松 +为紧
 #define SLV_DIR_TO_PRESS_CLOSE  0
 #define SLV_DIR_TO_PRESS_DOWN   1
@@ -49,7 +97,7 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run);
 
 #define GET_MASTER_MOTOR_CODE()  GetTimerCodeVal(TIM3)
 #define GET_SLAVE_MOTOR_CODE()  GetTimerCodeVal(TIM2)
-#define GET_SLAVE_WHEEL_CODE()  GetTimerCodeVal(TIM4)
+#define GET_SLAVE_WHEEL_CODE()  bsp_Enccoder_AB_GET_Cnt()
 
 //抱闸 使能管脚 PD1
 #define SET_MT_BREAK_OPEN      GpioSetL(GPIO_BREAK_MEN)
@@ -65,8 +113,9 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run);
 #define SET_SLAVE_MOTOR_ZZ()    GpioSetH(GPIO_CTL_DIR_S2) ; GpioSetL(GPIO_CTL_DIR_S1)
 #define SET_SLAVE_MOTOR_FZ()    GpioSetL(GPIO_CTL_DIR_S2) ; GpioSetH(GPIO_CTL_DIR_S1)
 
-#define SET_MASTER_MOTOR_PWM  SetPwm_Tim1_CH2
-#define SET_SLAVE_MOTOR_PWM   SetPwm_Tim8_CH3
+#define SET_MASTER_MOTOR_PWM  bsp_Master_motor1_Set_Speed
+#define SET_SLAVE_MOTOR_PWM   bsp_Slave_motor2_Set_Speed
+
 //#define SET_SLAVE_MOTOR_PWM(...)
 
 

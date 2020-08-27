@@ -347,7 +347,7 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
     if( stateFlag & BUILD_STATE_FLAG_SLVWH )
 	{
         //从动轮轮子 相关信息
-        g_zt_msg.trans_vals[0] = (signed short)(GET_SLAVE_WHEEL_CODE());
+        g_zt_msg.trans_vals[0] = bsp_Enccoder_AB_GET_Cnt();
         g_zt_msg.trans_vals[1] = gBatAutoCtrl.nCxCheckMove; //gSpeedAnaly_Whl.speed ;
         //g_zt_msg.trans_vals[1] = gCodeZ+1;
         str = cmd_para_build_para_string_ints( str , "SlvWhl" , g_zt_msg.trans_vals , 2 );

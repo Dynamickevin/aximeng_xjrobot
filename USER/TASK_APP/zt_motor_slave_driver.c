@@ -1,6 +1,9 @@
 
 #include <includes.h>
 
+static void bsp_Slave_Motor2_Config(void);
+static void bsp_Slave_Motor2_GPIO_Init(void);
+
 extern ZT_INFO_TYPE g_zt_msg;
 SpeedAnalyByCode gSpeedAnaly_Mst;    //MST  master 缩写
 SpeedAnalyByCode gSpeedAnaly_Slv;    //从动轮控制电机 编码器
@@ -13,6 +16,106 @@ RbtState 		 gRbtState;
 
 #define OUT_LOG_SLAVEMT  USART_DEBUG_OUT
 #define OUT_LOG_SLAVE_BYTE(byte) // uart_send_byte( DEBUG_PORT , (byte) )
+
+
+
+/*
+  * @brief  从电机MOTOR初始化
+  * @param  无
+  * @retval 无
+*/
+void bsp_slave_motor_Init(void)
+{
+	bsp_Slave_Motor2_GPIO_Init();
+	bsp_Slave_Motor2_Config();
+	
+}
+
+/*
+**从电机控制引脚初始化函数
+*/
+static void bsp_Slave_Motor2_GPIO_Init(void) 
+{
+	/*定义一个GPIO_InitTypeDef类型的结构体*/
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	/*开启相关的GPIO外设时钟*/
+	RCC_AHB1PeriphClockCmd (MOTOR2_EN_GPIO_CLK|MOTOR2_DIR_GPIO_CLK|MOTOR2_OCPWM_GPIO_CLK, ENABLE); 
+ 															   
+	GPIO_SetBits(MOTOR2_EN_GPIO_PORT,MOTOR2_EN_PIN);
+	GPIO_SetBits(MOTOR2_DIR_GPIO_PORT,MOTOR2_DIR_PIN);
+	
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 
+	GPIO_InitStructure.GPIO_Pin = MOTOR2_EN_PIN;		
+	GPIO_Init(MOTOR2_EN_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_InitStructure.GPIO_Pin = MOTOR2_DIR_PIN;		
+	GPIO_Init(MOTOR2_DIR_GPIO_PORT, &GPIO_InitStructure);	
+
+	/* 定时器通道引脚复用 */ 
+	GPIO_PinAFConfig(MOTOR2_OCPWM_GPIO_PORT,MOTOR2_OCPWM_PINSOURCE,MOTOR2_OCPWM_AF); 
+	/* 定时器通道引脚配置 */															   
+	GPIO_InitStructure.GPIO_Pin = MOTOR2_OCPWM_PIN;	
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz; 
+	GPIO_Init(MOTOR2_OCPWM_GPIO_PORT, &GPIO_InitStructure);
+	
+}
+
+
+/*
+ * 注意：TIM_TimeBaseInitTypeDef结构体里面有5个成员，TIM6和TIM7的寄存器里面只有
+ * TIM_Prescaler和TIM_Period，所以使用TIM6和TIM7的时候只需初始化这两个成员即可，
+ */
+static void bsp_Slave_Motor2_Config(void)
+{
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	TIM_OCInitTypeDef  TIM_OCInitStructure;
+	
+	// 开启TIMx_CLK,x[2,3,4,5,12,13,14] 
+	RCC_APB2PeriphClockCmd(MOTOR2_TIM_CLK, ENABLE); 
+
+	TIM_TimeBaseStructure.TIM_Period = MOTOR2_TIM_Period-1;       
+
+	TIM_TimeBaseStructure.TIM_Prescaler = MOTOR2_TIM_PSC-1;	
+	TIM_TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1;
+	TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
+	 
+	TIM_TimeBaseInit(MOTOR2_TIM, &TIM_TimeBaseStructure);
+	//ARR的周期值对应   TIM_TimeBaseStructure.TIM_Period  的设置值
+  //PSC的分频值对应   TIM_TimeBaseStructure.TIM_Prescaler 的设置值
+  //PWM频率=（168000K/（PSC+1））/ ARR = 
+	
+	/*PWM模式配置*/
+	/* PWM1 Mode configuration: Channel1 */
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;	    //配置为PWM模式1
+	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
+	TIM_OCInitStructure.TIM_Pulse = 20;
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
+	MOTOR2_TIM_OC_INIT(MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道1
+  
+	// 使能定时器
+	TIM_Cmd(MOTOR2_TIM, ENABLE);	
+	TIM_CtrlPWMOutputs(MOTOR2_TIM,ENABLE);
+}
+
+
+/*
+  * @brief  从电机2 速度调节
+  * @param  10~90;  	
+  * @retval 无
+*/
+void bsp_Slave_motor2_Set_Speed(u16 NewSpeed)
+{
+	if(NewSpeed>MOTOR2_TIM_Period*0.9)NewSpeed = MOTOR2_TIM_Period*0.9;
+	MOTOR2_SetCompare(MOTOR2_TIM,NewSpeed / 100);	
+}
+
+
 
 static __inline void real_set_slv_mt_close(void)
 {
@@ -55,10 +158,10 @@ void zt_motor_slave_driver_cfg_init(void)
         gSlvMtCfg.mstAddAccl = 10;
         gSlvMtCfg.mstDelAccl = 40;
         //AT+SlvCFG=6 pmin=40 pmax=110 pmid=75 StopMin=20 StopMax=150 SpeedBrg=10
-        gSlvMtCfg.press_ok_min         = 40;  //30;  //40;  //   正常运行过程中，压力的最小值
-        gSlvMtCfg.press_ok_max         = 70;  //70;  //100; //   正常运动过程中，压力的最大值
-        gSlvMtCfg.press_mst_stop_min   = 10;  //10;  //20;  //   压力太小，需要停止主动轮 停止主动轮压力最小值
-        gSlvMtCfg.press_mst_stop_max   = 120; //120; //150; //   压力太大，需要停止主动轮 停止主动轮压力最大值
+        gSlvMtCfg.press_ok_min         = 60;  //30;  //40;  //   正常运行过程中，压力的最小值
+        gSlvMtCfg.press_ok_max         = 150;  //70;  //100; //   正常运动过程中，压力的最大值
+        gSlvMtCfg.press_mst_stop_min   = 30;  //10;  //20;  //   压力太小，需要停止主动轮 停止主动轮压力最小值
+        gSlvMtCfg.press_mst_stop_max   = 250; //120; //150; //   压力太大，需要停止主动轮 停止主动轮压力最大值
         gSlvMtCfg.mst_limit_on_bridge  = 16;  //10;  //10;  //   在桥上的限速 //50;  //70;  //   需要进行调整时，目标压力值
     }
     
@@ -97,22 +200,15 @@ void zt_motor_slave_driver_cfg_init(void)
 *************************************************/
 void zt_motor_slave_driver_init(void)
 {
-    //PB12 PB13 从动轮 电机方向控制 
-		//PC4 PB5 限位开关
-    //GPIO_InitTypeDef            GPIO_InitStructure;
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOC , ENABLE);
-    
-    GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S1);
-    GPIO_INIT_OUT_PP(GPIO_CTL_DIR_S2);
+    //PB12 PB13 从动轮 电机方向控制 PC4 PB5 限位开关
+		bsp_slave_motor_Init();
     SET_SLAVE_MOTOR_CLOSE();    
     
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1);
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1 );
     
-    
     //编码器值 进行初始化
     //TimerCode_DefaultFunction_Init(3);  //编码器 数据采集初始化 从动轮 TIM3
-
     memset( &gBatAutoCtrl    , 0 , sizeof(gBatAutoCtrl    ) );
     memset( &gSpeedAnaly_Slv , 0 , sizeof(SpeedAnalyByCode) );
     memset( &gSpeedAnaly_Whl , 0 , sizeof(SpeedAnalyByCode) );
@@ -122,7 +218,6 @@ void zt_motor_slave_driver_init(void)
 
     //各种 配置信息的初始化
     zt_motor_slave_driver_cfg_init();
-    
     SET_SLAVE_MOTOR_CLOSE() ;
 
 		//从动轮码盘有关参数
@@ -191,7 +286,8 @@ static __inline void DoSpeedAnalyByCode(void)
 {
     //gSlaveMtAnaly.b_XianWei_Up   = !GpioGet(GPIO_CHK_LIMIT1) ;
     //gSlaveMtAnaly.b_XianWei_Down = !GpioGet(GPIO_CHK_LIMIT2) ;
-    gSlaveMtAnaly.b_XianWei_Up   = (!GpioGet(GPIO_CHK_LIMIT1)) || (!GpioGet(GPIO_CHK_LIMIT2));
+	
+    gSlaveMtAnaly.b_XianWei_Up   = (SW_GpioGet(GPIO_CHK_LIMIT1)) || (SW_GpioGet(GPIO_CHK_LIMIT2));
     gSlaveMtAnaly.b_XianWei_Down = gSlaveMtAnaly.b_XianWei_Up;
 
     //从电机 的控制 需要进行快速响应的控制 这时需要 获取当前 20ms 的电机速度
@@ -806,9 +902,9 @@ void UpdateFastBatChargingState(void)
 {
     int curDisByCheck;
 	
-	gRbtState.bCX_SwCheck1 = !GpioGet(GPIO_CHK_CHAOXUE1) ;
-    //gRbtState.bCX_SwCheck2 = !GpioGet(GPIO_CHK_CHAOXUE2) ;
-    gRbtState.bChargeVolIn = !GpioGet(GPIO_CHK_CHAG_JOIN ) ;
+		//gRbtState.bCX_SwCheck1 = SW_GpioGet(GPIO_CHK_LIMIT2) ;
+    gRbtState.bCX_SwCheck2 = SW_GpioGet(GPIO_CHK_CHAOXUE1) ;
+    //gRbtState.bChargeVolIn = !GpioGet(GPIO_CHK_CHAG_JOIN ) ;
     //gRbtState.bChargeShort = !GpioGet(GPIO_CHK_CHAG_SHORT) ;
     
     ////1.进入到红外遮挡位置，编码器寄存器自动清零一次；
@@ -824,7 +920,7 @@ void UpdateFastBatChargingState(void)
 		{ 
             gBatAutoCtrl.bOnBridge = true;
 			
-            GET_SLAVE_WHEEL_CODE() = 0; //当前编码器值清零
+            Enccoder_AB_GET_Clear_Cnt(); //当前编码器值清零
             gBatAutoCtrl.nCxCheckMove = 0;
             //gCodeZ=0;
 			

@@ -395,7 +395,7 @@ void Task_Timer(void *pdata)
 	uint8 err;
 	DATA_CONTROL_BLOCK *msg;
 	
-	static int gPress_Newton;
+	//static int gPress_Newton;
 	static s32 nCxCheckMove;
 	
 	//创建温湿度定时器1，
@@ -428,8 +428,8 @@ void Task_Timer(void *pdata)
 				{
 					//LED2(LED_ON);
 					System_State_LED();					
-					gPress_Newton = Pressure_Sensor_Get_Voltage();
-					nprintf(ID_DEBUG,gPress_Newton,0,DEC);
+					//gPress_Newton = bsp_slave_voltage_get_speed();
+					//nprintf(ID_DEBUG,gPress_Newton,0,DEC);
 					//stprintf(ID_LINUX,"LED \r\n");
 					//DBG_PRINTF("Hello World");
 				}

@@ -12,67 +12,78 @@ void TimerCode_And_Gpio_Init_TIM1(void)
     //BOX_ERROR_HANDLER( 777 );  //未实现 错误报警
 }
 
-//	从电机编码器采集	PA15 TIM2_CH1      PB3->TIM2_CH2 
-//01：部分映像(CH1/ETR/PA15，CH2/PB3，CH3/PA2，CH4/PA3)
-void TimerCode_And_Gpio_Init_TIM2(void)
-{
-    GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 ,ENABLE);    /*使能TIM2 时钟*/
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB , ENABLE); /*使能GPIOA/GPIOB 时钟*/
-
-		//开启下载功能，复用引脚
-    GPIO_PinAFConfig(GPIOA, GPIO_PinSource13 | GPIO_PinSource14, GPIO_AF_SWJ);
-	
-		GPIO_PinAFConfig(GPIOA, GPIO_PinSource15, GPIO_AF_TIM2); //将定时器管脚映射到pb3 pa15引脚
-
-    GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15 ;
-    GPIO_Init(GPIOA,&GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 ;
-    GPIO_Init(GPIOB,&GPIO_InitStructure);
-}
-
-//	主电机编码器采集
-//10：部分映像(CH1/PB4 ，CH2/PB5，CH3/PB0，CH4/PB1)
-//PB4 – 90 – CK_CODEA_M2 – TIM3_CH1 （重映射）– 主动轮编码器A通道信号采集
-//PB3 – 91 – CK_CODEB_M2 – TIM3_CH2 （重映射）– 主动轮编码器B通道信号采集
+//	主电机编码器采集	PB4 TIM3_CH1      PB5->TIM3_CH2
 void TimerCode_And_Gpio_Init_TIM3(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);    /*使能TIM3时钟*/
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE);   /*使能GPIOB时钟*/
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3 ,ENABLE);    /*使能TIM3 时钟*/
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB , ENABLE); /*使能GPIOB时钟*/
+
 	
-		GPIO_PinAFConfig(GPIOB, GPIO_PinSource3 | GPIO_PinSource4, GPIO_AF_TIM3);
-    //GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3,ENABLE);   //将定时器管脚映射到pb4、pb3引脚
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_TIM3); //将定时器管脚映射到pb4 引脚
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_TIM3); //将定时器管脚映射到pb5引脚
+	
+    GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 ;
+    GPIO_Init(GPIOB,&GPIO_InitStructure);
 
     GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4|GPIO_Pin_3 ; /*timer3 重映射的通道1 2*/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 ;
     GPIO_Init(GPIOB,&GPIO_InitStructure);
 }
 
-//1：完全映像(TIM4_CH1/PD12 ，TIM4_CH2/PD13，TIM4_CH3/PD14，TIM4_CH4/PD15) 
-// PD12 – 59 – CK_CODEB_CD – TIM4_CH1（重映射）– 从动轮轮子编码器B通道信号采集
-// PD13 – 60 – CK_CODEA_CD – TIM4_CH2（重映射）– 从动轮轮子编码器A通道信号采集
-// PD14 – 61 – CK_CODEZ_CD – TIM4_CH3（重映射）– 从动轮轮子编码器Z通道信号采集
+//	从电机编码器采集
+//PB6 – 58 – CK_CODEA_S2 – TIM4_CH1 （重映射）– 从动轮编码器A通道信号采集
+//PB7 – 59 – CK_CODEB_S2 – TIM4_CH2 （重映射）– 从动轮编码器B通道信号采集
 void TimerCode_And_Gpio_Init_TIM4(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,ENABLE);    /*使能TIM4时钟*/
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);   /*使能GPIOD时钟*/
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE);   /*使能GPIOB时钟*/
 	
-		GPIO_PinAFConfig(GPIOD, GPIO_PinSource12 | GPIO_PinSource13, GPIO_AF_TIM3);
-    //GPIO_PinRemapConfig(GPIO_Remap_TIM4,ENABLE);  		  //将定时器管脚映射到pd12 13引脚
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
+		GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_TIM4);
+	
+    GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7 ; /*timer4 重映射的通道1 2*/
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_Init(GPIOB,&GPIO_InitStructure);
+}
+
+
+// PA0 – 14 – CK_CODEA_CD – TIM5_CH1（重映射）– 从动轮轮子编码器B通道信号采集
+// PA1 – 15 – CK_CODEB_CD – TIM5_CH2（重映射）– 从动轮轮子编码器A通道信号采集
+void TimerCode_And_Gpio_Init_TIM5(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5,ENABLE);    /*使能TIM5时钟*/
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);   /*使能GPIOD时钟*/
+	
+		GPIO_PinAFConfig(GPIOA, GPIO_PinSource0 | GPIO_PinSource1, GPIO_AF_TIM5);
 
     GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12|GPIO_Pin_13; /*timer4 重映射的通道1 2*/
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1; /*timer5 重映射的通道1 2*/
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_Init(GPIOD,&GPIO_InitStructure);
+    GPIO_Init(GPIOA,&GPIO_InitStructure);
 }
+
+// PA5 – 21 – CK_CODEZ_CD – TIM2_CH1（重映射）– 从动轮轮子编码器Z通道信号采集
+void TimerCode_And_Gpio_Init_TIM2(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);    /*使能TIM2时钟*/
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);   /*使能GPIOD时钟*/
+	
+		GPIO_PinAFConfig(GPIOA, GPIO_PinSource5, GPIO_AF_TIM5);
+
+    GPIO_InitStructure.GPIO_Speed  =GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5; /*timer5 重映射的通道1*/
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+    GPIO_Init(GPIOA,&GPIO_InitStructure);
+}
+
 
 
 typedef void (*VoidFuncPtr) (void); 
@@ -82,7 +93,7 @@ const VoidFuncPtr TimerCode_And_Gpio_Inits[MAX_HARD_TIMER_CNT+1] = {
     TimerCode_And_Gpio_Init_TIM2 ,
     TimerCode_And_Gpio_Init_TIM3 ,
     TimerCode_And_Gpio_Init_TIM4 ,
-    //TimerCode_And_Gpio_Init_TIM5 ,
+    TimerCode_And_Gpio_Init_TIM5 ,
     //TimerCode_And_Gpio_Init_TIM6 ,
     //TimerCode_And_Gpio_Init_TIM7 ,
     //TimerCode_And_Gpio_Init_TIM8 ,

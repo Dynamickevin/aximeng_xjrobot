@@ -463,11 +463,6 @@
               <FilePath>..\USER\TASK_APP\zt_motor_slave_driver.c</FilePath>
             </File>
             <File>
-              <FileName>TimerPWm_Driver.C</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\TimerPWm_Driver.C</FilePath>
-            </File>
-            <File>
               <FileName>AM2320_By_IIC.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\AM2320_By_IIC.c</FilePath>

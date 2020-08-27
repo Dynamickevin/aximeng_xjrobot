@@ -4,10 +4,56 @@
 //底层驱动级别 提供电机初始化，速度控制，位置控制接口
 //驱动内部有一个自动的速度控制更新函数，该函数在每次tick时被调用一次
 //////////////////////////////////////////////////////////////////////////
+
+#include "stm32f4xx.h"
+
 #ifndef _ZT_MOTOR_MASTER_DRIVER_H_
 #define _ZT_MOTOR_MASTER_DRIVER_H_
 
-#define GET_SLAVE_WHEEL_CODE()  GetTimerCodeVal(TIM4)
+//定义
+/*******************************************************/
+#define MOTOR1_EN_PIN          			GPIO_Pin_2              
+#define MOTOR1_EN_GPIO_PORT    			GPIOB                      
+#define MOTOR1_EN_GPIO_CLK      		RCC_AHB1Periph_GPIOB
+
+#define MOTOR1_DIR_PIN          		GPIO_Pin_12              
+#define MOTOR1_DIR_GPIO_PORT    		GPIOA                      
+#define MOTOR1_DIR_GPIO_CLK      		RCC_AHB1Periph_GPIOA
+
+#define MOTOR1_OCPWM_PIN          	GPIO_Pin_14             
+#define MOTOR1_OCPWM_GPIO_PORT    	GPIOB                     
+#define MOTOR1_OCPWM_GPIO_CLK      	RCC_AHB1Periph_GPIOB
+#define MOTOR1_OCPWM_PINSOURCE			GPIO_PinSource14
+#define MOTOR1_OCPWM_AF							GPIO_AF_TIM1
+
+#define	MOTOR1_TIM           				TIM1
+#define MOTOR1_TIM_CLK       				RCC_APB2Periph_TIM1
+
+#define MOTOR1_TIM_OC_INIT					TIM_OC2Init
+
+#define	MOTOR1_TIM_Period						10000			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period = 80HZ   分辨率为MOTOR1_TIM_Period
+#define	MOTOR1_TIM_PSC							210
+#define	MOTOR1_SetCompare						TIM_SetCompare2
+
+//typedef struct{
+//	FunctionalState NewState;		//ENABLE / DISABLE
+//	int16_t 		Speed;			
+//}MOTOR_CTRL_TYPEDRF;
+
+// 主电机motor控制调用函数
+/*********************************************************/
+			
+void bsp_master_motor_Init(void);		//主电机驱动初始化
+	
+void bsp_Master_Motor1_Config(void);
+
+void bsp_Master_Motor1_GPIO_Init(void);
+
+void bsp_Master_motor1_Set_Speed(u16 NewSpeed);	
+
+
+
+#define GET_SLAVE_WHEEL_CODE()  bsp_Enccoder_AB_GET_Cnt()
 #define  SLAVE_WHEEL_CODE_SCALE         2400		//码盘换算比例系数
 
 
@@ -76,6 +122,10 @@ extern MotorDriverCtrlType gMstMt;
 *DESCRIPTION:  主动轮速度实际控制速度分析及更新过程
 *************************************************/
 void zt_motor_master_driver_update(void);
+
+
+int32_t bsp_Enccoder_AB_GET_Cnt(void);
+
 
 
 /*************************************************

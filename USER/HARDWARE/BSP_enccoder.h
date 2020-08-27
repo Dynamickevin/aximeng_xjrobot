@@ -51,6 +51,7 @@
 	
 void ENCCODER_Z_EXTI_Handler(void);
 void  bsp_enccoder_Init(void);
+void Enccoder_AB_GET_Clear_Cnt(void);
 int32_t bsp_Enccoder_AB_GET_Cnt(void);
 					
 #endif

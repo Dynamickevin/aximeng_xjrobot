@@ -26,8 +26,6 @@
 */
 void  bsp_Limit_SW_Init(void)
 {
-	
-
 	GPIO_InitTypeDef GPIO_InitStructure;
 	RCC_AHB1PeriphClockCmd ( LIMIT_SW1_GPIO_CLK|LIMIT_SW2_GPIO_CLK|NEST_SW_GPIO_CLK, ENABLE); 
 	
@@ -150,25 +148,7 @@ LIMIT_SW_Flag_Typedef Nest_SW_Get_Event(void)
 }
 #endif
 
-#define true  1
-#define false 0
 
-
-#ifndef bool
-#define bool unsigned char
-#endif
-
- static __inline bool  SW_GpioGet(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
-{
-    if ((GPIOx->IDR & GPIO_Pin) != (uint32_t)Bit_RESET )
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 
 
 
