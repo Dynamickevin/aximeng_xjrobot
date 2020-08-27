@@ -290,7 +290,6 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
 
     if( stateFlag & BUILD_STATE_FLAG_BAT )
 	{
-        //str = cmd_para_build_para_string_int( str , "bat" , get_adc_val(ADC_TYPE_ID_BAT_VOT)*2.5f/4096 );
         str = cmd_para_build_para_string_float( str , "bat" , gBatAutoCtrl.curBatVol*0.1f , 1 );//BAT_VOL_FLOAT
         str--; 
 		//*str++ = 'V';    
@@ -331,7 +330,7 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
         //g_zt_msg.trans_vals[2] = gMstMt.left_code ;          //剩余运动编码器值
         str = cmd_para_build_para_string_ints( str , "MstSet" , g_zt_msg.trans_vals , 2 );
         //g_zt_msg.trans_vals[0] = GET_MASTER_MOTOR_CODE() ;   //主动轮电机编码器值
-        g_zt_msg.trans_vals[0] = get_adc_val(ADC_TYPE_ID_MW_SP) ;   //速度电压值
+        g_zt_msg.trans_vals[0] = bsp_master_voltage_get_speed() ;   //主动轮转速
         g_zt_msg.trans_vals[1] = gSpeedAnaly_Mst.speed ;   //编码器速度
         str = cmd_para_build_para_string_ints( str , "MstState" , g_zt_msg.trans_vals , 1 );
     }
@@ -341,7 +340,7 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
         str = cmd_para_build_para_string_str( str , "SlvSet" , (gSlaveMtAnaly.s_SlvMtState == SLAVE_MT_CTRL_AUTO)? "AUTO" : "HANDLE" ); //从 电机 设置速度
         g_zt_msg.trans_vals[0] = gSlaveMtAnaly.real_out_speed ; //从机当前速度
         //g_zt_msg.trans_vals[2] = GET_SLAVE_MOTOR_CODE() ;      //从机编码器值
-        g_zt_msg.trans_vals[1] = get_adc_val(ADC_TYPE_ID_SW_SP) ;   //速度电压值
+        g_zt_msg.trans_vals[1] = bsp_slave_voltage_get_speed();   //从动轮转速
         g_zt_msg.trans_vals[2] = gSpeedAnaly_Slv.speed ;        //从机速度
         str = cmd_para_build_para_string_ints( str , "SlvState" , g_zt_msg.trans_vals , 3 );
     }
@@ -424,51 +423,37 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
     //str = cmd_para_build_para_string_str( str , "GpsPos" , gRbtState.GpsPosState );
     //str = cmd_para_build_para_string_str( str , "GpsTime" , gRbtState.GpsTimeState );
     
-    str = box_str_cpy_rt_pos(str,"GpsPos");
-    *str++ = '=' ;
-
-    //供妙算解析用
-    /*gGPS.bCurGetPos=1;
-	gGPS.f_lng =117.12345678;
-	gGPS.f_lat=39.87654321;
-	gGPS.f_height=60.0;
-    gGPS.bCurGetTime=1;
-    gGPS.gpsTime_year=118;
-	gGPS.gpsTime_mon=11;
-	gGPS.gpsTime_mday=21;
-	gGPS.gpsTime_hour=14;
-	gGPS.gpsTime_min=40;
-	gGPS.gpsTime_sec=38;
-	*/
+//    str = box_str_cpy_rt_pos(str,"GpsPos");
+//    *str++ = '=' ;
 	
-    if ( gGPS.bCurGetPos )
-    {
-        str = float_to_str( str ,  gGPS.f_lng , 7  );
-        *str++ = ',' ;
-        str = float_to_str( str ,  gGPS.f_lat , 7  );
-        *str++ = ',' ;
-        str = float_to_str( str ,  gGPS.f_height , 1  );
-    } 
-    else
-    {
-        str = box_str_cpy_rt_pos(str,"NoPos");  //未定位
-    }
-    *str++ = ' ';//'\t' ;
+//    if ( gGPS.bCurGetPos )
+//    {
+//        str = float_to_str( str ,  gGPS.f_lng , 7  );
+//        *str++ = ',' ;
+//        str = float_to_str( str ,  gGPS.f_lat , 7  );
+//        *str++ = ',' ;
+//        str = float_to_str( str ,  gGPS.f_height , 1  );
+//    } 
+//    else
+//    {
+//        str = box_str_cpy_rt_pos(str,"NoPos");  //未定位
+//    }
+//    *str++ = ' ';//'\t' ;
 
-    if ( gGPS.bCurGetTime )
-    {
-        vals[0] = gGPS.gpsTime_year - 100 ;
-        vals[1] = gGPS.gpsTime_mon + 1 ;
-        vals[2] = gGPS.gpsTime_mday ;
-        vals[3] = gGPS.gpsTime_hour ;
-        vals[4] = gGPS.gpsTime_min ;
-        vals[5] = gGPS.gpsTime_sec ;
-        str = cmd_para_build_para_string_ints( str , "GpsTime" , vals , 6 );
-    }
-    else
-    {
-        str = cmd_para_build_para_string_str( str , "GpsTime" , "NoTime" );
-    }
+//    if ( gGPS.bCurGetTime )
+//    {
+//        vals[0] = gGPS.gpsTime_year - 100 ;
+//        vals[1] = gGPS.gpsTime_mon + 1 ;
+//        vals[2] = gGPS.gpsTime_mday ;
+//        vals[3] = gGPS.gpsTime_hour ;
+//        vals[4] = gGPS.gpsTime_min ;
+//        vals[5] = gGPS.gpsTime_sec ;
+//        str = cmd_para_build_para_string_ints( str , "GpsTime" , vals , 6 );
+//    }
+//    else
+//    {
+//        str = cmd_para_build_para_string_str( str , "GpsTime" , "NoTime" );
+//    }
 
     vals[0] = GTZMHD_Get.directAngle/100;
     vals[1] = GTZMHD_Get.pitchAngle/100 ;

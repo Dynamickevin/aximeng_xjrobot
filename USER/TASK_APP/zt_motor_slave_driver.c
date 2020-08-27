@@ -198,8 +198,8 @@ static __inline void DoSpeedAnalyByCode(void)
     //根据20ms 的电机速度 计算电机立即停止，会再行走的距离 以及压力变化值
     //做一个大体的评估  因此先需要获取 20ms速度
     // gSpeedAnaly_Slv.speed > 0; is up running
-    gSpeedAnaly_Slv.speed = ( 1614 - get_adc_val(ADC_TYPE_ID_SW_SP) ) / (13) ;
-    gSpeedAnaly_Mst.speed = ( 1614 - get_adc_val(ADC_TYPE_ID_MW_SP) ) / (-10) ;
+    gSpeedAnaly_Slv.speed = ( 1614 - bsp_slave_voltage_get_speed() ) / (13) ;
+    gSpeedAnaly_Mst.speed = ( 1614 - bsp_master_voltage_get_speed() ) / (-10) ;
 
     //不需要实时采集从动轮的编码器值 每隔一段时间采集一次 多次采集，计算平均速度
     nLastCodeRecordTime++;
@@ -515,11 +515,8 @@ static __inline void DoPressFilter(void)
 		gPressFilter.cur_press_change = 0;
 	}
 
-    //gPressFilter.press_sum_all -= gPressFilter.original_vals[gPressFilter.cur_press_change] ;
-    //gPressFilter.original_vals[gPressFilter.cur_press_change] = get_adc_val(ADC_TYPE_ID_PRESS) >> 4 ;
-    //gPressFilter.press_sum_all += gPressFilter.original_vals[gPressFilter.cur_press_change] ;
-
-    gPressFilter.original_vals[gPressFilter.cur_press_change] = get_adc_val(ADC_TYPE_ID_PRESS1) >> 5 ;
+    gPressFilter.original_vals[gPressFilter.cur_press_change] = bsp_Pressure_Sensor_Get_Newton();
+	
     gPressFilter.press_sum_all = 0;
     for ( i=0 ; i<PRESS_FILTER_CNT_ONE ; i++ )
     {
@@ -829,7 +826,7 @@ void UpdateFastBatChargingState(void)
 			
             GET_SLAVE_WHEEL_CODE() = 0; //当前编码器值清零
             gBatAutoCtrl.nCxCheckMove = 0;
-            gCodeZ=0;
+            //gCodeZ=0;
 			
 			//遇到红外遮挡时，发一条信息给妙算UART2	zs 0306 add
             zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);

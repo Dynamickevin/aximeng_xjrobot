@@ -75,7 +75,7 @@ float Slave_Cal_Speed_Get_Voltage(void)
 	{
 		Adc_Sum += ADC_Value[SLAVE_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
 	}
-	tmp = Adc_Sum/(ADC_BUFFSIZE/ADC_CHANNEL_NUM) *3300/4096;
+	tmp = Adc_Sum /(ADC_BUFFSIZE/ADC_CHANNEL_NUM) *3300/4096;
 	return tmp;
 }
 
@@ -89,7 +89,7 @@ int bsp_master_voltage_get_speed(void)
 {
 	int Master_Voltage;
 	Master_Voltage = Master_Cal_Speed_Get_Voltage();
-	return Master_Voltage/(MASTER_MOTOR_IN_VOLTAGE_MAX)*SLAVE_MOTOR_SPEED_SPAN_MAX;
+	return Master_Voltage/(MASTER_MOTOR_IN_VOLTAGE_MAX)*MASTER_MOTOR_SPEED_SPAN_MAX;
 	
 }
 

@@ -443,11 +443,6 @@
           <GroupName>DRIVERS</GroupName>
           <Files>
             <File>
-              <FileName>user_adc_ctrl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\user_adc_ctrl.c</FilePath>
-            </File>
-            <File>
               <FileName>cmd_para.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\cmd_para.c</FilePath>
@@ -481,16 +476,6 @@
               <FileName>uart_api.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\uart_api.c</FilePath>
-            </File>
-            <File>
-              <FileName>GpsUart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\GpsUart.c</FilePath>
-            </File>
-            <File>
-              <FileName>Wheel_Encode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\Wheel_Encode.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -556,6 +541,11 @@
               <FileName>BSP_HI3521.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\HARDWARE\BSP_HI3521.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_Debug.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_Debug.c</FilePath>
             </File>
           </Files>
         </Group>

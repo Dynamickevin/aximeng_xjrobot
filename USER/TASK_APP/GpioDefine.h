@@ -13,11 +13,11 @@
 #define GPIO_CAM_EN        		  GPIOE,GPIO_Pin_11    //摄像头开关；低电平使能
 //#define GPIO_CTR_CAM_AV_SW 	 	  GPIOE,GPIO_Pin_2     //摄像头图传信号切换
 
-#define GPIO_CHK_PRS_VOL1        GPIOC,GPIO_Pin_2     //压力值ADC2
-#define GPIO_CHK_PRS_VOL2        GPIOC,GPIO_Pin_2     //压力值ADC2
+//#define GPIO_CHK_PRS_VOL1        GPIOC,GPIO_Pin_2     //压力值ADC2
+//#define GPIO_CHK_PRS_VOL2        GPIOC,GPIO_Pin_2     //压力值ADC2
 
-#define GPIO_CHK_MT_SPD_M        GPIOC,GPIO_Pin_0     //主动轮速度ADC0
-#define GPIO_CHK_MT_SPD_S     	 GPIOC,GPIO_Pin_1     //从动轮速度ADC1
+//#define GPIO_CHK_MT_SPD_M        GPIOC,GPIO_Pin_0     //主动轮速度ADC0
+//#define GPIO_CHK_MT_SPD_S     	 GPIOC,GPIO_Pin_1     //从动轮速度ADC1
 
 #define GPIO_CHK_BAT_CUR         GPIOC,GPIO_Pin_4     //电池电流 ADC14
 #define GPIO_CHK_BAT_VOL	     GPIOC,GPIO_Pin_5     //电池电压 ADC15
@@ -37,7 +37,7 @@
 #define GPIO_CTL_DIR_M1 	 	 GPIOB,GPIO_Pin_2	  	//主动轮方向1
 #define GPIO_CTL_DIR_M2 	 	 GPIOA,GPIO_Pin_12	  //主动轮方向2
 
-#define GPIO_CTL_FED_WTDG 	 	 GPIOC,GPIO_Pin_0	  //看门狗喂狗
+//#define GPIO_CTL_FED_WTDG 	 	 GPIOC,GPIO_Pin_0	  //看门狗喂狗
 #define GPIO_CTL_ARM_RST 	 	 	 GPIOA,GPIO_Pin_11	  //ARM复位控制脚
 #define GPIO_CTR_RF433_M0 	 	 GPIOE,GPIO_Pin_13	  //无线串口模式选择0
 #define GPIO_CTR_RF433_M1 	 	 GPIOE,GPIO_Pin_14	  //无线串口模式选择1

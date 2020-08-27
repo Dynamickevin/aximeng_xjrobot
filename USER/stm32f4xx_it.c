@@ -318,28 +318,29 @@ void EXTI9_5_IRQHandler(void)
 	//LIMIT_SW2_EXTI_Handler();
 	ENCCODER_AB_IRQHandler ();
 	ENCCODER_Z_EXTI_Handler();	
-}
-
-
-
-//extern void EXTI15_10_IRQ_ISR(void);
-void EXTI15_10_IRQHandler(void)
-{
-	CPU_SR         cpu_sr;
-	
-	OS_ENTER_CRITICAL();                         
-	OSIntNesting++;
-	OS_EXIT_CRITICAL();
-
-  #if ( OS_VIEW_MODULE == DEF_ENABLED )
-		OSView_RxTxISRHandler();
-	#endif
-	
-	EXTI15_10_IRQ_ISR();
-	
-	OSIntExit();	
 	
 }
+
+
+
+////extern void EXTI15_10_IRQ_ISR(void);
+//void EXTI15_10_IRQHandler(void)
+//{
+//	CPU_SR         cpu_sr;
+//	
+//	OS_ENTER_CRITICAL();                         
+//	OSIntNesting++;
+//	OS_EXIT_CRITICAL();
+
+//  #if ( OS_VIEW_MODULE == DEF_ENABLED )
+//		OSView_RxTxISRHandler();
+//	#endif
+//	
+//	EXTI15_10_IRQ_ISR();
+//	
+//	OSIntExit();	
+//	
+//}
 
 
 

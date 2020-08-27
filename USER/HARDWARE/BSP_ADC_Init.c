@@ -87,7 +87,7 @@ void bsp_ADC_Init(void)
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
 	//数据右对齐	
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	//转换通道 1个
+	//转换通道 4个
 	ADC_InitStructure.ADC_NbrOfConversion = ADC_CHANNEL_NUM;                                    
 	ADC_Init(ADC_USE, &ADC_InitStructure);
 	//---------------------------------------------------------------------------
@@ -105,3 +105,4 @@ void bsp_ADC_Init(void)
 	ADC_SoftwareStartConv(ADC_USE);
 
 }
+

@@ -48,7 +48,7 @@ float Pressure_Sensor_Get_Voltage(void)
 	for(i = 0 ; i < ADC_BUFFSIZE/ADC_CHANNEL_NUM ; i++){
 		Adc_Sum += ADC_Value[PRESSURE_SENSOR_ADC_INDEX + ADC_CHANNEL_NUM*i];
 	}
-	tmp = Adc_Sum/(ADC_BUFFSIZE/ADC_CHANNEL_NUM) *3300/4096;
+	tmp = Adc_Sum /(ADC_BUFFSIZE/ADC_CHANNEL_NUM) *3300/4096;
 	return tmp;
 }
 

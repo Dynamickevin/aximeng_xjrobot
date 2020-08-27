@@ -335,7 +335,7 @@ extern  RbtState gRbtState;
 #include "Task_Sensor_Data_Collect.h"
 
 
-#include "Uart_api.h"
+#include "uart_api.h"
 #include "zt_motor_master_driver.h"
 #include "zt_motor_slave_driver.h"
 #include "TimerPWm_Driver.h"
@@ -347,14 +347,15 @@ extern  RbtState gRbtState;
 #include "cmd_para.h"
 #include "App_cfg.h"
 #include "AM2320_By_IIC.h"
-#include "Wheel_Encode.h"
+//#include "Wheel_Encode.h"
 //#include "OperationList.h"
-#include "GpsUart.h"
+//#include "GpsUart.h"
 //#include "debug.h"
 
 #include "BSP_enccoder.h"
 #include "BSP_motor_cal_speed.h"
 #include  "board.h"
+
 
 #include "sys.h"
 #include "delay.h"

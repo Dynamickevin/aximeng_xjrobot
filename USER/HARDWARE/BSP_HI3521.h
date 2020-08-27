@@ -22,17 +22,17 @@
 
 //Òý½Å¶¨Òå
 /*******************************************************/
-#define HI3521_RST_GPIO_PORT		GPIOA
-#define HI3521_RST_GPIO_PIN			GPIO_Pin_11
-#define HI3521_RST_GPIO_CLK			RCC_AHB1Periph_GPIOA
+#define HI3521_RST_GPIO_PORT				GPIOA
+#define HI3521_RST_GPIO_PIN					GPIO_Pin_11
+#define HI3521_RST_GPIO_CLK					RCC_AHB1Periph_GPIOA
 
-#define HI3521_HEATER_GPIO_PORT		GPIOA
+#define HI3521_HEATER_GPIO_PORT			GPIOA
 #define HI3521_HEATER_GPIO_PIN			GPIO_Pin_11
 #define HI3521_HEATER_GPIO_CLK			RCC_AHB1Periph_GPIOA
 
-#define HI3521_NTC_GPIO_PORT		GPIOC
-#define HI3521_NTC_GPIO_PIN			GPIO_Pin_3
-#define HI3521_NTC_GPIO_CLK			RCC_AHB1Periph_GPIOC
+#define HI3521_NTC_GPIO_PORT				GPIOC
+#define HI3521_NTC_GPIO_PIN					GPIO_Pin_3
+#define HI3521_NTC_GPIO_CLK					RCC_AHB1Periph_GPIOC
 
 #define	HI3521_NTC_ADC_CHANNEL    	ADC_Channel_13	
 

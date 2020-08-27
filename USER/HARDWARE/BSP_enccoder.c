@@ -173,3 +173,5 @@ void ENCCODER_Z_EXTI_Handler(void)
 		EXTI_ClearITPendingBit(ENCCODER_Z_EXTI_LINE);     
 	} 
 }
+
+

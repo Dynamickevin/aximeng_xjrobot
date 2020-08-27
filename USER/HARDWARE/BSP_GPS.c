@@ -216,9 +216,12 @@ void GPS_RS232_UART_IRQHandler(void)
 */
 void bsp_GPS_cmd(FunctionalState NewSta)
 {
-	if(NewSta == ENABLE){
+	if(NewSta == ENABLE)
+	{
 		GPIO_SetBits(GPS_EN_GPIO_PORT,GPS_EN_PIN);
-	}else{
+	}
+	else
+	{
 		GPIO_ResetBits(GPS_EN_GPIO_PORT,GPS_EN_PIN);
 	}
 }
@@ -231,18 +234,21 @@ void bsp_GPS_cmd(FunctionalState NewSta)
 */
 static void GPS_UART_IRQHandler(u8 dataTemp)
 {
-	
-	if( dataTemp == '$' ){
+	if( dataTemp == '$' )
+	{
 		dataMode = 1;
 	}
-	if(dataTemp == 0X0A){//'*')
-		if( dataMode == 2 ){	
+	if(dataTemp == 0X0A)
+	{//'*')
+		if( dataMode == 2 )
+		{	
 			GGAData.flag = 1;
 			GGAData.GGAData_Len = dataCount;
 			GGAData.GGAData[dataCount+1] = 0;
-			memcpy(GGAData.GGAData,GGAData_buf,sizeof(GGAData_buf));
-			
-		}else if( dataMode == 3){
+			memcpy(GGAData.GGAData,GGAData_buf,sizeof(GGAData_buf));		
+		}
+		else if( dataMode == 3)
+		{
 			RMCData.flag = 1;
 			RMCData.RMCData[dataCount+1] = 0;
 			memcpy(RMCData.RMCData,RMCData_buf,sizeof(RMCData_buf));

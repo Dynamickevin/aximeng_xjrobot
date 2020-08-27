@@ -96,93 +96,6 @@ void SendWHLToLinux(void)
 
 
 
-//电池电压；电池电流  ADC采集及滤波处理过程
-void DoBatUsingGetFilter(void)
-{
-    static u8  iVolId = 0;
-    static u16 nVolValues[5]={0,0,0,0,0}; 
-    static u16 nVolAll=0; //
-    //static u8  iCurId = 0;
-    static u16 nCurValues[5]={0,0,0,0,0} ; 
-    static u16 nCurAll=0; //
-    
-    if(iVolId>=5){ iVolId = 0; }
-    nVolAll -= nVolValues[iVolId];
-    nCurAll -= nCurValues[iVolId];
-    nVolValues[iVolId] = get_adc_val(ADC_TYPE_ID_BAT_VOT);
-    nCurValues[iVolId] = get_adc_val(ADC_TYPE_ID_BAT_CUR);
-    nVolAll += nVolValues[iVolId];
-    nCurAll += nCurValues[iVolId];
-	//取均值，滤波
-    gRbtState.nBatVol = nVolAll / 5 ;
-    gRbtState.nBatCur = nCurAll / 5 ;
-    iVolId++;
-}
-
-void Battery(void)
-{
-    //如果正处于充电中，gBatAutoCtrl.bCharging
-    //uint8 ret;
-    DoBatUsingGetFilter(); 
-	//int ValCnt = cmd_para_get_int_by_val_str( gCmdParaInfos.items[0].value , gCmdParaVal_Ints , 5 );
-	
-    if( gBatAutoCtrl.bCharging )
-	{
-        gBatAutoCtrl.iChargingCircle++;
-        if( gBatAutoCtrl.iChargingCircle <= (4*60) )        //充电时间：256ms * 4 *60 一分钟
-		{
-			//stprintf(ID_DEBUG,"2\r\n");
-			if(!gRbtState.bChargeShort)
-			{ 
-				BAT_CHARGE_OPEN(); 
-				//stprintf(ID_DEBUG,"1\r\n");
-				//nprintf(ID_DEBUG,gBatAutoCtrl.iChargingCircle,0,0);
-			}
-			//如果处于桥上，收到电机运动指令且主电机速度不为0，电机正常运动
-			
-        }
-        else if( gBatAutoCtrl.iChargingCircle <= (4*60+10) )	//充电一分钟，断开2S，测量电压
-		{
-			//stprintf(ID_DEBUG,"2\r\n");
-			BAT_CHARGE_CLOSE();
-        }
-        else //if(gBatAutoCtrl.iChargingCircle >= 0)
-		{
-            gBatAutoCtrl.curBatVol = BAT_VOL_FLOAT*10;
-            if( gBatAutoCtrl.curBatVol > gSlvMtCfg.bat_charge_full )	//大于充满电压，断开继电器，停止充电
-			{
-                gBatAutoCtrl.bCharging = false; 
-				BAT_CHARGE_CLOSE();
-				//stprintf(ID_DEBUG,"4\r\n");
-            }
-            gBatAutoCtrl.iChargingCircle = 0;			
-        }
-       
-        if( !gRbtState.bChargeVolIn )					//无电压输入，停止充电
-		{
-            gBatAutoCtrl.bCharging = false; 
-			BAT_CHARGE_CLOSE();  						//外部供电关闭
-			//stprintf(ID_DEBUG,"5\r\n");
-        }
-       
-    }
-	else
-	{
-		
-		gBatAutoCtrl.curBatVol = BAT_VOL_FLOAT*10;
-
-	}
-
-    g_zt_msg.nTimeForNoLinuxHeartIn++;
-	
-    //zt_build_send_state_string(BUILD_STATE_FLAG_ALL);//zs 1116 del
-    //uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );//zs 1116 del
-	
-    //uart1_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
-    //stprintf(ID_DEBUG,"send to linux=ok\r\n");
-
-}
-
 
 void System_State_LED(void)
 
@@ -482,7 +395,7 @@ void Task_Timer(void *pdata)
 	uint8 err;
 	DATA_CONTROL_BLOCK *msg;
 	
-	//static int gPress_Newton;
+	static int gPress_Newton;
 	static s32 nCxCheckMove;
 	
 	//创建温湿度定时器1，
@@ -514,19 +427,17 @@ void Task_Timer(void *pdata)
 				case SYS_LED_MSG: 		// 1s
 				{
 					//LED2(LED_ON);
-					System_State_LED();
-					
-					//gPress_Newton = bsp_Enccoder_AB_GET_Cnt();
-					//nprintf(ID_DEBUG,gPress_Newton,0,DEC);
+					System_State_LED();					
+					gPress_Newton = Pressure_Sensor_Get_Voltage();
+					nprintf(ID_DEBUG,gPress_Newton,0,DEC);
 					//stprintf(ID_LINUX,"LED \r\n");
 					//DBG_PRINTF("Hello World");
-					
 				}
 				break;
 				case BATTERY_MSG: 		// 256ms
 				{
 					//LED2(LED_ON);
-					Battery();	
+					//Battery();	
 					
 				}
 				break;
