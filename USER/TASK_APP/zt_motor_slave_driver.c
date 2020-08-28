@@ -24,7 +24,7 @@ RbtState 		 gRbtState;
   * @param  无
   * @retval 无
 */
-void bsp_slave_motor_Init(void)
+void slave_motor2_GPIO_TIM_Init(void)
 {
 	bsp_Slave_Motor2_GPIO_Init();
 	bsp_Slave_Motor2_Config();
@@ -92,10 +92,10 @@ static void bsp_Slave_Motor2_Config(void)
 	
 	/*PWM模式配置*/
 	/* PWM1 Mode configuration: Channel1 */
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;	    //配置为PWM模式1
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式1
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
 	TIM_OCInitStructure.TIM_Pulse = 20;
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
 	MOTOR2_TIM_OC_INIT(MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道1
   
 	// 使能定时器
@@ -112,7 +112,7 @@ static void bsp_Slave_Motor2_Config(void)
 void bsp_Slave_motor2_Set_Speed(u16 NewSpeed)
 {
 	if(NewSpeed>MOTOR2_TIM_Period*0.9)NewSpeed = MOTOR2_TIM_Period*0.9;
-	MOTOR2_SetCompare(MOTOR2_TIM,NewSpeed / 100);	
+	MOTOR2_SetCompare(MOTOR2_TIM,NewSpeed);	
 }
 
 
@@ -143,7 +143,7 @@ static __inline void real_set_slv_mt_close(void)
 void zt_motor_slave_driver_cfg_init(void)
 {
     float tmp;
-    const UserCfgType* pcfg = (const UserCfgType*)( MCU_FLASH_ADDR_BEGIN+0x68000 );
+    const UserCfgType* pcfg = (const UserCfgType*)( MCU_FLASH_ADDR_BEGIN+0x48000 );
     if ( (pcfg->begin_cfg==0XAAAAAAAA) && (pcfg->end_cfg==0X55555555) )
     {
         memcpy( &gSlvMtCfg , &(pcfg->SlvMtCfg) , sizeof(gSlvMtCfg) );
@@ -154,7 +154,7 @@ void zt_motor_slave_driver_cfg_init(void)
         gSlvMtCfg.bat_no_move     = 220;			//机器人不能移动时的电压
         gSlvMtCfg.bat_auto_charge = 225;			//机器人需要充电的电压
         gSlvMtCfg.bat_charge_full = 250;			//机器人充满时的电压
-        gSlvMtCfg.onBridgeTime = 6; 				//桥上行走判断时间为6秒
+        gSlvMtCfg.onBridgeTime = 8; 				//桥上行走判断时间为6秒
         gSlvMtCfg.mstAddAccl = 10;
         gSlvMtCfg.mstDelAccl = 40;
         //AT+SlvCFG=6 pmin=40 pmax=110 pmid=75 StopMin=20 StopMax=150 SpeedBrg=10
@@ -201,7 +201,8 @@ void zt_motor_slave_driver_cfg_init(void)
 void zt_motor_slave_driver_init(void)
 {
     //PB12 PB13 从动轮 电机方向控制 PC4 PB5 限位开关
-		bsp_slave_motor_Init();
+		slave_motor2_GPIO_TIM_Init();
+	
     SET_SLAVE_MOTOR_CLOSE();    
     
     GPIO_INIT_IN_FLOAT(GPIO_CHK_LIMIT1);

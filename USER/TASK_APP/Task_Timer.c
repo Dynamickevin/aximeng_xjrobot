@@ -62,6 +62,66 @@ void tmr2_sys_led_callback(OS_TMR *ptmr,void *p_arg)
 }
 
 
+
+ZT_INFO_Power_Board_TYPE g_zt_Mst_Brake_msg;
+
+//向电源板发送主电机抱闸状态
+void uart2_Power_Board_send(char *sp, uint16 len)
+{
+    uint8 err; 
+	
+	if(OS_ERR_NONE != err)
+	{
+		return;
+	}
+	
+	CopyBuffer(sp,&g_zt_Mst_Brake_msg.sendbuf[0],len);
+	
+	//debug_sprintf(ID_DEBUG,g_zt_Mst_Brake_msg.sendbuf);
+	
+	g_zt_Mst_Brake_msg.icmd_len = len;
+	g_zt_Mst_Brake_msg.counter = 0;
+	USART_SendData(USART2, g_zt_Mst_Brake_msg.sendbuf[0]);
+	USART_ITConfig(USART2, USART_IT_TXE, ENABLE);
+}
+
+/************************************************* 
+*Return:     
+*DESCRIPTION: 发送主电机抱闸状态到Power_Board串口
+*************************************************/
+void ack_with_Power_Board_Uart(uint8 com,char *buf, uint16 len)
+{
+	if( com == ID_POWER_BOARD)
+	{
+      uart2_Power_Board_send(buf,len);
+			//debug_sprintf(ID_DEBUG,buf);
+	}
+	
+}
+
+//向Power_board发送主电机抱闸状态，
+void Send_P0wer_Board_Master_State(FunctionalState Newstate)
+{
+	char buf[30];
+  
+	if( Newstate == ENABLE)
+	{
+		strcpy(buf, "AT+Setmasterbrake=open");
+		ack_with_Power_Board_Uart(ID_POWER_BOARD,buf,sizeof(buf));	//向POWER_BOARD串口2发送将主电机抱闸打开
+		//debug_sprintf(ID_DEBUG,buf);
+		
+	}
+	else
+	{
+		strcpy(buf, "AT+Setmasterbrake=close");
+		ack_with_Power_Board_Uart(ID_POWER_BOARD,buf,sizeof(buf));	//向POWER_BOARD串口2发送将主电机抱闸关闭
+		//debug_sprintf(ID_DEBUG,buf);
+	}
+	
+}
+
+
+
 //向Linux发送从轮子码盘值，
 void SendWHLToLinux(void)
 {
@@ -428,9 +488,10 @@ void Task_Timer(void *pdata)
 				{
 					//LED2(LED_ON);
 					System_State_LED();					
-					//gPress_Newton = bsp_slave_voltage_get_speed();
-					//nprintf(ID_DEBUG,gPress_Newton,0,DEC);
-					//stprintf(ID_LINUX,"LED \r\n");
+					//gPress_Newton = gSlvMtCfg.onBridgeTime;
+					//nprintf(ID_DEBUG,-20,0,DEC);
+					//Send_P0wer_Board_Master_State(DISABLE);
+					
 					//DBG_PRINTF("Hello World");
 				}
 				break;

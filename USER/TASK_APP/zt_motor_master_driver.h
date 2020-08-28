@@ -12,28 +12,41 @@
 
 //定义
 /*******************************************************/
-#define MOTOR1_EN_PIN          			GPIO_Pin_2              
-#define MOTOR1_EN_GPIO_PORT    			GPIOB                      
-#define MOTOR1_EN_GPIO_CLK      		RCC_AHB1Periph_GPIOB
+#define Mst_MOTOR1_DIR1_PIN          			GPIO_Pin_2              
+#define Mst_MOTOR1_DIR1_GPIO_PORT    			GPIOB                      
+#define Mst_MOTOR1_DIR1_GPIO_CLK      		RCC_AHB1Periph_GPIOB
 
-#define MOTOR1_DIR_PIN          		GPIO_Pin_12              
-#define MOTOR1_DIR_GPIO_PORT    		GPIOA                      
-#define MOTOR1_DIR_GPIO_CLK      		RCC_AHB1Periph_GPIOA
+#define Mst_MOTOR1_DIR2_PIN          			GPIO_Pin_12              
+#define Mst_MOTOR1_DIR2_GPIO_PORT    			GPIOA                      
+#define Mst_MOTOR1_DIR2_GPIO_CLK      		RCC_AHB1Periph_GPIOA
 
-#define MOTOR1_OCPWM_PIN          	GPIO_Pin_14             
-#define MOTOR1_OCPWM_GPIO_PORT    	GPIOB                     
-#define MOTOR1_OCPWM_GPIO_CLK      	RCC_AHB1Periph_GPIOB
-#define MOTOR1_OCPWM_PINSOURCE			GPIO_PinSource14
-#define MOTOR1_OCPWM_AF							GPIO_AF_TIM1
+#define Mst_MOTOR1_OCPWM_PIN          	GPIO_Pin_14             
+#define Mst_MOTOR1_OCPWM_GPIO_PORT    	GPIOB                     
+#define Mst_MOTOR1_OCPWM_GPIO_CLK      	RCC_AHB1Periph_GPIOB
+#define Mst_MOTOR1_OCPWM_PINSOURCE			GPIO_PinSource14
+#define Mst_MOTOR1_OCPWM_AF							GPIO_AF_TIM1
 
-#define	MOTOR1_TIM           				TIM1
-#define MOTOR1_TIM_CLK       				RCC_APB2Periph_TIM1
+#define	Mst_MOTOR1_TIM           				TIM1
+#define Mst_MOTOR1_TIM_CLK       				RCC_APB2Periph_TIM1
 
-#define MOTOR1_TIM_OC_INIT					TIM_OC2Init
+#define Mst_MOTOR1_TIM_OC_INIT					TIM_OC2Init
 
-#define	MOTOR1_TIM_Period						10000			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period = 80HZ   分辨率为MOTOR1_TIM_Period
-#define	MOTOR1_TIM_PSC							210
-#define	MOTOR1_SetCompare						TIM_SetCompare2
+#define	Mst_MOTOR1_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period = 80HZ   分辨率为MOTOR1_TIM_Period
+#define	Mst_MOTOR1_TIM_PSC							21000
+#define	Mst_MOTOR1_SetCompare						TIM_SetCompare2
+
+//驱动器设置为 低电平使能 高电平关闭
+//->BSRR to set io=1  ->BRR to set io=0
+#define SET_MASTER_MOTOR_CLOSE() GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2);SET_MASTER_MOTOR_PWM(0)
+
+#define SET_MASTER_MOTOR_PWM  bsp_Master_motor1_Set_Speed
+
+#define SET_MASTER_MOTOR_ZZ()   GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetL(GPIO_CTL_DIR_M2)
+#define SET_MASTER_MOTOR_FZ()   GpioSetL(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2)
+
+#define GPIO_CTL_DIR_M1 	 	 GPIOB,GPIO_Pin_2	  	//主动轮方向1
+#define GPIO_CTL_DIR_M2 	 	 GPIOA,GPIO_Pin_12	  //主动轮方向2
+
 
 //typedef struct{
 //	FunctionalState NewState;		//ENABLE / DISABLE
@@ -43,7 +56,7 @@
 // 主电机motor控制调用函数
 /*********************************************************/
 			
-void bsp_master_motor_Init(void);		//主电机驱动初始化
+void master_motor1_GPIO_TIM_Init(void);		//主电机驱动初始化
 	
 void bsp_Master_Motor1_Config(void);
 
@@ -125,7 +138,6 @@ void zt_motor_master_driver_update(void);
 
 
 int32_t bsp_Enccoder_AB_GET_Cnt(void);
-
 
 
 /*************************************************

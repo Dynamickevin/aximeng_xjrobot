@@ -31,8 +31,8 @@
 #define MOTOR2_TIM_CLK       				RCC_APB2Periph_TIM8
 
 #define MOTOR2_TIM_OC_INIT					TIM_OC3Init
-#define	MOTOR2_TIM_Period						10000			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period   分辨率为MOTOR1_TIM_Period
-#define	MOTOR2_TIM_PSC							210
+#define	MOTOR2_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period   分辨率为MOTOR1_TIM_Period
+#define	MOTOR2_TIM_PSC							21000
 #define	MOTOR2_SetCompare						TIM_SetCompare3
 /*******************************************************/
 
@@ -46,11 +46,11 @@ typedef struct{
 // motor控制调用函数
 /*********************************************************/
 			
-void bsp_slave_motor_Init(void);		//从电机驱动初始化
+void slave_motor2_GPIO_TIM_Init(void);		//从电机驱动初始化
 		
 void bsp_Slave_motor2_cmd(FunctionalState NewState);		// 电机使能/失能命令
 
-void bsp_Slave_motor2_Set_Speed(u16 NewSpeed);			// 电机速度设置  1000~9000
+void bsp_Slave_motor2_Set_Speed(u16 NewSpeed);			// 电机速度设置  10~90
 
 
 
@@ -105,16 +105,17 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run);
 
 //驱动器设置为 低电平使能 高电平关闭
 //->BSRR to set io=1  ->BRR to set io=0
-#define SET_MASTER_MOTOR_CLOSE() GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2);SET_MASTER_MOTOR_PWM(0)
 #define SET_SLAVE_MOTOR_CLOSE()  GpioSetH(GPIO_CTL_DIR_S1) ; GpioSetH(GPIO_CTL_DIR_S2) ; SET_SLAVE_MOTOR_PWM(0)
 
-#define SET_MASTER_MOTOR_ZZ()   GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetL(GPIO_CTL_DIR_M2)
-#define SET_MASTER_MOTOR_FZ()   GpioSetL(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2)
+
 #define SET_SLAVE_MOTOR_ZZ()    GpioSetH(GPIO_CTL_DIR_S2) ; GpioSetL(GPIO_CTL_DIR_S1)
 #define SET_SLAVE_MOTOR_FZ()    GpioSetL(GPIO_CTL_DIR_S2) ; GpioSetH(GPIO_CTL_DIR_S1)
 
-#define SET_MASTER_MOTOR_PWM  bsp_Master_motor1_Set_Speed
 #define SET_SLAVE_MOTOR_PWM   bsp_Slave_motor2_Set_Speed
+
+#define GPIO_CTL_DIR_S1 	 	 GPIOB,GPIO_Pin_12	  //从动轮方向1
+#define GPIO_CTL_DIR_S2 	 	 GPIOB,GPIO_Pin_13	  //从动轮方向2
+
 
 //#define SET_SLAVE_MOTOR_PWM(...)
 
@@ -203,7 +204,6 @@ typedef struct
     u16  ys_running_time; 			//有刷电机 已经启动电机时间 用于时候异常不运动的判断
 }SlaveMotorAnaly;
 extern SlaveMotorAnaly gSlaveMtAnaly;
-
 
 
 //////////////////////////////////////////////////////////////////////////

@@ -32,10 +32,6 @@
 //#define GPIO_CHK_LIMIT1   		 GPIOB,GPIO_Pin_0     //从动轮运动上下限位开关检测1
 //#define GPIO_CHK_LIMIT2   		 GPIOB,GPIO_Pin_1     //从动轮运动上下限位开关检测2
 
-#define GPIO_CTL_DIR_S1 	 	 GPIOB,GPIO_Pin_12	  //从动轮方向1
-#define GPIO_CTL_DIR_S2 	 	 GPIOB,GPIO_Pin_13	  //从动轮方向2
-#define GPIO_CTL_DIR_M1 	 	 GPIOB,GPIO_Pin_2	  	//主动轮方向1
-#define GPIO_CTL_DIR_M2 	 	 GPIOA,GPIO_Pin_12	  //主动轮方向2
 
 //#define GPIO_CTL_FED_WTDG 	 	 GPIOC,GPIO_Pin_0	  //看门狗喂狗
 #define GPIO_CTL_ARM_RST 	 	 	 GPIOA,GPIO_Pin_11	  //ARM复位控制脚
@@ -49,19 +45,19 @@
 //#define GPIO_LED_OUT_SHOW1      GPIOD,GPIO_Pin_9      //外接指示灯 1
 //#define GPIO_LED_OUT_SHOW2      GPIOD,GPIO_Pin_10     //外接指示灯 2
 
-#define GPIO_MTS_CODEA1 	 	 GPIOA,GPIO_Pin_15    //从电机编码器 TIM2-CH1
-#define GPIO_MTS_CODEB1 	 	 GPIOB,GPIO_Pin_3     //从电机编码器 TIM2-CH2
-#define GPIO_MTS_CODEA2 	 	 GPIOC,GPIO_Pin_6     //从电机编码器 TIM8-CH1
-#define GPIO_MTS_CODEB2 	 	 GPIOC,GPIO_Pin_7     //从电机编码器 
+//#define GPIO_MTS_CODEA1 	 	 GPIOA,GPIO_Pin_15    //从电机编码器 TIM2-CH1
+//#define GPIO_MTS_CODEB1 	 	 GPIOB,GPIO_Pin_3     //从电机编码器 TIM2-CH2
+//#define GPIO_MTS_CODEA2 	 	 GPIOC,GPIO_Pin_6     //从电机编码器 TIM8-CH1
+//#define GPIO_MTS_CODEB2 	 	 GPIOC,GPIO_Pin_7     //从电机编码器 
 
-#define GPIO_MTM_CODEA 	 	   GPIOB,GPIO_Pin_4     //主电机编码器 TIM3-CH1
-#define GPIO_MTM_CODEB 	 	   GPIOB,GPIO_Pin_5     //主电机编码器 TIM3-CH2
+//#define GPIO_MTM_CODEA 	 	   GPIOB,GPIO_Pin_4     //主电机编码器 TIM3-CH1
+//#define GPIO_MTM_CODEB 	 	   GPIOB,GPIO_Pin_5     //主电机编码器 TIM3-CH2
 
-#define GPIO_MTM_PWM1 	 	  	 GPIOB,GPIO_Pin_14     //主电机PWM TIM1-CH2
-#define GPIO_MTM_PWM2 	 	  	 GPIOB,GPIO_Pin_15     //主电机PWM TIM8-CH3
+//#define GPIO_MTM_PWM1 	 	  	 GPIOB,GPIO_Pin_14     //主电机PWM TIM1-CH2
+//#define GPIO_MTM_PWM2 	 	  	 GPIOB,GPIO_Pin_15     //主电机PWM TIM8-CH3
 
-#define GPIO_CODEA_CD1 	 	  	 GPIOD,GPIO_Pin_12    //从轮子编码器 TIM4-CH1
-#define GPIO_CODEA_CD2	 	  	 GPIOD,GPIO_Pin_13    //从轮子编码器 TIM4-CH2
+//#define GPIO_CODEA_CD1 	 	  	 GPIOD,GPIO_Pin_12    //从轮子编码器 TIM4-CH1
+//#define GPIO_CODEA_CD2	 	  	 GPIOD,GPIO_Pin_13    //从轮子编码器 TIM4-CH2
 
 //#define GPIO_IIC_SCL 	 	  	 GPIOB,GPIO_Pin_6     //IIC 时钟
 //#define GPIO_IIC_SDA 	 	  	 GPIOB,GPIO_Pin_7     //IIC 数据

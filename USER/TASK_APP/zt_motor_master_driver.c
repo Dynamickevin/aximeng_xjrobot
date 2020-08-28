@@ -1,10 +1,6 @@
 
 #include <includes.h> 
-//////////////////////////////////////////////////////////////////////////
-//电机速度与脉冲速度   设置电机速度为10 脉冲速度=0.5S->50=100/S  脉冲速度=电机速度*10
-//按照上面的比例关系，在某个加速度，速度下，若目标速度为0，到速度为0时，脉冲数为：
 
-//////////////////////////////////////////////////////////////////////////
 
 MotorDriverCtrlType gMstMt;
 
@@ -20,7 +16,7 @@ static void bsp_Master_motor1_Set_Speed(u16 NewSpeed);
   * @param  无
   * @retval 无
 */
-void bsp_master_motor_Init(void)
+void master_motor1_GPIO_TIM_Init(void)
 {
 	bsp_Master_Motor1_GPIO_Init();
 	bsp_Master_Motor1_Config();
@@ -36,30 +32,31 @@ static void bsp_Master_Motor1_GPIO_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/*开启相关的GPIO外设时钟*/
-	RCC_AHB1PeriphClockCmd (MOTOR1_EN_GPIO_CLK|MOTOR1_DIR_GPIO_CLK|MOTOR1_OCPWM_GPIO_CLK, ENABLE); 					   
+	RCC_AHB1PeriphClockCmd (Mst_MOTOR1_DIR1_GPIO_CLK|Mst_MOTOR1_DIR2_GPIO_CLK|Mst_MOTOR1_OCPWM_GPIO_CLK, ENABLE); 					   
 
-	GPIO_SetBits(MOTOR1_EN_GPIO_PORT,MOTOR1_EN_PIN);
-	GPIO_SetBits(MOTOR1_DIR_GPIO_PORT,MOTOR1_DIR_PIN);
+	GPIO_SetBits(Mst_MOTOR1_DIR1_GPIO_PORT,Mst_MOTOR1_DIR1_PIN);
+	GPIO_SetBits(Mst_MOTOR1_DIR2_GPIO_PORT,Mst_MOTOR1_DIR2_PIN);
 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 
-	GPIO_InitStructure.GPIO_Pin = MOTOR1_EN_PIN;		
-	GPIO_Init(MOTOR1_EN_GPIO_PORT, &GPIO_InitStructure);	
-	GPIO_InitStructure.GPIO_Pin = MOTOR1_DIR_PIN;		
-	GPIO_Init(MOTOR1_DIR_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_InitStructure.GPIO_Pin = Mst_MOTOR1_DIR1_PIN;		
+	GPIO_Init(Mst_MOTOR1_DIR1_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_InitStructure.GPIO_Pin = Mst_MOTOR1_DIR2_PIN;		
+	GPIO_Init(Mst_MOTOR1_DIR2_GPIO_PORT, &GPIO_InitStructure);	
 
 	/* 定时器通道引脚复用 */
-	GPIO_PinAFConfig(MOTOR1_OCPWM_GPIO_PORT,MOTOR1_OCPWM_PINSOURCE,MOTOR1_OCPWM_AF); 
+	GPIO_PinAFConfig(Mst_MOTOR1_OCPWM_GPIO_PORT,Mst_MOTOR1_OCPWM_PINSOURCE,Mst_MOTOR1_OCPWM_AF);
+	
 	
 	/* 定时器通道引脚配置 */															   
-	GPIO_InitStructure.GPIO_Pin = MOTOR1_OCPWM_PIN;	
+	GPIO_InitStructure.GPIO_Pin = Mst_MOTOR1_OCPWM_PIN;	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz; 
-	GPIO_Init(MOTOR1_OCPWM_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_Init(Mst_MOTOR1_OCPWM_GPIO_PORT, &GPIO_InitStructure);
 	
 }
 
@@ -73,29 +70,29 @@ static void bsp_Master_Motor1_Config(void)
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 	
 	// 开启TIMx_CLK,x[2,3,4,5,12,13,14] 
-	RCC_APB2PeriphClockCmd(MOTOR1_TIM_CLK, ENABLE); 
+	RCC_APB2PeriphClockCmd(Mst_MOTOR1_TIM_CLK, ENABLE); 
 
-	TIM_TimeBaseStructure.TIM_Period = MOTOR1_TIM_Period-1;       
+	TIM_TimeBaseStructure.TIM_Period = Mst_MOTOR1_TIM_Period-1;       
 
-	TIM_TimeBaseStructure.TIM_Prescaler = MOTOR1_TIM_PSC-1;	
+	TIM_TimeBaseStructure.TIM_Prescaler = Mst_MOTOR1_TIM_PSC-1;	
 	TIM_TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
 
-	TIM_TimeBaseInit(MOTOR1_TIM, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(Mst_MOTOR1_TIM, &TIM_TimeBaseStructure);
 	
 	/*PWM模式配置*/
 	/* PWM1 Mode configuration: Channel1 */
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;	    //配置为PWM模式1
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式1
 //	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;	
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
-	TIM_OCInitStructure.TIM_Pulse = 0;
-	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
-//	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
-	MOTOR1_TIM_OC_INIT(MOTOR1_TIM, &TIM_OCInitStructure);	 //使能通道1
+	TIM_OCInitStructure.TIM_Pulse = 20;
+	//TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
+	Mst_MOTOR1_TIM_OC_INIT(Mst_MOTOR1_TIM, &TIM_OCInitStructure);	 //使能通道1
 
 	// 使能定时器
-	TIM_Cmd(MOTOR1_TIM, ENABLE);	
-	TIM_CtrlPWMOutputs(MOTOR1_TIM,ENABLE);
+	TIM_Cmd(Mst_MOTOR1_TIM, ENABLE);	
+	TIM_CtrlPWMOutputs(Mst_MOTOR1_TIM,ENABLE);
 }
 
 /*
@@ -105,12 +102,17 @@ static void bsp_Master_Motor1_Config(void)
 */
 void bsp_Master_motor1_Set_Speed(u16 NewSpeed)
 {
-	if(NewSpeed>MOTOR1_TIM_Period*0.9)NewSpeed = MOTOR1_TIM_Period*0.9;
-	MOTOR1_SetCompare(MOTOR1_TIM,NewSpeed / 100);	
+	if(NewSpeed > Mst_MOTOR1_TIM_Period*0.9)NewSpeed = Mst_MOTOR1_TIM_Period*0.9;
+	Mst_MOTOR1_SetCompare(Mst_MOTOR1_TIM,NewSpeed);
+	
 }
 
 
+//////////////////////////////////////////////////////////////////////////
+//电机速度与脉冲速度   设置电机速度为10 脉冲速度=0.5S->50=100/S  脉冲速度=电机速度*10
+//按照上面的比例关系，在某个加速度，速度下，若目标速度为0，到速度为0时，脉冲数为：
 
+//////////////////////////////////////////////////////////////////////////
 /************************************************* 
 *Function:		zt_motor_master_driver_init
 *Input:			
@@ -121,7 +123,7 @@ void bsp_Master_motor1_Set_Speed(u16 NewSpeed)
 void zt_motor_master_driver_init(void)
 {
     //PB14 PB15 主动轮 电机方向控制 
-		bsp_master_motor_Init(); 
+		master_motor1_GPIO_TIM_Init(); 
 		
 		SET_MT_BREAK_CLOSE;
 	
@@ -153,8 +155,12 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
         bFanxiang = 1;
     }
     else
-	{
-        ;
+		{
+       speed = speed;
+       bFanxiang = 0;
+			//nprintf(ID_DEBUG,speed,0,DEC);
+			//debug_sprintf(ID_DEBUG,"1111");
+			//debug_sprintf(ID_DEBUG,"\r\n");
     }
     if ( speed >= 90 )
     {
@@ -168,9 +174,11 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
 
     gMstMt.set_dir   = bFanxiang ;
     gMstMt.set_speed = speed*100 ;  //速度需要乘以100
-	
-    //SetPwm_Tim1_CH2( speed );  //电机当前速度为 0
+		//nprintf(ID_DEBUG,gMstMt.set_speed,0,DEC);
+		
     //SET_MASTER_MOTOR_PWM(speed);
+		//SET_MASTER_MOTOR_ZZ();
+		
     return (bFanxiang)?(-speed):(speed);
 }
 
@@ -440,8 +448,10 @@ void zt_motor_master_driver_update(void)
         SET_MT_BREAK_CLOSE ;
     }
     
-    real_mst_mt_set_speed = gMstMt.cur_speed/100;
+    real_mst_mt_set_speed = gMstMt.cur_speed / 100;
     SET_MASTER_MOTOR_PWM( real_mst_mt_set_speed );  //速度值
+		
+		
     gMstMt.real_out_speed = (gMstMt.cur_dir)? (-real_mst_mt_set_speed):(real_mst_mt_set_speed) ;
     
     if( gMstMt.cur_speed < 9*100)

@@ -18,9 +18,7 @@ void bsp_Board_Init(void)
 	bsp_HI3521_GPIO_Init();	
 	bsp_Video_Trans_PWR_Init();
 	bsp_Limit_SW_Init();
-	bsp_master_motor_Init();
-	bsp_slave_motor_Init();
-	bsp_enccoder_Init();			//从动轮轮子编码器
+	bsp_enccoder_Init();							//从动轮轮子编码器
 	//GENERAL_TIM_Configuration();
 	//bsp_BRD_Init();
 	bsp_GPS_Init(GPS_RS232);

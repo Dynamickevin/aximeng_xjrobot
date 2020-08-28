@@ -58,7 +58,7 @@ static void at_build_mtSetBk_string(uint8 com,uint8 rst,uint8 kind)
 	else
 	{
 		//stprintf(com,"AT+SlvMt true ");
-		str = cmd_para_build_para_string_str( str , "AT+SlvMt " , "1" );
+		str = cmd_para_build_para_string_str( str , "AT+SlvMt " , "2" );
     }	
 
 	str--;//去掉'=';
@@ -280,8 +280,6 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
 	//str = (char*)(g_zt_msg.sendbuf) ;
 
     //str = cmd_para_build_para_string_str( str , "Name" , gRbtState.RobotName );
-    
-    //str = cmd_para_build_para_string_int( str , "STATE" , gBoxOs_CpuIdleTime/1000 );
 
     if ( g_zt_msg.nTimeForNoLinuxHeartIn > 30 )
     {
@@ -352,7 +350,7 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
         //g_zt_msg.trans_vals[1] = gCodeZ+1;
         str = cmd_para_build_para_string_ints( str , "SlvWhl" , g_zt_msg.trans_vals , 2 );
         
-        //code_ab[0] = (GET_SLAVE_WHEEL_CODE());
+    //code_ab[0] = (GET_SLAVE_WHEEL_CODE());
 		//code_ab[1] =gBatAutoCtrl.nCxCheckMove;
 		//str = cmd_para_build_para_string_longs( str , "SlvWhl" , &code_ab[0] , 2 );
     }
@@ -391,7 +389,7 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
         *str++ = ',';
         *str++ = (gBatAutoCtrl.bChargingClosed)? 'X' : '_' ; //软件判断，手动关闭充电中
         *str++ = ',';
-        *str++ = (!GpioGet(GPIO_BAT_CHARGE_EN))? 'O' : '_' ; //实时输出
+        //*str++ = (!GpioGet(GPIO_BAT_CHARGE_EN))? 'O' : '_' ; //实时输出
         *str++ = ' ';//'\t' ;
         *str = 0 ;
     }
@@ -1015,9 +1013,9 @@ void SetSlaveMotor(uint8 com,uint8* cmd)       //4
 			at_build_mtSetBk_string(com,ret,2);
             return;
         }
-		//nprintf(1,gCmdParaVal_Ints[0],0,DEC);
-		//stprintf(1," ");
-		//nprintf(1,gCmdParaVal_Ints[1],0,DEC);
+		//nprintf(ID_DEBUG,gCmdParaVal_Ints[0],0,DEC);
+		//stprintf(ID_DEBUG," ");
+		//nprintf(ID_DEBUG,gCmdParaVal_Ints[1],0,DEC);
 		
 		if(gMstMt.cur_speed != 0)		//主动轮先停止，从动轮才能下降
         {
@@ -1041,10 +1039,12 @@ void SetSlaveMotor(uint8 com,uint8* cmd)       //4
 		    else if ( ValCnt == 2 )
 		    {
 				zt_motor_slave_driver_set_speed( gCmdParaVal_Ints[0] , gCmdParaVal_Ints[1] );
+				//nprintf(ID_DEBUG,gCmdParaVal_Ints[0],0,DEC);
+				
 		    }
     	}
     }
-	ret = 0x00;//命令执行成功
+		ret = 0x00;//命令执行成功
     at_build_mtSetBk_string(com,ret,2);
 
 
@@ -1055,30 +1055,29 @@ void SetSlaveMotor(uint8 com,uint8* cmd)       //4
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
-
-//AT+MstMt=15,1000  CRC=bb6f
+/*
 //AT+MstMt=15,1000  SlvMt=hold CRC=da3c
 //AT+MstMt=15,1000  SlvMt=0 CRC=8b08
 void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
 {
     uint8 ret;
 	//对命令进行解析
-    if( CheckIsCmdOk(com,cmd , &gCmdParaInfos) == false )
+  if( CheckIsCmdOk(com,cmd , &gCmdParaInfos) == false )
 	{
-        stprintf(ID_DEBUG,"MstMt Cmd Err\r\n");
+    stprintf(ID_DEBUG,"MstMt Cmd Err\r\n");
 		ret = 0x08;//命令的CRC校验错误
 		at_build_mtSetBk_string(com,ret,1);
-        return;
-    }
-    else
-    {
-        u16 bNeed_SetSlvMtAuto = 1; 			//是否设置从动轮自动
+    return;
+  }
+  else
+  {	
+				u16 bNeed_SetSlvMtAuto = 1; 			//是否设置从动轮自动
         int ValCnt = cmd_para_get_int_by_val_str( gCmdParaInfos.items[0].value , gCmdParaVal_Ints , 5 );
         if ( (ValCnt <= 0) || (ValCnt>2) )
         {
             stprintf(ID_DEBUG,"MstMt Err Val\r\n");
-			ret = 0x01;//参数错误
-			at_build_mtSetBk_string(com,ret,1);
+						ret = 0x01;//参数错误
+						at_build_mtSetBk_string(com,ret,1);
             return;
         }
 		
@@ -1140,7 +1139,7 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
         //USART_DEBUG_OUT("M_Mt=%d\n", gMstMt.set_speed );
         if ( gCmdParaInfos.item_cnt >= 2 )
         {
-            if ( box_str_cmp(gCmdParaInfos.items[1].name , "SlvMt" ) == 0 )
+            if ( box_str_cmp(gCmdParaInfos.items[1].name , "MstMt" ) == 0 )
             {
                 if( box_str_cmp(gCmdParaInfos.items[1].value , "hold" ) == 0 )
 				{
@@ -1160,16 +1159,70 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
             //USART_DEBUG_OUT("slv mt auto\n" );
         }
     }
-	ret = 0x00;//命令执行成功
+//		nprintf(ID_DEBUG,gCmdParaVal_Ints[0],0,DEC);
+//		stprintf(ID_DEBUG," ");
+//		nprintf(ID_DEBUG,gCmdParaVal_Ints[1],0,DEC);
+		
+		ret = 0x00;//命令执行成功
     at_build_mtSetBk_string(com,ret,1);
 
-	//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
-	gRbtState.StateSwitchFlag[0] = 'H' ;
-	zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
-    uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
-	gRbtState.StateSwitchFlag[0] = 'I' ;
+		//发送一条字符串给妙算，告诉为手动控制,然后切换到空闲状态
+		gRbtState.StateSwitchFlag[0] = 'H' ;
+		zt_build_send_state_string(BUILD_STATE_FLAG_ALL,ID_LINUX,8);
+		uart3_send(g_zt_msg.sendbuf , g_zt_msg.icmd_len );
+		gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
+
+*/
+
+
+//AT+MstMt=15,1000  SlvMt=hold CRC=da3c
+//AT+MstMt=15,1000  SlvMt=0 CRC=8b08
+void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
+{
+  uint8 ret;
+	//对命令进行解析
+	if( CheckIsCmdOk(com,cmd, &gCmdParaInfos) == false )
+	{
+		stprintf(ID_DEBUG,"MstMt Cmd Err\r\n");
+		ret = 0x08;//命令的CRC校验错误
+		at_build_mtSetBk_string(com,ret,1);
+		return;
+	}
+	else
+	{	
+		//u16 bNeed_SetSlvMtAuto = 1; 			//是否设置从动轮自动
+    int ValCnt = cmd_para_get_int_by_val_str( gCmdParaInfos.items[0].value , gCmdParaVal_Ints , 5 );
+    if ( (ValCnt <= 0) || (ValCnt>2) )
+    {
+      stprintf(ID_DEBUG,"MstMt Err Val\r\n");
+			ret = 0x01;//参数错误
+			at_build_mtSetBk_string(com,ret,1);
+      return;
+    }
+		
+		if ( ValCnt == 1 )
+	  {
+	     zt_motor_master_driver_set_speed( gCmdParaVal_Ints[0] , 50000 );
+	  }
+	  else if ( ValCnt == 2 )
+	  {
+	     zt_motor_master_driver_set_speed( gCmdParaVal_Ints[0] , gCmdParaVal_Ints[1] );
+	  }
+            
+  }
+		
+	ret = 0x00;//命令执行成功
+  at_build_mtSetBk_string(com,ret,1);
+	
+}
+
+
+
+
+
+
 
 //AT+Hello=OK GpsPos=116.1479415,33.7518119,61.2 GpsTime=17,11,20,14,0,24 name=Rbt9999
 void Hello(uint8 com,uint8* cmd)   			 //6
@@ -1868,13 +1921,13 @@ void CommDebug(uint8 id,uint8 *sp,uint16 length)
 		    }
 			else
 			{
-                if((gCmdParaInfos.item_cnt>1) && (box_str_cmp("Hello",gCmdParaInfos.items[0].name)==0))
-	        	{
+        if((gCmdParaInfos.item_cnt>1) && (box_str_cmp("Hello",gCmdParaInfos.items[0].name)==0))
+	      {
 					Hello(com,dp);
 					OSMemPut(mem512ptr,dp);//释放内存块  
 					OSSemPost(mem512_sem);
 					return;
-	        	}
+	      }
 				else
 				{
 					OSMemPut(mem512ptr,dp);//释放内存块  
@@ -1889,7 +1942,7 @@ void CommDebug(uint8 id,uint8 *sp,uint16 length)
 			OSSemPost(mem512_sem);
 			return;
 		}
-    }
+  }
 	
 
 	temp = FindingOrder(dp);
