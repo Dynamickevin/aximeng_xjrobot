@@ -674,9 +674,9 @@ void rt_get_SlvCFG(uint8 com)
 void cfg_oper_init(void)
 {
     //const UserCfgType* pcfg = (const UserCfgType*)( BOX_OS_USER_SLV_CFG_ADDR );
-   // memcpy( &gUserAllCfg , pcfg , sizeof(gUserAllCfg) );  //不是加载默认，而是从以及使用的进行加载
+    // memcpy( &gUserAllCfg , pcfg , sizeof(gUserAllCfg) );  //不是加载默认，而是从以及使用的进行加载
     //memcpy( &gUserAllCfg.SlvMtCfg , &gSlvMtCfg , sizeof(gSlvMtCfg) );
-	CopyBuffer(&gSlvMtCfg, &gUserAllCfg.SlvMtCfg, sizeof(gSlvMtCfg));
+		CopyBuffer(&gSlvMtCfg, &gUserAllCfg.SlvMtCfg, sizeof(gSlvMtCfg));
     gUserAllCfg.begin_cfg = 0XAAAAAAAA;
     gUserAllCfg.end_cfg   = 0X55555555;
     //gUserAllCfg.SlvMtCfg.fk_mst_limit_down = 0;
@@ -706,7 +706,7 @@ void cfg_oper_save_to_flash(void)
     {
         OS_CPU_SR  cpu_sr = 0;
         OS_ENTER_CRITICAL();
-        //不相同 需要擦除该页，并且写入对应的数据
+        //不相同 需要擦除该部分，并且写入对应的数据
         FLASH_Unlock();
         FLASH_ClearFlag( FLASH_FLAG_EOP |  FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
         FLASH_EraseSector( FLASH_Sector_6,VoltageRange_3 ); //20200806 caigz add

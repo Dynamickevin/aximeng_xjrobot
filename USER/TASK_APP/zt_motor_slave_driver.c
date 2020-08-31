@@ -40,29 +40,29 @@ static void bsp_Slave_Motor2_GPIO_Init(void)
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	/*开启相关的GPIO外设时钟*/
-	RCC_AHB1PeriphClockCmd (MOTOR2_EN_GPIO_CLK|MOTOR2_DIR_GPIO_CLK|MOTOR2_OCPWM_GPIO_CLK, ENABLE); 
+	RCC_AHB1PeriphClockCmd (Slv_MOTOR2_DIR1_GPIO_CLK|Slv_MOTOR2_DIR2_GPIO_CLK|Slv_MOTOR2_OCPWM_GPIO_CLK, ENABLE); 
  															   
-	GPIO_SetBits(MOTOR2_EN_GPIO_PORT,MOTOR2_EN_PIN);
-	GPIO_SetBits(MOTOR2_DIR_GPIO_PORT,MOTOR2_DIR_PIN);
+	GPIO_SetBits(Slv_MOTOR2_DIR1_GPIO_PORT,Slv_MOTOR2_DIR1_PIN);
+	GPIO_SetBits(Slv_MOTOR2_DIR2_GPIO_PORT,Slv_MOTOR2_DIR2_PIN);
 	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 
-	GPIO_InitStructure.GPIO_Pin = MOTOR2_EN_PIN;		
-	GPIO_Init(MOTOR2_EN_GPIO_PORT, &GPIO_InitStructure);	
-	GPIO_InitStructure.GPIO_Pin = MOTOR2_DIR_PIN;		
-	GPIO_Init(MOTOR2_DIR_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_InitStructure.GPIO_Pin = Slv_MOTOR2_DIR1_PIN;		
+	GPIO_Init(Slv_MOTOR2_DIR1_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_InitStructure.GPIO_Pin = Slv_MOTOR2_DIR2_PIN;		
+	GPIO_Init(Slv_MOTOR2_DIR2_GPIO_PORT, &GPIO_InitStructure);	
 
 	/* 定时器通道引脚复用 */ 
-	GPIO_PinAFConfig(MOTOR2_OCPWM_GPIO_PORT,MOTOR2_OCPWM_PINSOURCE,MOTOR2_OCPWM_AF); 
+	GPIO_PinAFConfig(Slv_MOTOR2_OCPWM_GPIO_PORT,Slv_MOTOR2_OCPWM_PINSOURCE,Slv_MOTOR2_OCPWM_AF); 
 	/* 定时器通道引脚配置 */															   
-	GPIO_InitStructure.GPIO_Pin = MOTOR2_OCPWM_PIN;	
+	GPIO_InitStructure.GPIO_Pin = Slv_MOTOR2_OCPWM_PIN;	
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;    
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz; 
-	GPIO_Init(MOTOR2_OCPWM_GPIO_PORT, &GPIO_InitStructure);
+	GPIO_Init(Slv_MOTOR2_OCPWM_GPIO_PORT, &GPIO_InitStructure);
 	
 }
 
@@ -77,30 +77,30 @@ static void bsp_Slave_Motor2_Config(void)
 	TIM_OCInitTypeDef  TIM_OCInitStructure;
 	
 	// 开启TIMx_CLK,x[2,3,4,5,12,13,14] 
-	RCC_APB2PeriphClockCmd(MOTOR2_TIM_CLK, ENABLE); 
+	RCC_APB2PeriphClockCmd(Slv_MOTOR2_TIM_CLK, ENABLE); 
 
-	TIM_TimeBaseStructure.TIM_Period = MOTOR2_TIM_Period-1;       
+	TIM_TimeBaseStructure.TIM_Period = Slv_MOTOR2_TIM_Period-1;       
 
-	TIM_TimeBaseStructure.TIM_Prescaler = MOTOR2_TIM_PSC-1;	
+	TIM_TimeBaseStructure.TIM_Prescaler = Slv_MOTOR2_TIM_PSC-1;	
 	TIM_TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
 	 
-	TIM_TimeBaseInit(MOTOR2_TIM, &TIM_TimeBaseStructure);
+	TIM_TimeBaseInit(Slv_MOTOR2_TIM, &TIM_TimeBaseStructure);
 	//ARR的周期值对应   TIM_TimeBaseStructure.TIM_Period  的设置值
   //PSC的分频值对应   TIM_TimeBaseStructure.TIM_Prescaler 的设置值
   //PWM频率=（168000K/（PSC+1））/ ARR = 
 	
 	/*PWM模式配置*/
 	/* PWM1 Mode configuration: Channel1 */
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式1
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式2
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
-	TIM_OCInitStructure.TIM_Pulse = 20;
+	TIM_OCInitStructure.TIM_Pulse = 0;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
-	MOTOR2_TIM_OC_INIT(MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道1
+	Slv_MOTOR2_TIM_OC_INIT(Slv_MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道1
   
 	// 使能定时器
-	TIM_Cmd(MOTOR2_TIM, ENABLE);	
-	TIM_CtrlPWMOutputs(MOTOR2_TIM,ENABLE);
+	TIM_Cmd(Slv_MOTOR2_TIM, ENABLE);	
+	TIM_CtrlPWMOutputs(Slv_MOTOR2_TIM,ENABLE);
 }
 
 
@@ -111,8 +111,8 @@ static void bsp_Slave_Motor2_Config(void)
 */
 void bsp_Slave_motor2_Set_Speed(u16 NewSpeed)
 {
-	if(NewSpeed>MOTOR2_TIM_Period*0.9)NewSpeed = MOTOR2_TIM_Period*0.9;
-	MOTOR2_SetCompare(MOTOR2_TIM,NewSpeed);	
+	if(NewSpeed>Slv_MOTOR2_TIM_Period*0.9)NewSpeed = Slv_MOTOR2_TIM_Period*0.9;
+	Slv_MOTOR2_SetCompare(Slv_MOTOR2_TIM,NewSpeed);	
 }
 
 
@@ -143,7 +143,7 @@ static __inline void real_set_slv_mt_close(void)
 void zt_motor_slave_driver_cfg_init(void)
 {
     float tmp;
-    const UserCfgType* pcfg = (const UserCfgType*)( MCU_FLASH_ADDR_BEGIN+0x48000 );
+    const UserCfgType* pcfg = (const UserCfgType*)( MCU_FLASH_ADDR_BEGIN+0x40000 );
     if ( (pcfg->begin_cfg==0XAAAAAAAA) && (pcfg->end_cfg==0X55555555) )
     {
         memcpy( &gSlvMtCfg , &(pcfg->SlvMtCfg) , sizeof(gSlvMtCfg) );
@@ -158,11 +158,11 @@ void zt_motor_slave_driver_cfg_init(void)
         gSlvMtCfg.mstAddAccl = 10;
         gSlvMtCfg.mstDelAccl = 40;
         //AT+SlvCFG=6 pmin=40 pmax=110 pmid=75 StopMin=20 StopMax=150 SpeedBrg=10
-        gSlvMtCfg.press_ok_min         = 60;  //30;  //40;  //   正常运行过程中，压力的最小值
-        gSlvMtCfg.press_ok_max         = 150;  //70;  //100; //   正常运动过程中，压力的最大值
-        gSlvMtCfg.press_mst_stop_min   = 30;  //10;  //20;  //   压力太小，需要停止主动轮 停止主动轮压力最小值
-        gSlvMtCfg.press_mst_stop_max   = 250; //120; //150; //   压力太大，需要停止主动轮 停止主动轮压力最大值
-        gSlvMtCfg.mst_limit_on_bridge  = 16;  //10;  //10;  //   在桥上的限速 //50;  //70;  //   需要进行调整时，目标压力值
+        gSlvMtCfg.press_ok_min         = 60;  //60;  //80;  //   正常运行过程中，压力的最小值
+        gSlvMtCfg.press_ok_max         = 150;  //1400;  //200; //   正常运动过程中，压力的最大值
+        gSlvMtCfg.press_mst_stop_min   = 30;  //20;  //50;  //   压力太小，需要停止主动轮 停止主动轮压力最小值
+        gSlvMtCfg.press_mst_stop_max   = 250; //250; //2800; //   压力太大，需要停止主动轮 停止主动轮压力最大值
+        gSlvMtCfg.mst_limit_on_bridge  = 16;  //10;  //14;  //   在桥上的限速 //50;  //70;  //   需要进行调整时，目标压力值
     }
     
     //gSlvMtCfg.press_ok_to_adjust   = (gSlvMtCfg.press_ok_min+gSlvMtCfg.press_ok_max)>>1; 

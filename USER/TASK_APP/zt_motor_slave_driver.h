@@ -12,28 +12,28 @@
 
 
 
-#define MOTOR2_EN_PIN          			GPIO_Pin_12              
-#define MOTOR2_EN_GPIO_PORT    			GPIOB                      
-#define MOTOR2_EN_GPIO_CLK      		RCC_AHB1Periph_GPIOB
+#define Slv_MOTOR2_DIR1_PIN          			GPIO_Pin_12              
+#define Slv_MOTOR2_DIR1_GPIO_PORT    			GPIOB                      
+#define Slv_MOTOR2_DIR1_GPIO_CLK      		RCC_AHB1Periph_GPIOB
 
-#define MOTOR2_DIR_PIN          		GPIO_Pin_13              
-#define MOTOR2_DIR_GPIO_PORT    		GPIOB                      
-#define MOTOR2_DIR_GPIO_CLK      		RCC_AHB1Periph_GPIOB
+#define Slv_MOTOR2_DIR2_PIN          			GPIO_Pin_13              
+#define Slv_MOTOR2_DIR2_GPIO_PORT    			GPIOB                      
+#define Slv_MOTOR2_DIR2_GPIO_CLK      		RCC_AHB1Periph_GPIOB
 
-#define MOTOR2_OCPWM_PIN          	GPIO_Pin_15             
-#define MOTOR2_OCPWM_GPIO_PORT    	GPIOB                     
-#define MOTOR2_OCPWM_GPIO_CLK      	RCC_AHB1Periph_GPIOB
-#define MOTOR2_OCPWM_PINSOURCE			GPIO_PinSource15
-#define MOTOR2_OCPWM_AF							GPIO_AF_TIM8
+#define Slv_MOTOR2_OCPWM_PIN          	GPIO_Pin_15             
+#define Slv_MOTOR2_OCPWM_GPIO_PORT    	GPIOB                     
+#define Slv_MOTOR2_OCPWM_GPIO_CLK      	RCC_AHB1Periph_GPIOB
+#define Slv_MOTOR2_OCPWM_PINSOURCE			GPIO_PinSource15
+#define Slv_MOTOR2_OCPWM_AF							GPIO_AF_TIM8
 
 
-#define	MOTOR2_TIM           				TIM8
-#define MOTOR2_TIM_CLK       				RCC_APB2Periph_TIM8
+#define	Slv_MOTOR2_TIM           				TIM8
+#define Slv_MOTOR2_TIM_CLK       				RCC_APB2Periph_TIM8
 
-#define MOTOR2_TIM_OC_INIT					TIM_OC3Init
-#define	MOTOR2_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period   分辨率为MOTOR1_TIM_Period
-#define	MOTOR2_TIM_PSC							21000
-#define	MOTOR2_SetCompare						TIM_SetCompare3
+#define Slv_MOTOR2_TIM_OC_INIT					TIM_OC3Init
+#define	Slv_MOTOR2_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period   分辨率为MOTOR1_TIM_Period
+#define	Slv_MOTOR2_TIM_PSC							21000
+#define	Slv_MOTOR2_SetCompare						TIM_SetCompare3
 /*******************************************************/
 
 typedef enum {MOTOR_CCW = 0,MOTOR_CW}MOTOR_DIR;

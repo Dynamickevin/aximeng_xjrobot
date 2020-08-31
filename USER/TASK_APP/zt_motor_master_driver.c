@@ -33,7 +33,7 @@ static void bsp_Master_Motor1_GPIO_Init(void)
 
 	/*开启相关的GPIO外设时钟*/
 	RCC_AHB1PeriphClockCmd (Mst_MOTOR1_DIR1_GPIO_CLK|Mst_MOTOR1_DIR2_GPIO_CLK|Mst_MOTOR1_OCPWM_GPIO_CLK, ENABLE); 					   
-
+	//方向1、2引脚初始化为高电平
 	GPIO_SetBits(Mst_MOTOR1_DIR1_GPIO_PORT,Mst_MOTOR1_DIR1_PIN);
 	GPIO_SetBits(Mst_MOTOR1_DIR2_GPIO_PORT,Mst_MOTOR1_DIR2_PIN);
 	
@@ -46,7 +46,7 @@ static void bsp_Master_Motor1_GPIO_Init(void)
 	GPIO_InitStructure.GPIO_Pin = Mst_MOTOR1_DIR2_PIN;		
 	GPIO_Init(Mst_MOTOR1_DIR2_GPIO_PORT, &GPIO_InitStructure);	
 
-	/* 定时器通道引脚复用 */
+	/* PB14 定时器通道引脚复用 */
 	GPIO_PinAFConfig(Mst_MOTOR1_OCPWM_GPIO_PORT,Mst_MOTOR1_OCPWM_PINSOURCE,Mst_MOTOR1_OCPWM_AF);
 	
 	
@@ -82,10 +82,10 @@ static void bsp_Master_Motor1_Config(void)
 	
 	/*PWM模式配置*/
 	/* PWM1 Mode configuration: Channel1 */
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式1
-//	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;	
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式2
+	//TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;	
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
-	TIM_OCInitStructure.TIM_Pulse = 20;
+	TIM_OCInitStructure.TIM_Pulse = 0;
 	//TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
 	Mst_MOTOR1_TIM_OC_INIT(Mst_MOTOR1_TIM, &TIM_OCInitStructure);	 //使能通道1
@@ -166,14 +166,14 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
     {
         speed = 90;
     }
-    else if ( speed < 12 )
+    else if ( speed < 10 )
     {
         speed = 0;
     }
     gMstMt.left_code = code_run ;
 
     gMstMt.set_dir   = bFanxiang ;
-    gMstMt.set_speed = speed*100 ;  //速度需要乘以100
+    gMstMt.set_speed = speed * 100 ;  //速度需要乘以100
 		//nprintf(ID_DEBUG,gMstMt.set_speed,0,DEC);
 		
     //SET_MASTER_MOTOR_PWM(speed);
@@ -344,7 +344,7 @@ void zt_motor_master_driver_update(void)
         bMtCheckStop = true;
     }
     else
-	{
+		{
         bMtCheckStop = false;
     }
     
@@ -359,7 +359,7 @@ void zt_motor_master_driver_update(void)
         
         //限制速度为0
         if( gMstMt.limit_speed == 0 )
-		{
+				{
             bMtCheckStop = true;  //强制识别为停止状态
         }
     }
@@ -372,38 +372,36 @@ void zt_motor_master_driver_update(void)
     
     //如果当前检测到主电机失控，需要强制关闭主电机一段时间
     if( gMtDisControlCheck.mstNeedStopCnt > 0 )
-	{
+		{
         gMtDisControlCheck.mstNeedStopCnt--;
         real_mst_mt_set_speed    = 0 ;
         real_mst_mt_set_del_accl = gSlvMtCfg.mstDelAccl*100 ;    //减速度加快
-    }
-    
-    
+    }  
 
     //设定速度方向 与当前实际输出 速度和方向不同；需要进行切换处理
     //先判断控制方向 与 当前电机运动方向是否相同
     if( gMstMt.set_dir != gMstMt.cur_dir )  //需要切换方向的处理过程
     {   
         if( bMtCheckStop )
-		{ //实际速度为0
+				{ //实际速度为0
             gMstMt.cur_speed = 11*100;
             gMstMt.cur_dir = gMstMt.set_dir;
         }
         else
-		{ //如果当前有一个设定速度，按照加速度值进行减速
+				{ //如果当前有一个设定速度，按照加速度值进行减速
             if( gMstMt.cur_speed > real_mst_mt_set_del_accl )
-			{
+						{
                 gMstMt.cur_speed -= real_mst_mt_set_del_accl;
             }
             else
-			{
+						{
                 gMstMt.cur_speed = 0;
             }
         }
     }
     else if( real_mst_mt_set_speed != gMstMt.cur_speed )
-	{ //速度有变化
-		if ( real_mst_mt_set_speed > gMstMt.cur_speed )   //需要加速
+		{ 	//速度有变化
+				if ( real_mst_mt_set_speed > gMstMt.cur_speed )   //需要加速
         {
             gMstMt.cur_speed += real_mst_mt_set_accl ;
             if( gMstMt.cur_speed > real_mst_mt_set_speed )
@@ -411,7 +409,7 @@ void zt_motor_master_driver_update(void)
                 gMstMt.cur_speed = real_mst_mt_set_speed ;
             }
             if( gMstMt.cur_speed < 11*100 )
-			{
+						{
                 gMstMt.cur_speed = 11*100 ;
             }
         }
@@ -422,40 +420,39 @@ void zt_motor_master_driver_update(void)
                 gMstMt.cur_speed = real_mst_mt_set_speed ;
             }
             else
-			{
+						{
                 gMstMt.cur_speed -= real_mst_mt_set_del_accl ;
             }
         }
     }
     
     if( (gMstMt.cur_speed > (10*100-1)) )
-	{
+		{
         SET_MT_BREAK_OPEN ;
     }
     else if( (!bMtCheckStop)  )
-	{
+		{
         if ( gMstMt.limit_speed_time )  //在桥上，立即停止
         {
-			SET_MT_BREAK_CLOSE ;
+					SET_MT_BREAK_CLOSE ;
         }
         else
-		{ //不在桥上，等待停止
+				{ //不在桥上，等待停止
             SET_MT_BREAK_OPEN ;
         }
     }
     else
-	{
+		{
         SET_MT_BREAK_CLOSE ;
     }
     
     real_mst_mt_set_speed = gMstMt.cur_speed / 100;
     SET_MASTER_MOTOR_PWM( real_mst_mt_set_speed );  //速度值
 		
-		
     gMstMt.real_out_speed = (gMstMt.cur_dir)? (-real_mst_mt_set_speed):(real_mst_mt_set_speed) ;
     
     if( gMstMt.cur_speed < 9*100)
-	{
+		{
         SET_MASTER_MOTOR_CLOSE();
     }
     else if ( gMstMt.cur_dir )
