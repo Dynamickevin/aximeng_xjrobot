@@ -4,15 +4,16 @@
 
 MotorDriverCtrlType gMstMt;
 
+//主电机定时器初始化
 static void bsp_Master_Motor1_Config(void);
-
+//主电机I/O口初始化
 static void bsp_Master_Motor1_GPIO_Init(void);
-
+//主电机速度设置
 static void bsp_Master_motor1_Set_Speed(u16 NewSpeed);	
 
 
 /*
-  * @brief  主电机MOTOR初始化
+  * @brief  主电机MOTOR初始化，包含I/O口和定时器
   * @param  无
   * @retval 无
 */
@@ -24,7 +25,7 @@ void master_motor1_GPIO_TIM_Init(void)
 }
 
 /*
-**主电机控制引脚初始化函数
+**主电机控制引脚I/O口初始化函数
 */
 static void bsp_Master_Motor1_GPIO_Init(void) 
 {
@@ -40,7 +41,7 @@ static void bsp_Master_Motor1_GPIO_Init(void)
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;   
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz; 
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
 	GPIO_InitStructure.GPIO_Pin = Mst_MOTOR1_DIR1_PIN;		
 	GPIO_Init(Mst_MOTOR1_DIR1_GPIO_PORT, &GPIO_InitStructure);	
 	GPIO_InitStructure.GPIO_Pin = Mst_MOTOR1_DIR2_PIN;		
@@ -83,12 +84,17 @@ static void bsp_Master_Motor1_Config(void)
 	/*PWM模式配置*/
 	/* PWM1 Mode configuration: Channel1 */
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式2
-	//TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;	
-	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
 	TIM_OCInitStructure.TIM_Pulse = 0;
-	//TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;  	  //当定时器计数值小于CCR1_Val时为高电平
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
-	Mst_MOTOR1_TIM_OC_INIT(Mst_MOTOR1_TIM, &TIM_OCInitStructure);	 //使能通道1
+	TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;  	  //当定时器计数值大于CCR1_Val时为高电平
+	//TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable ;
+//	TIM_OCInitStructure.TIM_OutputNState    = TIM_OutputNState_Disable;
+//  TIM_OCInitStructure.TIM_OCNIdleState    = TIM_OCNIdleState_Reset;
+//  TIM_OCInitStructure.TIM_OCIdleState     = TIM_OCIdleState_Reset ;
+	
+	Mst_MOTOR1_TIM_OC_INIT(Mst_MOTOR1_TIM, &TIM_OCInitStructure);	 //使能通道2
+
+	TIM_OC2PreloadConfig(Mst_MOTOR1_TIM,TIM_OCPreload_Enable); //TIM_1---->通道2[PB14]
 
 	// 使能定时器
 	TIM_Cmd(Mst_MOTOR1_TIM, ENABLE);	
@@ -96,7 +102,7 @@ static void bsp_Master_Motor1_Config(void)
 }
 
 /*
-  * @brief  主电机1 速度调节
+  * @brief  主电机1 速度设置
   * @param  10~90;  	
   * @retval 无
 */
@@ -122,21 +128,20 @@ void bsp_Master_motor1_Set_Speed(u16 NewSpeed)
 *************************************************/
 void zt_motor_master_driver_init(void)
 {
-    //PB14 PB15 主动轮 电机方向控制 
+    //PB14 PB15 主动轮 电机I/O口和定时器初始化 
 		master_motor1_GPIO_TIM_Init(); 
 		
-		SET_MT_BREAK_CLOSE;
+		SET_MT_BREAK_CLOSE;					//抱闸关闭
 	
-    SET_MASTER_MOTOR_CLOSE();  //电机当前速度为 0
+    SET_MASTER_MOTOR_CLOSE();  	//设置电机当前速度为 0
 		  			
-
     //编码器值 进行初始化
     //TimerCode_DefaultFunction_Init(2);  //编码器 数据采集初始化 主动轮 TIM2
     memset( &gMstMt , 0 , sizeof(gMstMt) );
 		memset( &gSpeedAnaly_Mst, 0 , sizeof(SpeedAnalyByCode) );
 	
     gMstMt.limit_speed  = 101*100 ;
-    SET_MASTER_MOTOR_CLOSE();
+    SET_MASTER_MOTOR_CLOSE();		//设置电机当前速度为 0
 }
 
 /************************************************* 
@@ -151,17 +156,30 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
     u8 bFanxiang = 0;
     if ( speed < 0 )
     {
-        speed = -speed;
+        speed = - speed;
         bFanxiang = 1;
+//			nprintf(ID_DEBUG,speed,0,DEC);
+//			//debug_sprintf(ID_DEBUG,"1111");
+//			debug_sprintf(ID_DEBUG,"\r\n");
+//			SET_MASTER_MOTOR_PWM(speed);
+//			SET_MASTER_MOTOR_FZ();
     }
-    else
+    else if( speed > 0 )
 		{
        speed = speed;
        bFanxiang = 0;
-			//nprintf(ID_DEBUG,speed,0,DEC);
-			//debug_sprintf(ID_DEBUG,"1111");
-			//debug_sprintf(ID_DEBUG,"\r\n");
+//			nprintf(ID_DEBUG,speed,0,DEC);
+//			//debug_sprintf(ID_DEBUG,"1111");
+//			debug_sprintf(ID_DEBUG,"\r\n");
+//			SET_MASTER_MOTOR_PWM(speed);
+//			SET_MASTER_MOTOR_ZZ();
+			
     }
+		else
+		{
+			  SET_MASTER_MOTOR_CLOSE();
+		}
+		
     if ( speed >= 90 )
     {
         speed = 90;
@@ -175,9 +193,8 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
     gMstMt.set_dir   = bFanxiang ;
     gMstMt.set_speed = speed * 100 ;  //速度需要乘以100
 		//nprintf(ID_DEBUG,gMstMt.set_speed,0,DEC);
-		
     //SET_MASTER_MOTOR_PWM(speed);
-		//SET_MASTER_MOTOR_ZZ();
+		//SET_MASTER_MOTOR_FZ();
 		
     return (bFanxiang)?(-speed):(speed);
 }
@@ -312,14 +329,14 @@ void zt_motor_master_driver_update(void)
 *DESCRIPTION:  主动轮 速度限制时间更新 速度限制只需要持续一定时间，
 *       时间到了，不再进行速度限制
 *************************************************/
-static void __inline DoLimitMstMtSpeed_Stop(void) //,u16 time_hold
+static void __inline DoLimitMstMtSpeed_Stop(void) 
 {
     if ( gMstMt.limit_speed_time )
     {
         gMstMt.limit_speed_time--;
     }
     else
-	{
+		{
         gMstMt.limit_speed = 101*100;
     }
 }
@@ -351,6 +368,7 @@ void zt_motor_master_driver_update(void)
     //根据设置的速度 和 限速，分析实际需要的设置速度 和 加速度，减速度值
     //然后更新电机状态
     DoLimitMstMtSpeed_Stop();
+		
     if ( gMstMt.set_speed >= gMstMt.limit_speed )
     {   
         real_mst_mt_set_speed       = gMstMt.limit_speed;
@@ -373,9 +391,10 @@ void zt_motor_master_driver_update(void)
     //如果当前检测到主电机失控，需要强制关闭主电机一段时间
     if( gMtDisControlCheck.mstNeedStopCnt > 0 )
 		{
-        gMtDisControlCheck.mstNeedStopCnt--;
-        real_mst_mt_set_speed    = 0 ;
-        real_mst_mt_set_del_accl = gSlvMtCfg.mstDelAccl*100 ;    //减速度加快
+      gMtDisControlCheck.mstNeedStopCnt--;
+      real_mst_mt_set_speed    = 0 ;
+      real_mst_mt_set_del_accl = gSlvMtCfg.mstDelAccl*100 ;    //减速度加快
+			debug_sprintf(ID_DEBUG,"Master Motor out of control");
     }  
 
     //设定速度方向 与当前实际输出 速度和方向不同；需要进行切换处理
@@ -388,7 +407,7 @@ void zt_motor_master_driver_update(void)
             gMstMt.cur_dir = gMstMt.set_dir;
         }
         else
-				{ //如果当前有一个设定速度，按照加速度值进行减速
+				{ 	//如果当前有一个设定速度，按照加速度值进行减速
             if( gMstMt.cur_speed > real_mst_mt_set_del_accl )
 						{
                 gMstMt.cur_speed -= real_mst_mt_set_del_accl;

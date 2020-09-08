@@ -31,8 +31,8 @@
 
 #define Mst_MOTOR1_TIM_OC_INIT					TIM_OC2Init
 
-#define	Mst_MOTOR1_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period = 80HZ   分辨率为MOTOR1_TIM_Period
-#define	Mst_MOTOR1_TIM_PSC							21000
+#define	Mst_MOTOR1_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period = 2KHZ   分辨率为MOTOR1_TIM_Period
+#define	Mst_MOTOR1_TIM_PSC							840
 #define	Mst_MOTOR1_SetCompare						TIM_SetCompare2
 
 //驱动器设置为 低电平使能 高电平关闭
@@ -48,10 +48,6 @@
 #define GPIO_CTL_DIR_M2 	 	 GPIOA,GPIO_Pin_12	  //主动轮方向2
 
 
-//typedef struct{
-//	FunctionalState NewState;		//ENABLE / DISABLE
-//	int16_t 		Speed;			
-//}MOTOR_CTRL_TYPEDRF;
 
 // 主电机motor控制调用函数
 /*********************************************************/
@@ -65,8 +61,7 @@ void bsp_Master_Motor1_GPIO_Init(void);
 void bsp_Master_motor1_Set_Speed(u16 NewSpeed);	
 
 
-
-#define GET_SLAVE_WHEEL_CODE()  bsp_Enccoder_AB_GET_Cnt()
+#define  GET_SLAVE_WHEEL_CODE()  bsp_Enccoder_AB_GET_Cnt()
 #define  SLAVE_WHEEL_CODE_SCALE         2400		//码盘换算比例系数
 
 

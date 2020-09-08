@@ -491,7 +491,6 @@ void Task_Timer(void *pdata)
 					//gPress_Newton = gSlvMtCfg.onBridgeTime;
 					//nprintf(ID_DEBUG,-20,0,DEC);
 					//Send_P0wer_Board_Master_State(DISABLE);
-					
 					//DBG_PRINTF("Hello World");
 				}
 				break;

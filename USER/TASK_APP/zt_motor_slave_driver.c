@@ -1,8 +1,13 @@
 
 #include <includes.h>
 
+//从电机定时器初始化
 static void bsp_Slave_Motor2_Config(void);
+//从电机I/O口初始化
 static void bsp_Slave_Motor2_GPIO_Init(void);
+//从电机速度设置
+static void bsp_Slave_motor2_Set_Speed(u16 NewSpeed);	
+
 
 extern ZT_INFO_TYPE g_zt_msg;
 SpeedAnalyByCode gSpeedAnaly_Mst;    //MST  master 缩写
@@ -11,8 +16,8 @@ SpeedAnalyByCode gSpeedAnaly_Whl;    //从动轮 码盘wheel,  Whl -- 缩写
 SlvMtCfgType     gSlvMtCfg;  		 //配置参数
 SlaveMotorAnaly  gSlaveMtAnaly;
 MtDisControlCheck gMtDisControlCheck;
-BatAutoCtrl		 gBatAutoCtrl;
-RbtState 		 gRbtState;
+BatAutoCtrl		 		gBatAutoCtrl;
+RbtState 		 			gRbtState;
 
 #define OUT_LOG_SLAVEMT  USART_DEBUG_OUT
 #define OUT_LOG_SLAVE_BYTE(byte) // uart_send_byte( DEBUG_PORT , (byte) )
@@ -20,7 +25,7 @@ RbtState 		 gRbtState;
 
 
 /*
-  * @brief  从电机MOTOR初始化
+  * @brief  从电机MOTOR初始化，包含I/O和定时器
   * @param  无
   * @retval 无
 */
@@ -91,13 +96,14 @@ static void bsp_Slave_Motor2_Config(void)
   //PWM频率=（168000K/（PSC+1））/ ARR = 
 	
 	/*PWM模式配置*/
-	/* PWM1 Mode configuration: Channel1 */
+	/* PWM2 Mode configuration: Channel1 */
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM2;	    //配置为PWM模式2
-	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	
+	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	//比较输出使能
 	TIM_OCInitStructure.TIM_Pulse = 0;
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;  	  //当定时器计数值小于CCR1_Val时为高电平
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  	  //当定时器计数值大于CCR1_Val时为高电平
 	Slv_MOTOR2_TIM_OC_INIT(Slv_MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道1
   
+	TIM_OC3PreloadConfig(Slv_MOTOR2_TIM,TIM_OCPreload_Enable); //TIM_8---->通道3[PB15]
 	// 使能定时器
 	TIM_Cmd(Slv_MOTOR2_TIM, ENABLE);	
 	TIM_CtrlPWMOutputs(Slv_MOTOR2_TIM,ENABLE);
@@ -255,7 +261,6 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run)
     else if ( speed_abs<12 ) 
 #endif
 
-
     {
         gSlaveMtAnaly.s_SlvMtState = SLAVE_MT_CTRL_HANDLE;
         gSlaveMtAnaly.hand_set_speed = 0;
@@ -284,19 +289,19 @@ static u16 nLastCodeRecordTime = 0;
 static u16 nSpeedAnaly_ChangeId = 0;
 //static u16 nSpeedAnaly_SlvMtChangeId = 0;
 static __inline void DoSpeedAnalyByCode(void)
-{
-    //gSlaveMtAnaly.b_XianWei_Up   = !GpioGet(GPIO_CHK_LIMIT1) ;
-    //gSlaveMtAnaly.b_XianWei_Down = !GpioGet(GPIO_CHK_LIMIT2) ;
-	
-    gSlaveMtAnaly.b_XianWei_Up   = (SW_GpioGet(GPIO_CHK_LIMIT1)) || (SW_GpioGet(GPIO_CHK_LIMIT2));
+{	
+    //Motor_Driver_Ana_Vol_ADC_Val,与MAXON电机驱动器模拟输出口配置电压为3.5V，芯片端输入电压3.5V*3/4=2.625V,有关系，
+		//速度为零时对应模拟电压为1.3V，模拟输出电压对应的ADC值
+		int Motor_Driver_Ana_Vol_ADC_Val = 1600; 
+		gSlaveMtAnaly.b_XianWei_Up   = (SW_GpioGet(GPIO_CHK_LIMIT1)) || (SW_GpioGet(GPIO_CHK_LIMIT2));
     gSlaveMtAnaly.b_XianWei_Down = gSlaveMtAnaly.b_XianWei_Up;
 
     //从电机 的控制 需要进行快速响应的控制 这时需要 获取当前 20ms 的电机速度
     //根据20ms 的电机速度 计算电机立即停止，会再行走的距离 以及压力变化值
     //做一个大体的评估  因此先需要获取 20ms速度
     // gSpeedAnaly_Slv.speed > 0; is up running
-    gSpeedAnaly_Slv.speed = ( 1614 - bsp_slave_voltage_get_speed() ) / (13) ;
-    gSpeedAnaly_Mst.speed = ( 1614 - bsp_master_voltage_get_speed() ) / (-10) ;
+    gSpeedAnaly_Slv.speed = ( Motor_Driver_Ana_Vol_ADC_Val - Slave_Cal_Speed_Get_ADC_Val() ) / (13) ;
+    gSpeedAnaly_Mst.speed = ( Motor_Driver_Ana_Vol_ADC_Val - Master_Cal_Speed_Get_ADC_Val()	) / (-10) ;
 
     //不需要实时采集从动轮的编码器值 每隔一段时间采集一次 多次采集，计算平均速度
     nLastCodeRecordTime++;
@@ -333,7 +338,7 @@ s16 GetCode_DiffFromSaveList(SpeedAnalyByCode* code_list,u16 save_tick)
 }
 
 //在压力过大 或者 压力过小时 限制主动轮速度
-static __inline void DoLimitMstMtSpeed(u16 limit_speed,u16 limitTime) //,u16 time_hold
+static __inline void DoLimitMstMtSpeed(u16 limit_speed,u16 limitTime) 
 {
     gMstMt.limit_speed      = limit_speed*100;
     gMstMt.limit_speed_time = limitTime ;
@@ -658,93 +663,97 @@ static __inline void DoPjzLvboAnaly(PjzLvboAnaly* plv,s16 newVal)
 *************************************************/
 void CheckMtDisControl(void)
 {
-    gMtDisControlCheck.curDealValID++;
-    if( gMtDisControlCheck.curDealValID>=PJZ_ANALY_MAX_CNT )
+  gMtDisControlCheck.curDealValID++;
+  if( gMtDisControlCheck.curDealValID>=PJZ_ANALY_MAX_CNT )
 	{
-        gMtDisControlCheck.curDealValID = 0;
-    }
-    DoPjzLvboAnaly(&gMtDisControlCheck.mstMtBackSpeed,gSpeedAnaly_Mst.speed);
-    DoPjzLvboAnaly(&gMtDisControlCheck.slvMtBackSpeed,gSpeedAnaly_Slv.speed);
-    
-    if( gSlaveMtAnaly.real_out_speed > 13 )
+     gMtDisControlCheck.curDealValID = 0;
+  }
+  DoPjzLvboAnaly(&gMtDisControlCheck.mstMtBackSpeed,gSpeedAnaly_Mst.speed);
+  DoPjzLvboAnaly(&gMtDisControlCheck.slvMtBackSpeed,gSpeedAnaly_Slv.speed);
+   
+	
+  if( gSlaveMtAnaly.real_out_speed > 13 )
 	{
-        gMtDisControlCheck.slvOutCnt++;
-        if( gMtDisControlCheck.slvOutCnt >= MT_DIS_CONTROL_CHECK_TICK )
+    gMtDisControlCheck.slvOutCnt++;
+    if( gMtDisControlCheck.slvOutCnt >= MT_DIS_CONTROL_CHECK_TICK )
 		{
-            gMtDisControlCheck.slvOutCnt = MT_DIS_CONTROL_CHECK_TICK-1 ;
-            if( gMtDisControlCheck.slvMtBackSpeed.lvVal < 10 )
+      gMtDisControlCheck.slvOutCnt = MT_DIS_CONTROL_CHECK_TICK-1 ;
+      if( gMtDisControlCheck.slvMtBackSpeed.lvVal < 10 )
 			{
-                //uart_send_byte( DEBUG_PORT , 'S' );
-                gMtDisControlCheck.slvNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
-          	}
-        }
-    }
-    else if( gSlaveMtAnaly.real_out_speed < -13 )
+       //uart_send_byte( DEBUG_PORT , 'S' );
+        gMtDisControlCheck.slvNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
+      }
+     }
+  }
+  else if( gSlaveMtAnaly.real_out_speed < -13 )
 	{
-        gMtDisControlCheck.slvOutCnt--;
-        if( gMtDisControlCheck.slvOutCnt <= -MT_DIS_CONTROL_CHECK_TICK )
+    gMtDisControlCheck.slvOutCnt--;
+    if( gMtDisControlCheck.slvOutCnt <= -MT_DIS_CONTROL_CHECK_TICK )
 		{
-            gMtDisControlCheck.slvOutCnt = -(MT_DIS_CONTROL_CHECK_TICK-1) ;
-            if( gMtDisControlCheck.slvMtBackSpeed.lvVal > -10 )
+      gMtDisControlCheck.slvOutCnt = -(MT_DIS_CONTROL_CHECK_TICK-1) ;
+      if( gMtDisControlCheck.slvMtBackSpeed.lvVal > -10 )
 			{
-                //uart_send_byte( DEBUG_PORT , 'V' );
-                gMtDisControlCheck.slvNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
-            }
-        }
-    }
-    else
+       //uart_send_byte( DEBUG_PORT , 'V' );
+        gMtDisControlCheck.slvNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
+       }
+     }
+  }
+  else
 	{
-        gMtDisControlCheck.slvOutCnt = 0;
-    }
+    gMtDisControlCheck.slvOutCnt = 0;
+  }
     
-    
-    if( gMstMt.real_out_speed > 12 )
+	
+	
+  if( gMstMt.real_out_speed > 12 )
 	{
-        gMtDisControlCheck.mstOutCnt++;
-        if( gMtDisControlCheck.mstOutCnt >= MT_DIS_CONTROL_CHECK_TICK )
+    //LED2(LED_ON);	
+		gMtDisControlCheck.mstOutCnt++;
+    if( gMtDisControlCheck.mstOutCnt >= MT_DIS_CONTROL_CHECK_TICK )
 		{
-            gMtDisControlCheck.mstOutCnt = MT_DIS_CONTROL_CHECK_TICK-1 ;
-            if( gMtDisControlCheck.mstMtBackSpeed.lvVal < 3 )
+       gMtDisControlCheck.mstOutCnt = MT_DIS_CONTROL_CHECK_TICK-1 ;
+       if( gMtDisControlCheck.mstMtBackSpeed.lvVal < 3 )
 			{
-                gMtDisControlCheck.mstNotMoveCnt++;
-                if( gMtDisControlCheck.mstNotMoveCnt > 20 )
+        gMtDisControlCheck.mstNotMoveCnt++;
+        if( gMtDisControlCheck.mstNotMoveCnt > 20 )
 				{
-                    //uart_send_byte( DEBUG_PORT , 'M' );
-                    gMtDisControlCheck.mstNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
-                }
-            }
-            else
+           //uart_send_byte( DEBUG_PORT , 'M' );
+           gMtDisControlCheck.mstNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
+         }
+       }
+      else
 			{
-                gMtDisControlCheck.mstNotMoveCnt=0;
-            }
-        }
-    }
-    else if( gMstMt.real_out_speed < -12 )
-	{
-        gMtDisControlCheck.mstOutCnt--;
-        if( gMtDisControlCheck.mstOutCnt <= -MT_DIS_CONTROL_CHECK_TICK )
-		{
-            gMtDisControlCheck.mstOutCnt = -(MT_DIS_CONTROL_CHECK_TICK-1) ;
-            if( gMtDisControlCheck.mstMtBackSpeed.lvVal > -3 )
-			{
-                gMtDisControlCheck.mstNotMoveCnt++;
-                if( gMtDisControlCheck.mstNotMoveCnt > 20 )
-				{
-                    //uart_send_byte( DEBUG_PORT , 'W' );
-                    gMtDisControlCheck.mstNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
-                }
-            }
-            else
-			{
-                gMtDisControlCheck.mstNotMoveCnt=0;
-            }
-        }
-    }
-    else
-	{
         gMtDisControlCheck.mstOutCnt = 0;
-        gMtDisControlCheck.mstNotMoveCnt = 0;
+				gMtDisControlCheck.mstNotMoveCnt=0;
+      }
     }
+  }
+  else if( gMstMt.real_out_speed < -12 )
+	{
+    gMtDisControlCheck.mstOutCnt--;
+    if( gMtDisControlCheck.mstOutCnt <= -MT_DIS_CONTROL_CHECK_TICK )
+		{
+       gMtDisControlCheck.mstOutCnt = -(MT_DIS_CONTROL_CHECK_TICK-1) ;
+      if( gMtDisControlCheck.mstMtBackSpeed.lvVal > -3 )
+			{
+         gMtDisControlCheck.mstNotMoveCnt++;
+        if( gMtDisControlCheck.mstNotMoveCnt > 20 )
+				{
+          //uart_send_byte( DEBUG_PORT , 'W' );
+          gMtDisControlCheck.mstNeedStopCnt = MT_DIS_CONTROL_CHECK_TICK/2;
+         }
+       }
+      else
+			{
+         gMtDisControlCheck.mstNotMoveCnt=0;
+      }
+    }
+  }
+  else
+	{
+     gMtDisControlCheck.mstOutCnt = 0;
+     gMtDisControlCheck.mstNotMoveCnt = 0;
+  }
 }
 
 
@@ -776,7 +785,7 @@ void DoSetSlaveMtSpeedByCurSpeed(void)
         if( gSpeedAnaly_Slv.speed < -15 )
 		{
             gSlaveMtAnaly.real_out_speed = FAST_STOP_FX_SPEED_CUR_DOWN;
-            OUT_LOG_SLAVE_BYTE('%');
+            debug_sprintf(ID_DEBUG,"Slave Motor speed < -15");
         }
         else
 		{
@@ -816,7 +825,7 @@ void DoSetSlaveMtSpeedByCurSpeed(void)
 	{
         gMtDisControlCheck.slvNeedStopCnt--;
         gSlaveMtAnaly.real_out_speed = 0;
-        OUT_LOG_SLAVE_BYTE('\\');
+				debug_sprintf(ID_DEBUG,"Slave Motor out of control");
     }
     
     //从电机实际控制输出
@@ -841,7 +850,7 @@ void Sensor_Collect(void)
 	//电机状态更新，不需要频率太高，降低些频率
 		DoPressFilter();       			//压力传感器采集值滤波
     DoSpeedAnalyByCode();  			//各种需要进行的状态更新；速度分析更新
-    UpdateFastBatChargingState();	//电池管理，充电状态更新
+    //UpdateFastBatChargingState();	//电池管理，充电状态更新
 }
 
 /************************************************* 
@@ -861,36 +870,36 @@ void TaskFun_MotorUpdate(void)
         
 		CheckMtDisControl(); //电机是否失控检测
         
-        if ( gSlaveMtAnaly.s_SlvMtState == SLAVE_MT_CTRL_AUTO )
-        {   
-            zt_motor_slave_driver_update();   //从动轮自动控制过程
-            gSlaveMtAnaly.need_out_speed = gSlaveMtAnaly.auto_cal_speed;
-            //gSlaveMtAnaly.need_out_speed = 0; //测试过程
-        }
-        else  //从动轮手动控制，设置速度
-        {   
-            gSlaveMtAnaly.need_out_speed = gSlaveMtAnaly.hand_set_speed;
-            if( gSlaveMtAnaly.need_out_speed > 0 )
+   if ( gSlaveMtAnaly.s_SlvMtState == SLAVE_MT_CTRL_AUTO )
+	 {   
+      zt_motor_slave_driver_update();   //从动轮自动控制过程
+      gSlaveMtAnaly.need_out_speed = gSlaveMtAnaly.auto_cal_speed;
+      //gSlaveMtAnaly.need_out_speed = 0; //测试过程
+   }
+   else  //从动轮手动控制，设置速度
+   {   
+      gSlaveMtAnaly.need_out_speed = gSlaveMtAnaly.hand_set_speed;
+      if( gSlaveMtAnaly.need_out_speed > 0 )
 			{ 
-                if( (gPressFilter.val >= 40) )		//向上运动，有一个压力值判断
+        if( (gPressFilter.val >= 80) )		//向上运动，有一个压力值判断
 				{
-                    gSlaveMtAnaly.need_out_speed = 0;
-                }
-            }
-        }
+            gSlaveMtAnaly.need_out_speed = 0;
+         }
+       }
+    }
         
-        if( gSlaveMtAnaly.need_out_speed < 0 )
+    if( gSlaveMtAnaly.need_out_speed < 0 )
 		{ 
-            if( gSlaveMtAnaly.b_XianWei_Down )		 //向下运动，需要判断限位开关
+      if( gSlaveMtAnaly.b_XianWei_Down )		 //向下运动，需要判断限位开关
 			{ 
-                gSlaveMtAnaly.need_out_speed = 0;	 //如果碰到下面的限位开关，直接关闭电机
-                //OUT_LOG_SLAVE_BYTE('&');
-            }
-        }
+         gSlaveMtAnaly.need_out_speed = 0;	 //如果碰到下面的限位开关，直接关闭电机
+         //OUT_LOG_SLAVE_BYTE('&');
+       }
+     }
         
-        DoSetSlaveMtSpeedByCurSpeed(); 				 //从电机控制
+     DoSetSlaveMtSpeedByCurSpeed(); 				 //从电机控制
         
-        zt_motor_master_driver_update();
+     zt_motor_master_driver_update();
 #endif
 
 }

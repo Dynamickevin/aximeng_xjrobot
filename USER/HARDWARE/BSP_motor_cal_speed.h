@@ -6,6 +6,9 @@
 #include "stm32f4xx.h"
 #include  "BSP_ADC_Init.h"
 
+//extern u32 Slave_ADC_count;
+extern u32 Master_ADC_count;
+
 /*****************************************************/
 //主电机模拟速度计算
 #define		MASTER_MOTOR_IN_VOLTAGE_MAX				3000					//单位mv //单片机采集最大电压
@@ -41,7 +44,11 @@ void bsp_master_cal_speed_Init(void);							//主动轮模拟速度计算初始化
 
 void bsp_slave_cal_speed_Init(void);							//从动轮模拟速度计算初始化
 
+float Master_Cal_Speed_Get_ADC_Val(void);
+
 float Master_Cal_Speed_Get_Voltage(void);
+
+float Slave_Cal_Speed_Get_ADC_Val(void);
 	
 float Slave_Cal_Speed_Get_Voltage(void);
 

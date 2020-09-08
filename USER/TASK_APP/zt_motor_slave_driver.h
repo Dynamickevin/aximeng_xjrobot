@@ -31,8 +31,8 @@
 #define Slv_MOTOR2_TIM_CLK       				RCC_APB2Periph_TIM8
 
 #define Slv_MOTOR2_TIM_OC_INIT					TIM_OC3Init
-#define	Slv_MOTOR2_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period   分辨率为MOTOR1_TIM_Period
-#define	Slv_MOTOR2_TIM_PSC							21000
+#define	Slv_MOTOR2_TIM_Period						100			//频率 = 系统频率（168M）/MOTOR1_TIM_PSC/MOTOR1_TIM_Period = 2KHZ 分辨率为MOTOR1_TIM_Period
+#define	Slv_MOTOR2_TIM_PSC							840
 #define	Slv_MOTOR2_SetCompare						TIM_SetCompare3
 /*******************************************************/
 
@@ -111,10 +111,10 @@ s16 zt_motor_slave_driver_set_speed(s16 speed,u16 code_run);
 #define SET_SLAVE_MOTOR_ZZ()    GpioSetH(GPIO_CTL_DIR_S2) ; GpioSetL(GPIO_CTL_DIR_S1)
 #define SET_SLAVE_MOTOR_FZ()    GpioSetL(GPIO_CTL_DIR_S2) ; GpioSetH(GPIO_CTL_DIR_S1)
 
-#define SET_SLAVE_MOTOR_PWM   bsp_Slave_motor2_Set_Speed
+#define SET_SLAVE_MOTOR_PWM  		bsp_Slave_motor2_Set_Speed
 
-#define GPIO_CTL_DIR_S1 	 	 GPIOB,GPIO_Pin_12	  //从动轮方向1
-#define GPIO_CTL_DIR_S2 	 	 GPIOB,GPIO_Pin_13	  //从动轮方向2
+#define GPIO_CTL_DIR_S1 	 	 		GPIOB,GPIO_Pin_12	  //从动轮方向1
+#define GPIO_CTL_DIR_S2 	 			GPIOB,GPIO_Pin_13	  //从动轮方向2
 
 
 //#define SET_SLAVE_MOTOR_PWM(...)

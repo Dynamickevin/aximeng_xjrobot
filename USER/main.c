@@ -126,8 +126,6 @@ INT32S main(void)
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
 	
 	
-	//OSTimeDly(OS_TICKS_PER_SEC/50);//解决更新程序后，无法识别芯片问题
-	
 	SystemInit();
 	
 	delay_init(168);		  //初始化延时函数
