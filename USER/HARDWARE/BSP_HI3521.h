@@ -4,15 +4,18 @@
 
 #include "stm32f4xx.h"
 #include  "BSP_ADC_Init.h"
-#include "BSP_UART.h"
+//#include "BSP_UART.h"
 #include "string.h"
 /*****************************************************/
 
-//*************************/、
+//*************************/
+
+void USART3_IRQHandler(void);
+extern void USART3_Config(void);
+extern void uart3_send(uint8 *sp,uint16 len) ;
+
 //错误信息
 #define HI3521_NTC_ERROR		0x10
-
-
 
 
 /******************************************/
@@ -69,12 +72,11 @@
 
 void bsp_HI3521_Heater(void);   //获取HI3521 表面温度，如低于设定值 则开始加热，高于设定值停止加热
 
-void bsp_HI3521_GPIO_Init(void);							//初始化
+void bsp_HI3521_Init(void);							//初始化
 int8_t bsp_HI3521_Ntc_Get_Temp(void);							//获取温度
 void HI3521_Reset(void);
 
-void bsp_HI3521_Pluse(void);   //心跳函数 				//主函数 while循环调用
-u16 bsp_HI3521_UART_Parse(void);
+
 #endif
 /**************************************************END LINE**********************************************/
 

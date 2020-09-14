@@ -130,9 +130,7 @@ void zt_motor_master_driver_init(void)
 {
     //PB14 PB15 主动轮 电机I/O口和定时器初始化 
 		master_motor1_GPIO_TIM_Init(); 
-		
 		SET_MT_BREAK_CLOSE;					//抱闸关闭
-	
     SET_MASTER_MOTOR_CLOSE();  	//设置电机当前速度为 0
 		  			
     //编码器值 进行初始化
@@ -161,8 +159,6 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
 //			nprintf(ID_DEBUG,speed,0,DEC);
 //			//debug_sprintf(ID_DEBUG,"1111");
 //			debug_sprintf(ID_DEBUG,"\r\n");
-//			SET_MASTER_MOTOR_PWM(speed);
-//			SET_MASTER_MOTOR_FZ();
     }
     else if( speed > 0 )
 		{
@@ -171,9 +167,6 @@ s16 zt_motor_master_driver_set_speed(s16 speed,u16 code_run)
 //			nprintf(ID_DEBUG,speed,0,DEC);
 //			//debug_sprintf(ID_DEBUG,"1111");
 //			debug_sprintf(ID_DEBUG,"\r\n");
-//			SET_MASTER_MOTOR_PWM(speed);
-//			SET_MASTER_MOTOR_ZZ();
-			
     }
 		else
 		{
@@ -447,22 +440,26 @@ void zt_motor_master_driver_update(void)
     
     if( (gMstMt.cur_speed > (10*100-1)) )
 		{
-        SET_MT_BREAK_OPEN ;
+       //Send_Power_Board_Master_State(ENABLE);
+			SET_MT_BREAK_OPEN ;
     }
     else if( (!bMtCheckStop)  )
 		{
         if ( gMstMt.limit_speed_time )  //在桥上，立即停止
         {
+					//Send_Power_Board_Master_State(DISABLE);
 					SET_MT_BREAK_CLOSE ;
         }
         else
 				{ //不在桥上，等待停止
-            SET_MT_BREAK_OPEN ;
+					//Send_Power_Board_Master_State(ENABLE);
+          SET_MT_BREAK_OPEN ;
         }
     }
     else
 		{
-        SET_MT_BREAK_CLOSE ;
+      //Send_Power_Board_Master_State(DISABLE);
+			//SET_MT_BREAK_CLOSE ;
     }
     
     real_mst_mt_set_speed = gMstMt.cur_speed / 100;

@@ -45,7 +45,7 @@ int TimingDelay;
 //内部函数声明
 static void  bsp_GPS_TTL_Init(void);
 static void  bsp_GPS_GPS_RS232_Init(void);
-static void GPS_UART_IRQHandler(u8 dataTemp);
+void GPS_UART_ISR(u8 dataTemp);
 
 
 
@@ -70,10 +70,13 @@ void  bsp_GPS_Init(GPS_PORT  GPS_COM)
 	GPIO_Init(GPS_EN_GPIO_PORT, &GPIO_InitStructure);	
 	bsp_GPS_cmd(DISABLE);
 	
-	if(GPS_COM == GPS_TTL){
+	if(GPS_COM == GPS_TTL)
+	{
 		bsp_GPS_TTL_Init();
 		GPS_UART = GPS_TTL_UART;
-	}else if(GPS_COM == GPS_RS232){
+	}
+	else if(GPS_COM == GPS_RS232)
+	{
 		GPS_UART = GPS_RS232_UART;
 		bsp_GPS_GPS_RS232_Init();
 	}
@@ -138,7 +141,7 @@ void GPS_TTL_UART_IRQHandler(void)
 	if(USART_GetITStatus(GPS_TTL_UART, USART_IT_RXNE) != RESET)
 	{
 		tmp = USART_ReceiveData(GPS_TTL_UART);
-		GPS_UART_IRQHandler(tmp);
+		GPS_UART_ISR(tmp);
 	}
 }
 
@@ -198,15 +201,16 @@ static void  bsp_GPS_GPS_RS232_Init(void)
   * @param  无
   * @retval 无
 */
-void GPS_RS232_UART_IRQHandler(void)
-{
-	u8 tmp;
-	if(USART_GetITStatus(GPS_RS232_UART, USART_IT_RXNE) != RESET)
-	{
-		tmp = USART_ReceiveData(GPS_RS232_UART);
-		GPS_UART_IRQHandler(tmp);
-	}
-}
+//void GPS_RS232_UART_IRQHandler(void)
+//{
+//	u8 tmp;
+//	if(USART_GetITStatus(GPS_RS232_UART, USART_IT_RXNE) != RESET)
+//	{
+//		tmp = USART_ReceiveData(GPS_RS232_UART);
+//		GPS_UART_ISR(tmp);
+//	}
+//}
+
 
  /*
   * @brief  GPS 电源开启关闭命令
@@ -232,7 +236,7 @@ void bsp_GPS_cmd(FunctionalState NewSta)
   * @param   dataTemp 接收到的数据
   * @retval 无
 */
-static void GPS_UART_IRQHandler(u8 dataTemp)
+void GPS_UART_ISR(u8 dataTemp)
 {
 	if( dataTemp == '$' )
 	{
@@ -255,7 +259,7 @@ static void GPS_UART_IRQHandler(u8 dataTemp)
 			RMCData.RMCData_Len = dataCount;
 		}
 		dataMode  = 0;
-		//	LED_Blink();
+		//LED_Blink();
 	}
 	switch(dataMode){
 		case 1: 
@@ -363,7 +367,8 @@ static u8 GetTime(time *time ,char *data)
 {
 	u8 i;
 	u8 buf[6];
-	for(i = 0 ; i < 6;i++){
+	for(i = 0 ; i < 6;i++)
+	{
 		buf[i ] = data[i];
 		if(buf[i] < '0' || buf[i] > '9')return 1;
 	}
@@ -405,7 +410,8 @@ void GPS_Get_Speed(float *Speed,char *data,u8 size)
 {
 	float Tmp = 0,Tmp2 = 1;
 	u8 flag = 0,i = 0;
-	for(i = 0 ; i < size;i++){
+	for(i = 0 ; i < size;i++)
+	{
 		if(data[i] != '.'){
 			Tmp= Tmp*10 +data[i]-'0';
 			if(flag) Tmp2*=10;
@@ -428,7 +434,8 @@ u8 GPS_Parse_GGA(GPS_Info_Typedef  *GPS_Info)
 	token = strchr(GGA,',');
 	if(token == NULL)return 1;
 	token++;
-	for(i = 0 ; i<8 ;i++){
+	for(i = 0 ; i<8 ;i++)
+	{
 		token2 = strchr(token,',');
 		if(token2 == NULL){
 			return i + 2;
@@ -436,7 +443,8 @@ u8 GPS_Parse_GGA(GPS_Info_Typedef  *GPS_Info)
 		len = token2 - token;
 		token2++;
 		if(len){
-			switch(i){
+			switch(i)
+			{
 				case 0:
 					GetTime(&GPS_Info->NewTime,token);
 					break;
@@ -544,11 +552,14 @@ u8 GPS_Parse_RMC(GPS_Info_Typedef  *GPS_Info)
 */
 u8 bsp_GPS_Get_Info(GPS_Info_Typedef  *GPS_Info)
 {
-	if(GGAData.flag == 1){
+	if(GGAData.flag == 1)
+	{
 		GGAData.flag = 0;
-			   GPS_Parse_RMC(GPS_Info);
-		return GPS_Parse_GGA(GPS_Info);;
-	}else{
+		GPS_Parse_RMC(GPS_Info);
+		return GPS_Parse_GGA(GPS_Info);
+	}
+	else
+	{
 		return 0xff;
 	}
 }

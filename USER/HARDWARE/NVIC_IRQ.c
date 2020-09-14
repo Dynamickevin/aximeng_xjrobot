@@ -11,21 +11,21 @@ void NVIC_Configuration(void)
 
 	//中断优先级
 	
-	/*  配置串口1中断源 Enable the USART1 Interrupt */
+	/*  配置串口1中断源 Enable the USART1 Interrupt  RF433*/
   NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 	
-	/*  配置串口2中断源 Enable the USART2 Interrupt */
+	/*  配置串口2中断源 Enable the USART2 Interrupt  电源板*/
   NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 	
-	/*  配置串口3中断源 Enable the USART3 Interrupt */
+	/*  配置串口3中断源 Enable the USART3 Interrupt Linux */
   NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
@@ -52,14 +52,14 @@ void NVIC_Configuration(void)
 //	
 	
 
-	/*  配置串口4中断源 Enable the UART4 Interrupt */
+	/*  配置串口4中断源 Enable the UART4 Interrupt  打印Debug*/
   NVIC_InitStructure.NVIC_IRQChannel = UART4_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 	
-	/* 配置串口5中断源 */
+	/* 配置串口5中断源 Enable the UART5 Interrupt  GPS*/
 	NVIC_InitStructure.NVIC_IRQChannel = GPS_RS232_UART_IRQ; 
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = GPS_TTL_UART_PreemptionPriority;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = GPS_TTL_UART_SubPriority;
@@ -74,7 +74,7 @@ void NVIC_Configuration(void)
 //	NVIC_Init(&NVIC_InitStructure);
 //	
 //	
-//				  /* 配置中断源 */
+//			/* 配置中断源 */
 //	NVIC_InitStructure.NVIC_IRQChannel = BRD_UART_IRQ; 
 //	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = BRD_UART_PreemptionPriority;
 //	NVIC_InitStructure.NVIC_IRQChannelSubPriority = BRD_UART_SubPriority;
@@ -89,14 +89,14 @@ void NVIC_Configuration(void)
 //	NVIC_Init(&NVIC_InitStructure);
 //	
 //	
-//		// 设置中断来源
+//		// 设置中断来源 从动轮轮子编码器
     NVIC_InitStructure.NVIC_IRQChannel = ENCCODER_AB_TIM_IRQn; 	
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = ENCCODER_AB_TIM_PreemptionPriority;	 
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = ENCCODER_AB_TIM_SubPriority;	
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 	
-				//中断优先级
+				//中断优先级 
 		NVIC_InitStructure.NVIC_IRQChannel = ENCCODER_Z_IRQn;//外部中断0
 		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = ENCCODER_Z_PreemptionPriority;//抢占优先级0
 		NVIC_InitStructure.NVIC_IRQChannelSubPriority = ENCCODER_Z_SubPriority;//子优先级2
@@ -111,8 +111,6 @@ void NVIC_Configuration(void)
 //    NVIC_Init(&NVIC_InitStructure);
 
  
-
-
 
 }
 

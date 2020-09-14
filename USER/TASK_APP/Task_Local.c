@@ -30,7 +30,7 @@ void ack_with_debug(uint8 com,uint8 *buf, uint16 len)
 	}
 	else if( com == ID_POWER_BOARD)
 	{
-        uart2_send(buf,len);
+        //uart2_send(buf,len);
 	}
 	else if( com == ID_LINUX)
 	{
@@ -1055,7 +1055,7 @@ void SetSlaveMotor(uint8 com,uint8* cmd)       //4
 	gRbtState.StateSwitchFlag[0] = 'I' ;
 	
 }
-/*
+
 //AT+MstMt=15,1000  SlvMt=hold CRC=da3c
 //AT+MstMt=15,1000  SlvMt=0 CRC=8b08
 void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
@@ -1095,36 +1095,36 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
             gMstMt.limit_speed      = gSlvMtCfg.mst_limit_on_bridge*100;
             gMstMt.limit_speed_time = (OS_TICKS_PER_SEC/4)*gSlvMtCfg.onBridgeTime ;
         }
-        
-		if(gPressFilter.val<gSlvMtCfg.press_ok_min)//从动轮没有加紧时，从动轮先加紧，主动轮再运动
-		{
-			gSlaveMtAnaly.press_to_adj = gSlvMtCfg.press_ok_to_adjust ;
-		    if ( gPressFilter.val < gSlvMtCfg.press_ok_min )
-		    {
-		        //gSlaveMtAnaly.real_slv_up_press_to_adg = gSlvMtCfg.press_ok_to_adjust + 10 ;
-		        gSlaveMtAnaly.real_slv_up_press_to_adg = gSlvMtCfg.press_ok_max - 4 ;
-		        SLV_AUTO_SPEED_UP();
-		    }
-		    else if ( gPressFilter.val > gSlvMtCfg.press_ok_max )
-		    {
-		        //需要松开从动轮
-		        gSlaveMtAnaly.real_slv_down_press_to_adg = gSlvMtCfg.press_ok_to_adjust ;
-		        SLV_AUTO_SPEED_DOWN();
-		    }
-		    else  //当前压力在正常范围内
-		    {
-		        gSlaveMtAnaly.auto_cal_speed = 0;
-		    }
-			if ( ValCnt == 1 )
-	        {
-	            zt_motor_master_driver_set_speed( gCmdParaVal_Ints[0] , 50000 );
-	        }
-	        else if ( ValCnt == 2 )
-	        {
-	            zt_motor_master_driver_set_speed( gCmdParaVal_Ints[0] , gCmdParaVal_Ints[1] );
-	        }
-		}
-		else
+//        
+//		if(gPressFilter.val<gSlvMtCfg.press_ok_min)//从动轮没有加紧时，从动轮先加紧，主动轮再运动
+//		{
+//			gSlaveMtAnaly.press_to_adj = gSlvMtCfg.press_ok_to_adjust ;
+//		    if ( gPressFilter.val < gSlvMtCfg.press_ok_min )
+//		    {
+//		        //gSlaveMtAnaly.real_slv_up_press_to_adg = gSlvMtCfg.press_ok_to_adjust + 10 ;
+//		        gSlaveMtAnaly.real_slv_up_press_to_adg = gSlvMtCfg.press_ok_max - 4 ;
+//		        SLV_AUTO_SPEED_UP();
+//		    }
+//		    else if ( gPressFilter.val > gSlvMtCfg.press_ok_max )
+//		    {
+//		        //需要松开从动轮
+//		        gSlaveMtAnaly.real_slv_down_press_to_adg = gSlvMtCfg.press_ok_to_adjust ;
+//		        SLV_AUTO_SPEED_DOWN();
+//		    }
+//		    else  //当前压力在正常范围内
+//		    {
+//		        gSlaveMtAnaly.auto_cal_speed = 0;
+//		    }
+//			if ( ValCnt == 1 )
+//	        {
+//	            zt_motor_master_driver_set_speed( gCmdParaVal_Ints[0] , 50000 );
+//	        }
+//	        else if ( ValCnt == 2 )
+//	        {
+//	            zt_motor_master_driver_set_speed( gCmdParaVal_Ints[0] , gCmdParaVal_Ints[1] );
+//	        }
+//		}
+//		else
 		{
 			if ( ValCnt == 1 )
 	        {
@@ -1174,11 +1174,10 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
 	
 }
 
-*/
 
+/*
 
-//AT+MstMt=15,1000  SlvMt=hold CRC=da3c
-//AT+MstMt=15,1000  SlvMt=0 CRC=8b08
+//不检测从动轮压力状态
 void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
 {
   uint8 ret;
@@ -1218,9 +1217,7 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
 	
 }
 
-
-
-
+*/
 
 
 

@@ -127,8 +127,8 @@ void UART4_ISR(void)
 		   
 		   if(OS_ERR_NONE != OSQPost(RemoteRecQueue,(void*)dp))
 		   {
-			   OSMemPut(mem160ptr,dp1);
 			   OSMemPut(p_msgBuffer,dp);
+				 OSMemPut(mem160ptr,dp1);
 		   }	
 		}
 		else

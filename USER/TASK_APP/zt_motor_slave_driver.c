@@ -101,9 +101,10 @@ static void bsp_Slave_Motor2_Config(void)
 	TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;	//比较输出使能
 	TIM_OCInitStructure.TIM_Pulse = 0;
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;  	  //当定时器计数值大于CCR1_Val时为高电平
-	Slv_MOTOR2_TIM_OC_INIT(Slv_MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道1
+	Slv_MOTOR2_TIM_OC_INIT(Slv_MOTOR2_TIM, &TIM_OCInitStructure);	 //使能通道3
   
-	TIM_OC3PreloadConfig(Slv_MOTOR2_TIM,TIM_OCPreload_Enable); //TIM_8---->通道3[PB15]
+	TIM_OC3PreloadConfig(Slv_MOTOR2_TIM,TIM_OCPreload_Enable); //TIM_8---->通道3[PB15] 使能TIM8在CCR2上的预装载寄存器
+	
 	// 使能定时器
 	TIM_Cmd(Slv_MOTOR2_TIM, ENABLE);	
 	TIM_CtrlPWMOutputs(Slv_MOTOR2_TIM,ENABLE);

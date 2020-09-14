@@ -34,8 +34,8 @@ void Task_Weather(void *pdata)
 				}				
 				case WEATHER_DEBUG_OUT_MSG_POWER_BOARD:
 				{
-					uart2_send(bp->point, bp->count);
-					OSMemPut(mem160ptr,bp->point);
+					//uart2_send(bp->point, bp->count);
+					//OSMemPut(mem160ptr,bp->point);
 					break;
 				}				
 				case WEATHER_DEBUG_OUT_MSG_LINUX:

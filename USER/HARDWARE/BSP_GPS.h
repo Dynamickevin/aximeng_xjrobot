@@ -95,9 +95,9 @@ typedef struct
 
 typedef  struct
 {
-	u8 		Status;						//GPS状态，0=未定位，1=非差分定位，2=差分定位，3=无效PPS，6=正在估算
+	u8 			Status;						//GPS状态，0=未定位，1=非差分定位，2=差分定位，3=无效PPS，6=正在估算
 	time  	NewTime;					//GPS时间
-	u8		currentSatellitesUsed;		//所用星数
+	u8			currentSatellitesUsed;		//所用星数
 	double  currentLatitude;			//纬度
 	double 	currentLongitude;			//经度
 	float 	HDOP;						//水平精度因子

@@ -347,15 +347,8 @@ extern  RbtState gRbtState;
 #include "cmd_para.h"
 #include "App_cfg.h"
 #include "AM2320_By_IIC.h"
-//#include "Wheel_Encode.h"
-//#include "OperationList.h"
-//#include "GpsUart.h"
-//#include "debug.h"
 
-#include "BSP_enccoder.h"
-#include "BSP_motor_cal_speed.h"
 #include  "board.h"
-
 
 #include "sys.h"
 #include "delay.h"

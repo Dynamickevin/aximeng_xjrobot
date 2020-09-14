@@ -12,7 +12,10 @@
 #include "BSP_Video_TRANS.h"
 #include "BSP_Debug.h"
 #include "BSP_MOTOR.h"
-//#include "BSP_BRD.h"
+#include "BSP_enccoder.h"
+#include "BSP_motor_cal_speed.h"
+#include "BSP_BRD.h"
+
 void bsp_Board_Init(void);
 
 #endif

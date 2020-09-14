@@ -105,7 +105,7 @@ static void ENCCODER_AB_Config(void)
 }
 
  /*
-  * @brief  获取编码器定时器寄存器值
+  * @brief  编码器定时器寄存器值清零
   * @param  无
   * @retval 编码值
 */
@@ -154,8 +154,8 @@ void  ENCCODER_AB_IRQHandler (void)
 */
 void ENCCODER_Z_EXTI_Handler(void)
 {
-	static u8 dir_Down,dir_Up,Status;
-	static u32 Time;
+	static u8 dir_Down,dir_Up;
+	//static u32 Time;
 	if(EXTI_GetITStatus(ENCCODER_Z_EXTI_LINE) != RESET) 
 	{
 		if(GPIO_ReadInputDataBit(ENCCODER_Z_GPIO_PORT,ENCCODER_Z_PIN) == 0)

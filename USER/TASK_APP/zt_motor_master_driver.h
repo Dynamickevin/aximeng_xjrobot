@@ -35,6 +35,7 @@
 #define	Mst_MOTOR1_TIM_PSC							840
 #define	Mst_MOTOR1_SetCompare						TIM_SetCompare2
 
+
 //驱动器设置为 低电平使能 高电平关闭
 //->BSRR to set io=1  ->BRR to set io=0
 #define SET_MASTER_MOTOR_CLOSE() GpioSetH(GPIO_CTL_DIR_M1) ; GpioSetH(GPIO_CTL_DIR_M2);SET_MASTER_MOTOR_PWM(0)

@@ -236,11 +236,12 @@ void USART1_IRQHandler(void)
 	#endif
 	
 	USART1_ISR();
+	
 	OSIntExit();
 }
 
-extern void USART2_ISR(void);
-void USART2_IRQHandler(void)
+extern void BRD_POWER_ISR(void);
+void BRD_UART_IRQHandler(void)    //USART2_IRQHandler
 {       
 	CPU_SR    cpu_sr;
 
@@ -252,7 +253,8 @@ void USART2_IRQHandler(void)
 		OSView_RxTxISRHandler();
 	#endif
 	
-	USART2_ISR();
+	BRD_POWER_ISR();
+	
 	OSIntExit();
 }
 
@@ -270,6 +272,7 @@ void USART3_IRQHandler(void)
 	#endif
 	
 	USART3_ISR();
+	
 	OSIntExit();
 }
 
@@ -287,25 +290,32 @@ void UART4_IRQHandler(void)
 	#endif
 	
 	UART4_ISR();
+	
 	OSIntExit();
 }
 
-//extern void UART5_ISR(void);
-//void UART5_IRQHandler(void)
-//{       
-//	CPU_SR   cpu_sr;
+extern void GPS_UART_ISR(u8 dataTemp);
+void GPS_RS232_UART_IRQHandler(void)
+{       
+	CPU_SR   cpu_sr;
+	u8 tmp;
+	OS_ENTER_CRITICAL();                         
+  OSIntNesting++;
+  OS_EXIT_CRITICAL();
+	
+	#if ( OS_VIEW_MODULE == DEF_ENABLED )
+		OSView_RxTxISRHandler();
+	#endif
+	
+	if(USART_GetITStatus(GPS_RS232_UART, USART_IT_RXNE) != RESET)
+	{
+		tmp = USART_ReceiveData(GPS_RS232_UART);
+		GPS_UART_ISR(tmp);
+	}
+	
+	OSIntExit();
+}
 
-//	OS_ENTER_CRITICAL();                         
-//  OSIntNesting++;
-//  OS_EXIT_CRITICAL();
-//	
-//	#if ( OS_VIEW_MODULE == DEF_ENABLED )
-//		OSView_RxTxISRHandler();
-//	#endif
-//	
-//	UART5_ISR();
-//	OSIntExit();
-//}
 
 
 /*

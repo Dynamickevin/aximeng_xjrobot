@@ -542,6 +542,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\HARDWARE\BSP_Debug.c</FilePath>
             </File>
+            <File>
+              <FileName>BSP_BRD.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_BRD.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

@@ -1,4 +1,11 @@
 
+/*
+														主动轮、从动轮 模拟速度初始化、ADC值采集、速度计算
+ 
+
+*/
+
+
 #include "BSP_motor_cal_speed.h"
 
 
@@ -51,14 +58,14 @@ void bsp_slave_cal_speed_Init(void)
 u32 Master_ADC_count;
 float Master_Cal_Speed_Get_ADC_Val(void)
 {
-	u8 i;
-	u32 Adc_Sum = 0;
-	float Master_Cal_ADC;
-	for(i = 0 ; i < ADC_BUFFSIZE / ADC_CHANNEL_NUM ; i++)
-	{
-		Adc_Sum += ADC_Value[MASTER_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
-	}
-	Master_Cal_ADC = Adc_Sum/(ADC_BUFFSIZE/ADC_CHANNEL_NUM);
+//	u8 i;
+//	u32 Adc_Sum = 0;
+//	float Master_Cal_ADC;
+//	for(i = 0 ; i < ADC_BUFFSIZE / ADC_CHANNEL_NUM ; i++)
+//	{
+//		Adc_Sum += ADC_Value[MASTER_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
+//	}
+//	Master_Cal_ADC = Adc_Sum/(ADC_BUFFSIZE/ADC_CHANNEL_NUM);
 	return ADC_Value[MASTER_MOTOR_SPEED_ADC_INDEX];
 	//return Master_Cal_ADC;
 	//Master_ADC_count = ADC_Value[MASTER_MOTOR_SPEED_ADC_INDEX];
@@ -94,15 +101,15 @@ float Master_Cal_Speed_Get_Voltage(void)
 float Slave_Cal_Speed_Get_ADC_Val(void)
 {
 	
-	u8 i;
-	u32 Adc_Sum = 0;
-	float Slave_Cal_ADC;
-	for(i = 0 ; i < ADC_BUFFSIZE/ADC_CHANNEL_NUM ; i++)
-	{
-		Adc_Sum += ADC_Value[SLAVE_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
-	}
-	Slave_Cal_ADC = Adc_Sum /(ADC_BUFFSIZE/ADC_CHANNEL_NUM);
-	//return Slave_Cal_ADC;
+//	u8 i;
+//	u32 Adc_Sum = 0;
+//	float Slave_Cal_ADC;
+//	for(i = 0 ; i < ADC_BUFFSIZE/ADC_CHANNEL_NUM ; i++)
+//	{
+//		Adc_Sum += ADC_Value[SLAVE_MOTOR_SPEED_ADC_INDEX + ADC_CHANNEL_NUM*i];
+//	}
+//	Slave_Cal_ADC = Adc_Sum /(ADC_BUFFSIZE/ADC_CHANNEL_NUM);
+//	//return Slave_Cal_ADC;
 	return ADC_Value[SLAVE_MOTOR_SPEED_ADC_INDEX];
 	//Slave_ADC_count = ADC_Value[SLAVE_MOTOR_SPEED_ADC_INDEX]*10/11;
 	//return Slave_ADC_count;
