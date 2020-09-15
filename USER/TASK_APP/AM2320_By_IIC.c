@@ -393,7 +393,7 @@ void AM2320_Get_Data(void)
 		
 	}
 	OSTimeDly(2);
-	Delay(100000);//必须加这个延时，否则传感器没准备好数据会出现读数据错误
+	//Delay(100000);//必须加这个延时，否则传感器没准备好数据会出现读数据错误
 	
 	ret = VT_I2C_HardReadNByte(I2C3,0,Read_from_AM2320Data,8);//读取温度和湿度
 	if(ret)

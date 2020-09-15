@@ -14,7 +14,7 @@
 
 #define GPS_BDS    //BDS 北斗导航系统
 
-
+#define GPIO_GPS_EN        		  GPIOC,GPIO_Pin_8    //GPS开关；低电平使能
 
 //引脚定义
 /*******************************************************/
@@ -46,7 +46,7 @@
 #define GPS_RS232_UART                             UART5
 #define GPS_RS232_UART_CLK                         RCC_APB1Periph_UART5
 //串口波特率
-#define GPS_RS232_UART_BAUDRATE                    9600	
+#define GPS_RS232_UART_BAUDRATE                    4800
 
 #define GPS_RS232_UART_RX_GPIO_PORT                GPIOC
 #define GPS_RS232_UART_RX_GPIO_CLK                 RCC_AHB1Periph_GPIOC
@@ -95,13 +95,13 @@ typedef struct
 
 typedef  struct
 {
-	u8 			Status;						//GPS状态，0=未定位，1=非差分定位，2=差分定位，3=无效PPS，6=正在估算
-	time  	NewTime;					//GPS时间
+	u8 			Status;										//GPS状态，0=未定位，1=非差分定位，2=差分定位，3=无效PPS，6=正在估算
+	time  	NewTime;									//GPS时间
 	u8			currentSatellitesUsed;		//所用星数
-	double  currentLatitude;			//纬度
-	double 	currentLongitude;			//经度
-	float 	HDOP;						//水平精度因子
-	float   Speed;						//速度
+	double  currentLatitude;					//纬度
+	double 	currentLongitude;					//经度
+	float 	HDOP;											//水平精度因子
+	float   Speed;										//速度
 }GPS_Info_Typedef; 
 
 

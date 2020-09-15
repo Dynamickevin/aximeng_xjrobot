@@ -4,6 +4,8 @@
 
 #include "stm32f4xx.h"
 
+#define GPIO_CAM_EN        		  GPIOA,GPIO_Pin_15    //摄像头开关；低电平使能
+
 //引脚定义
 /*******************************************************/
 #define VEDIO_TRANS_PWR_EN_PIN                  GPIO_Pin_15          

@@ -1,3 +1,5 @@
+
+
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
@@ -15,8 +17,13 @@
 #include "BSP_enccoder.h"
 #include "BSP_motor_cal_speed.h"
 #include "BSP_BRD.h"
+#include "BSP_LORA.h"
+
+extern float gGPS_Value;
 
 void bsp_Board_Init(void);
+
+void STM_TX_Robot_Info(void);
 
 #endif
 

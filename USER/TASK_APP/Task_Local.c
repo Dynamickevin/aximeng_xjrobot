@@ -288,11 +288,11 @@ int zt_build_send_state_string(u32 stateFlag,uint8 id,uint8 kind)
 
     if( stateFlag & BUILD_STATE_FLAG_BAT )
 	{
-        str = cmd_para_build_para_string_float( str , "bat" , gBatAutoCtrl.curBatVol*0.1f , 1 );//BAT_VOL_FLOAT
+        str = cmd_para_build_para_string_float( str , "bat" , POWER_get_BAT_VOL()*0.1f , 1 );//BAT_VOL_FLOAT
         str--; 
 		//*str++ = 'V';    
 		*str++ = ' ';//'\t';添加一个字符 空格 
-        str = cmd_para_build_para_string_float( str , "cur" , BAT_CUR_FLOAT , 2 );
+        str = cmd_para_build_para_string_float( str , "cur" , POWER_get_BAT_CUR(), 2 );
         str--; 
 		//*str++ = 'A';    
 		*str++ = ' ';//'\t';添加一个字符 空格
@@ -758,51 +758,68 @@ bool OpenOrCloseDevOperate(char* devName,bool bOpen)
 {
     bool bGpioVal = !bOpen ; //一般是低电平使能
     
-    if ( box_str_cmp( devName , "4G" ) == 0 ){ 
-        GpioSetBit(GPIO_4G_EN,bGpioVal);
+    if ( box_str_cmp( devName , "4G" ) == 0 )
+		{ 
+        //GpioSetBit(GPIO_4G_EN,bGpioVal);
     }
-    if(box_str_cmp( devName , "MT" )== 0){
-        GpioSetBit(GPIO_MOTOR_PWR_EN,bGpioVal);
+    if(box_str_cmp( devName , "MT" )== 0)
+		{
+        //GpioSetBit(GPIO_MOTOR_PWR_EN,bGpioVal);
     }
-    else if(box_str_cmp( devName , "Brk" )== 0){
+    else if(box_str_cmp( devName , "Brk" )== 0)
+		{
         GpioSetBit(GPIO_BREAK_MEN,bGpioVal);
     }
-    else if(box_str_cmp( devName , "Charge" )== 0){
-        if( bOpen ){
-            if(!gRbtState.bChargeShort){
+    else if(box_str_cmp( devName , "Charge" )== 0)
+		{
+        if( bOpen )
+				{
+            if(!gRbtState.bChargeShort)
+						{
                 BAT_CHARGE_OPEN();
             }
-            else{
+            else
+						{
                 BAT_CHARGE_CLOSE();
                 return false;
             }
         }
-        else{
-            BAT_CHARGE_CLOSE();
+        else
+				{
+            //BAT_CHARGE_CLOSE();
         }
     }
-    else if(box_str_cmp( devName , "CamAv" )== 0){ //图传
-        GpioSetBit(GPIO_CAM_AV_EN,bGpioVal);
+    else if(box_str_cmp( devName , "CamAv" )== 0)
+		{ //图传
+        //GpioSetBit(GPIO_CAM_AV_EN,bGpioVal);
+				//bsp_Video_Trans_PWR(ENABLE);
     }
-    else if(box_str_cmp( devName , "Cam" )== 0){
+    else if(box_str_cmp( devName , "Cam" )== 0)
+		{
         GpioSetBit(GPIO_CAM_EN,bGpioVal);
+				//bsp_Video_Trans_PWR(ENABLE);
     }
-    else if(box_str_cmp( devName , "GPS" )== 0){
+    else if(box_str_cmp( devName , "GPS" )== 0)
+		{
         GpioSetBit(GPIO_GPS_EN,bGpioVal);
+				//bsp_GPS_cmd(ENABLE);
     }
-    else if(box_str_cmp( devName , "12V" )== 0){
-        GpioSetBit(GPIO_12V_EN,bGpioVal);
+    else if(box_str_cmp( devName , "12V" )== 0)
+		{
+        //GpioSetBit(GPIO_12V_EN,bGpioVal);
     }
-    else if(box_str_cmp( devName , "CamSW" )== 0){
+    else if(box_str_cmp( devName , "CamSW" )== 0)
+		{
         //GpioSetBit(GPIO_CTR_CAM_AV_SW,bGpioVal);
     }
-	else  if(box_str_cmp( devName , "ALL" )== 0)//处理所有的外设电源
-	{
-        GpioSetBit(GPIO_MOTOR_PWR_EN,bGpioVal);//电机驱动板
-        GpioSetBit(GPIO_CAM_AV_EN,bGpioVal);//图传
+		else  if(box_str_cmp( devName , "ALL" )== 0)//处理所有的外设电源
+		{
+        //GpioSetBit(GPIO_MOTOR_PWR_EN,bGpioVal);//电机驱动板
+        //GpioSetBit(GPIO_CAM_AV_EN,bGpioVal);//图传
         //GpioSetBit(GPIO_CTR_CAM_AV_SW,bGpioVal);//视频编码器
-        GpioSetBit(GPIO_CAM_EN,bGpioVal);//主摄像头
-	}
+				GpioSetBit(GPIO_GPS_EN,bGpioVal);//GPS电源
+        GpioSetBit(GPIO_CAM_EN,bGpioVal);//主摄像头电源
+		}
     else
     {
         return false;
@@ -1084,12 +1101,11 @@ void SetMasterMotor(uint8 com,uint8* cmd)   		    //5
         //如果机器人处于桥上，正在充电，需要机器人运动
 		if( (gBatAutoCtrl.bOnBridge||gBatAutoCtrl.bCharging) && (gCmdParaVal_Ints[0]!=0) )
 		{
-            
             //处于桥上的处理，以及充电状态更新处理
 						//如果正在充电中，需要关闭充电
             gBatAutoCtrl.bChargingClosed = true;
             gBatAutoCtrl.bCharging = false; 
-						BAT_CHARGE_CLOSE();					//如果运动了，需要关闭充电
+						//BAT_CHARGE_CLOSE();					//如果运动了，需要关闭充电
 
             //因为是在桥上，需要限制电机速度为在桥上速度
             gMstMt.limit_speed      = gSlvMtCfg.mst_limit_on_bridge*100;
@@ -1285,12 +1301,12 @@ void Hello(uint8 com,uint8* cmd)   			 //6
                 if( 'A' == gRbtState.RobotState[0] ){ //自动巡检状态
                     //需要默认开启各种功能
                     //GpioSetBit(GPIO_MOTOR_PWR_EN,0);
-                    GpioSetBit(GPIO_CAM_AV_EN,0);
+                    //GpioSetBit(GPIO_CAM_AV_EN,0);
                     GpioSetBit(GPIO_CAM_EN,0);
                 }
                 else if( 'B' == gRbtState.RobotState[0] ){ //返回充电
                     //需要默认关闭摄像头等各种功能
-                    GpioSetBit(GPIO_CAM_AV_EN,1);
+                    //GpioSetBit(GPIO_CAM_AV_EN,1);
                     GpioSetBit(GPIO_CAM_EN,1);
                 }
             }

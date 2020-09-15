@@ -5,12 +5,13 @@
 
 /**
   *
-  *		
+  *		电源控制板 
   *
 **/
 
 #include "stm32f4xx.h"
 #include  "board.h"
+
 
 
 #define  UART_HEAD1 	0x55
@@ -74,11 +75,12 @@
 
 
 
-//  帧格式内部数据包 __PACKED紧凑结构 为方便传输
+//帧格式内部数据包 __PACKED紧凑结构 为方便传输
 typedef struct __PACKED{
 	u8  Cmd1;							//定义报文的发送和接收对象
 	u8  Cmd2;							//定义具体业务报文命令
 	u32 Packet_Length;		//包括从包头至包尾的整帧长度，Data_Length为数据尺寸，Packet Length = Data_Length+16
+												//16：Crc32 + Param + Packet_Length + Cmd2 +Cmd1 + UART_HEAD2 + UART_HEAD1
 	u32	Param;						//根据具体命令字定义
 	u32 Crc32;						//包括从CMD1至数据段的CRC32校验，CRC32字段按0参与运算
 	u8  Data[DATA_MAX];
@@ -107,7 +109,12 @@ typedef struct{
 /************************************************************************************/
 
 
+#define GPIO_BAT_CHARGE_EN      GPIOD,GPIO_Pin_1     //充电使能
+#define GPIO_BREAK_MEN          GPIOE,GPIO_Pin_1     //抱闸开关；低电平使能
 
+//充电检测引脚
+#define GPIO_CHK_CHAG_SHORT	 	 GPIOE,GPIO_Pin_4    //充电短路检测
+#define GPIO_CHK_CHAG_JOIN	 	 GPIOE,GPIO_Pin_5	   //充电接入检测
 
 //引脚定义
 /*******************************************************/
@@ -141,6 +148,7 @@ typedef struct {
 	u8			Sw_Status;						//设备电源开关状态
 } BRD_Info_Typedef;
 
+extern BRD_Info_Typedef gBattery_Value;
 
 extern UARTbuf_Typedef UART_Rx_Buf;
 u32 crc32( u32 inCrc32, const void *buf, u32 bufLen );
@@ -156,6 +164,10 @@ void bsp_BRD_Pluse(void);
 u16 bsp_BRD_UART_Parse(void);
 
 void STM_GET_POWER_Info(void);
+
+short POWER_get_BAT_VOL(void);
+
+short POWER_get_BAT_CUR(void);
 
 #endif
 

@@ -851,7 +851,7 @@ void Sensor_Collect(void)
 	//电机状态更新，不需要频率太高，降低些频率
 		DoPressFilter();       			//压力传感器采集值滤波
     DoSpeedAnalyByCode();  			//各种需要进行的状态更新；速度分析更新
-    //UpdateFastBatChargingState();	//电池管理，充电状态更新
+    UpdateFastBatChargingState();	//电池管理，充电状态更新
 }
 
 /************************************************* 
@@ -915,8 +915,8 @@ void UpdateFastBatChargingState(void)
 	
 		//gRbtState.bCX_SwCheck1 = SW_GpioGet(GPIO_CHK_LIMIT2) ;
     gRbtState.bCX_SwCheck2 = SW_GpioGet(GPIO_CHK_CHAOXUE1) ;
-    //gRbtState.bChargeVolIn = !GpioGet(GPIO_CHK_CHAG_JOIN ) ;
-    //gRbtState.bChargeShort = !GpioGet(GPIO_CHK_CHAG_SHORT) ;
+    gRbtState.bChargeVolIn = SW_GpioGet(GPIO_CHK_CHAG_JOIN ) ;
+    gRbtState.bChargeShort = SW_GpioGet(GPIO_CHK_CHAG_SHORT) ;
     
     ////1.进入到红外遮挡位置，编码器寄存器自动清零一次；
     ////2.进入到红外遮挡位置，运动的编码器距离大于桥距离一半，自动停止机器人一次；

@@ -1,25 +1,16 @@
-/****************************************************************************
-	注意：
-	(1) 中断程序未对发送缓冲区满做处理.也就是说调用comSendBuf()函数时，如果
-		开辟的发送缓冲区不足，将导致最先放入FIFO的数据被冲掉。
-		不过对以一般的应用程序，将发送缓冲区开的足够大以保证一个最长的通信帧能够容纳下即可。*/
-/* Includes ------------------------------------------------------------------*/
+
+
 #include <includes.h>
 
-/* 定义串口结构体变量 */
+/*********************************LORA通信串口*****************************/
+/**/
+/**/
+/**/
+/************************************************************************/
 
 OS_EVENT	*Usart1Sem;
 AtCmdInfo AtCmdFromRF433;
 ZT_INFO_TYPE g_zt_msg1;
-
-OS_EVENT	*Uart5Sem;
-AtCmdInfo AtCmdFromPTZ;
-ZT_INFO_TYPE g_zt_msg5;
-
-
-//CmdParaInfo gCmdParaInfos;//,gCmdParaInfos_RF433,gCmdParaInfos_DEBUG,gCmdParaInfos_LINUX;
-extern RbtState gRbtState;
-
 
 /* this is for LORA module */
 void bsp_Lora_init(void)
@@ -184,6 +175,7 @@ void uart1_send(uint8 *sp, uint16 len)
 	USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
 	
 }
+
 
 
 

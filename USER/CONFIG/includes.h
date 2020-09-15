@@ -324,8 +324,8 @@ extern  RbtState gRbtState;
 #define  __OUT_      //参数作为输出
 #endif
 
-#define BAT_VOL_FLOAT   (gRbtState.nBatVol*21.0f*2.5f/4096)
-#define BAT_CUR_FLOAT   (gRbtState.nBatCur*2.5f/0.3f/4096)
+//#define BAT_VOL_FLOAT   (gRbtState.nBatVol*21.0f*2.5f/4096)
+//#define BAT_CUR_FLOAT   (gRbtState.nBatCur*2.5f/0.3f/4096)
 
 #include "Task_Timer.h"
 #include "Task_Local.h"
@@ -334,15 +334,14 @@ extern  RbtState gRbtState;
 #include "Task_Remote_Rec.h"
 #include "Task_Sensor_Data_Collect.h"
 
-
-#include "uart_api.h"
+//#include "uart_api.h"
 #include "zt_motor_master_driver.h"
 #include "zt_motor_slave_driver.h"
-#include "TimerPWm_Driver.h"
+//#include "TimerPWm_Driver.h"
 #include "GpioDefine.h"
 #include "GpioDriver.h"
-#include "user_adc_ctrl.h"
-#include "adc_dma.h"
+//#include "user_adc_ctrl.h"
+//#include "adc_dma.h"
 #include "str.h"
 #include "cmd_para.h"
 #include "App_cfg.h"

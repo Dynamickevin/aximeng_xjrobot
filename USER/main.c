@@ -3,6 +3,7 @@
 #include <includes.h>
 #include "stm32f4xx.h"                  // Device header file
 
+
 OS_EVENT	*log_sem;
 
 OS_EVENT	*PtzSem;
@@ -122,9 +123,8 @@ INT32S main(void)
 { 
 	CPU_INT08U  os_err;
 	
-		os_err = os_err; 
+	os_err = os_err; 
    __disable_irq();	// 关闭全局中断，ucosii要求必须先关闭全局中断
-	
 	
 	SystemInit();
 	
@@ -132,7 +132,6 @@ INT32S main(void)
 	
 	OSInit();   
  	
-	
 	//创建起始任务
 	os_err = OSTaskCreateExt((void (*)(void *)) App_TaskStart,  /* Create the start task. */
                              (void          * ) 0,
@@ -174,13 +173,12 @@ static void App_TaskStart(void *pdata)
 		App_OSViewTaskCreate();
 	#endif
 	
-	//板载硬件初始化
+	//板载硬件(传感器、电机、定时器、ADC、串口等)初始化
 	bsp_Board_Init();
 
 	//LED2(LED_ON);
 	log_sem 	= OSSemCreate(1);
 	
-
 	strcpy(gRbtState.RobotName, "Rbt9999");
 	gSlaveMtAnaly.s_SlvMtState = SLAVE_MT_CTRL_HANDLE ;
 	gRbtState.bRf433Mode3 =false;

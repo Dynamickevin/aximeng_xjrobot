@@ -3,8 +3,10 @@
 
 #include <math.h>
 #include "string.h"
+
+
 /************************************************************************/
-/*********************************电源板控制*****************************/
+/*********************************电源控制板*****************************/
 /**/
 /**/
 /**/
@@ -18,6 +20,7 @@ OS_EVENT	*Uart2Sem;					//定义电源板信息  信号量
   * @param  无
   * @retval 无
 */
+
 
 
 const u32 crcTable[256] = {
@@ -68,7 +71,7 @@ void UART_Tx_Byte(USART_TypeDef* USARTx, uint8_t Data)
     while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);
     USART_SendData(USARTx, Data);
 		//掉电、待机等特殊情况下，保证USART数据会成功发送出去
-		while(USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET);
+		//while(USART_GetFlagStatus(USARTx, USART_FLAG_TC) == RESET);
 }
 
   
@@ -239,7 +242,7 @@ void BRD_POWER_ISR(void)
   * @param  无
   * @retval cmd 命令字  datalen 数据长度 data数据
 */
-//bsp_Power_UART_TX(STM_TX_GET_MST_BRAKE_STATUS,1,0)
+//bsp_Power_UART_TX(STM_TX_GET_MST_BRAKE_STATUS,1,0) //抱闸信息
 //bsp_Power_UART_TX(STM_TX_GET_BAT_STATUS,0,0) //向电源板发送获取电池状态
 //bsp_Power_UART_TX(STM_TX_GET_POWER_SW_STATUS,0,0) //向电源板发送获取设备电源状态
 
@@ -357,5 +360,21 @@ void STM_GET_POWER_Info(void)
 	
 }
 
+BRD_Info_Typedef gBattery_Value;
+
+//获取电池电压值
+short POWER_get_BAT_VOL(void)
+{
+    //gBattery_Voltage = BRD_Info.Total_voltage;
+		gBattery_Value.Total_voltage = BRD_Info.Total_voltage;
+		return gBattery_Value.Total_voltage;
+}
+
+//获取电池电流值
+short POWER_get_BAT_CUR(void)
+{
+    gBattery_Value.Electric_current = BRD_Info.Electric_current;
+		return gBattery_Value.Electric_current;
+}
 
 

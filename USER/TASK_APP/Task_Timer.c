@@ -430,7 +430,8 @@ void Task_Timer(void *pdata)
 					//nprintf(ID_DEBUG,-20,0,DEC);
 					//Send_Power_Board_Master_State(DISABLE);
 					//DBG_PRINTF("Hello World");
-					debug_sprintf(ID_DEBUG,"1111");
+					//STM_TX_Robot_Info();
+					//debug_sprintf(ID_DEBUG,"1111");
 				}
 				break;
 				case BATTERY_MSG: 		// 256ms

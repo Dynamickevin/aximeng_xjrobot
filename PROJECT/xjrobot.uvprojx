@@ -467,11 +467,6 @@
               <FileType>1</FileType>
               <FilePath>..\USER\TASK_APP\AM2320_By_IIC.c</FilePath>
             </File>
-            <File>
-              <FileName>uart_api.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\TASK_APP\uart_api.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -546,6 +541,16 @@
               <FileName>BSP_BRD.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\USER\HARDWARE\BSP_BRD.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_Lora.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_Lora.c</FilePath>
+            </File>
+            <File>
+              <FileName>BSP_Lora.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\USER\HARDWARE\BSP_Lora.h</FilePath>
             </File>
           </Files>
         </Group>
