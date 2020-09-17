@@ -23,6 +23,8 @@ extern float gGPS_Value;
 
 void bsp_Board_Init(void);
 
+void Get_Info(void);
+
 void STM_TX_Robot_Info(void);
 
 #endif

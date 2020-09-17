@@ -65,7 +65,7 @@ const u32 crcTable[256] = {
 UARTbuf_Typedef UART_Sendbuf;
 UARTbuf_Typedef UART_Rx_Buf;   
 
-
+	 
 void UART_Tx_Byte(USART_TypeDef* USARTx, uint8_t Data)
 {
     while(USART_GetFlagStatus(USARTx, USART_FLAG_TXE) == RESET);
@@ -105,10 +105,27 @@ u32 crc32( u32 inCrc32, const void *buf, u32 bufLen )
     /** accumulate crc32 for buffer **/
     crc32 = inCrc32 ^ 0xFFFFFFFF;
     byteBuf = (u8*) buf;
-    for (i=0; i < bufLen; i++) {
+    for (i=0; i < bufLen; i++) 
+		{
         crc32 = (crc32 >> 8) ^ crcTable[ (crc32 ^ byteBuf[i]) & 0xFF ];
     }
     return( crc32 ^ 0xFFFFFFFF );
+}
+
+
+//包含包头到数据区所有数据的按字节的求和值，取低8位
+u8 Power_Checksum(u8 Cmd,u8 Datalen,u8*data)
+{
+	u8 i;
+	u32 Checksum,Packet_Length;
+	Packet_Length = Datalen + 8;
+	Checksum  = UART_HEAD1 + UART_HEAD2 ;
+	Checksum  = Checksum + Packet_Length + Cmd;
+	for(i = 0 ; i < Datalen ; i++)
+	{
+		Checksum += data[i];
+	}
+	return (Checksum & 0x00FF);
 }
 
 
@@ -120,6 +137,9 @@ u32 crc32( u32 inCrc32, const void *buf, u32 bufLen )
 */
 
 BRD_Info_Typedef BRD_Info; 
+BAT_Protect_Info_Typedef				BAT_Protect_Info;
+Power_Control_Status_Typedef 		Power_Control_Status;
+
 RX_Buf_Typedef BRD_RX_Buf;
 
 Pluse_Info_Typedef BRD_Pluse_Info = {0};
@@ -242,24 +262,27 @@ void BRD_POWER_ISR(void)
   * @param  无
   * @retval cmd 命令字  datalen 数据长度 data数据
 */
-//bsp_Power_UART_TX(STM_TX_GET_MST_BRAKE_STATUS,1,0) //抱闸信息
-//bsp_Power_UART_TX(STM_TX_GET_BAT_STATUS,0,0) //向电源板发送获取电池状态
-//bsp_Power_UART_TX(STM_TX_GET_POWER_SW_STATUS,0,0) //向电源板发送获取设备电源状态
-
+//bsp_Power_UART_TX(GET_STATUS,0,0) 						//获取设备状态指令01
+//bsp_Power_UART_TX(GET_PROTECT_CMD,0,0) 				//获取保护参数指令02
+//bsp_Power_UART_TX(SET_PW_STATUS,0,0) 					//控制电源状态指令03
+//bsp_Power_UART_TX(SET_CHARGE_STATUS,0,0) 			//控制充电开关指令04
+//bsp_Power_UART_TX(SET_CELL_BALANCE,0,0) 			//控制平衡开关指令05
 void bsp_Power_UART_TX(u8 Cmd,u8 Datalen,u8*data)
 {
-	u8 i,sum;
+	u8 i,Checksum;
 	UART_Tx_Byte(BRD_UART,UART_HEAD1);
 	UART_Tx_Byte(BRD_UART,UART_HEAD2);
-	UART_Tx_Byte(BRD_UART,Datalen + 5);
+	UART_Tx_Byte(BRD_UART,Datalen + 8);
 	UART_Tx_Byte(BRD_UART,Cmd);
-	sum  = Cmd;
+
 	for(i = 0 ; i < Datalen ; i++)
 	{
-		sum+=data[i];
 		UART_Tx_Byte(BRD_UART,data[i]);
 	}
-	UART_Tx_Byte(BRD_UART,sum);
+	
+	Checksum  = Power_Checksum(Cmd, Datalen,data);
+	
+	UART_Tx_Byte(BRD_UART,Checksum);
 }
 
 /*
@@ -351,6 +374,50 @@ u16 bsp_BRD_UART_Parse(void)
 	return UART_Rx_Buf.Cmd2;
 }
 
+Power_UARTbuf_Typedef Power_UART_Sendbuf;
+Power_UARTbuf_Typedef Power_UART_Rx_Buf;
+
+/*
+* @brief  Power BRD 串口接收数据解析函数
+  * @param  无
+  * @retval 收到的指令
+	
+*/
+u16 bsp_Power_BRD_UART_Parse(void)
+{
+	u8 Checksum;
+	if(BRD_RX_Buf.Status == UART_END)
+	{			
+		memcpy(&Power_UART_Rx_Buf,BRD_RX_Buf.data,BRD_RX_Buf.Datalen);
+		BRD_RX_Buf.Status = UART_READY;
+		Checksum = Power_UART_Rx_Buf.Checksum;
+		
+		Power_UART_Rx_Buf.Checksum = 0 ;
+		Power_UART_Rx_Buf.Checksum = Power_Checksum(Power_UART_Rx_Buf.Cmd, (u8)sizeof(Power_UART_Rx_Buf.Data),Power_UART_Rx_Buf.Data);
+		
+		if(Checksum == Power_UART_Rx_Buf.Checksum)
+		{
+			switch(Power_UART_Rx_Buf.Cmd)
+			{
+				case ACK:
+					break;
+				case REPLY_GET_STATUS:
+					memcpy(&BRD_Info,Power_UART_Rx_Buf.Data,sizeof(BRD_Info));
+					break;
+				case REPLY_GET_PROTECT:
+					memcpy(&BAT_Protect_Info,Power_UART_Rx_Buf.Data,sizeof(BAT_Protect_Info));
+					break;
+				case REPLY_SET_PW:
+					memcpy(&Power_Control_Status,Power_UART_Rx_Buf.Data,sizeof(Power_Control_Status));
+					break;
+				default:
+					break;
+			}
+		}
+	}
+	return Power_UART_Rx_Buf.Cmd;
+}
+
 
 //获取电源板信息参数
 void STM_GET_POWER_Info(void)
@@ -365,16 +432,15 @@ BRD_Info_Typedef gBattery_Value;
 //获取电池电压值
 short POWER_get_BAT_VOL(void)
 {
-    //gBattery_Voltage = BRD_Info.Total_voltage;
-		gBattery_Value.Total_voltage = BRD_Info.Total_voltage;
-		return gBattery_Value.Total_voltage;
+	gBattery_Value.Total_voltage = BRD_Info.Total_voltage;
+	return gBattery_Value.Total_voltage;
 }
 
 //获取电池电流值
 short POWER_get_BAT_CUR(void)
 {
-    gBattery_Value.Electric_current = BRD_Info.Electric_current;
-		return gBattery_Value.Electric_current;
+  gBattery_Value.Electric_current = BRD_Info.Electric_current;
+	return gBattery_Value.Electric_current;
 }
 
 
