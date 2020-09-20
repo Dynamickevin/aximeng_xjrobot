@@ -165,17 +165,17 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>gMstMt.real_out_speed</ItemText>
+          <ItemText>Master_ADC_count,0x0A</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>Master_ADC_count,0x0A</ItemText>
+          <ItemText>gGPS_Value</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>gGPS_Value</ItemText>
+          <ItemText>datatmp[0]</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
@@ -320,7 +320,7 @@
 
   <Group>
     <GroupName>USER</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

@@ -12,74 +12,31 @@
 #include "stm32f4xx.h"
 #include  "board.h"
 
+#define  UART_FIFO_NUM     64  //1032
+#define  USART_HEAD_1 	0x55
+#define  USART_HEAD_2 	0xaa
 
-#define  UART_HEAD1 	0x55
-#define  UART_HEAD2 	0xaa
-
-#define  UART_READY 	0
-#define  UART_END			0x80
-
-#define  RX_TIMEOUT		10
 #define  DATA_MAX   	512
 
-//命令字
-/****************************************************************************************************/
-//数据方向
-//#define		STM32_HI3521_CMD1				0x1200 	//STM32 -->HI35213521
-#define		STM32_BRD_CMD1					0x1300	//STM32 -->BRD
-//#define		HI3521_STM32_CMD1				0x2100	//HI35213521-->STM32
-#define		BRD_STM32_CMD1					0x3100	//BRD   -->STM32
-//#define		STM32_RF_CMD1						0x1400	//STM32 -->RF
-//#define 	RF_STM32_CMD1						0x4100	//RF   -->STM32
+//机器人主板与电源板内部通讯协议  版本1.1.2
 
-//#define		HI3521_BRD_CMD1					0x3200	//HI35213521-->BRD
-//#define		BRD_HI3521_CMD1					0x2300	//BRD   -->HI35213521
+#define			UART_CMD_ACK			    			 0x00 					//通用应答指令
 
+#define			UART_GET_STATUS			    		 0x01 					//获取设备状态指令
+#define			UART_REPLY_GET_STATUS			   0x81 					//获取设备状态回复指令
 
-#define   UART_ACK								0x00
-#define		STM_TX_GET_STAUS				0x01
-#define		STM_RX_REPLY_STAUS			0x01
+#define			UART_GET_PROTECT_CMD			   0x02 					//获取保护参数指令
+#define			UART_REPLY_GET_PROTECT			 0x82 					//获取保护参数回复指令
 
+#define			UART_SET_PW_STATUS			     0x03 					//控制电源状态指令
+#define			UART_REPLY_SET_PW						 0x83 					//控制电源状态回复指令
 
-//STM32 -->Power 
-#define		STM_TX_GET_BAT_STATUS					0x13
-#define		STM_TX_GET_MST_BRAKE_STATUS		0x12
-#define		STM_TX_GET_POWER_SW_STATUS		0x11
+#define			UART_SET_CHARGE_STATUS	     0x04 					//控制充电开关指令
 
-//Power --> STM32
-#define		POWER_RX_BAT_VALUE					0x21
-#define		POWER_RX_POWER_SW_STATUS		0x23
-
-
-////STM32 -->HI35213521
-//#define		STM_TX_CTRL_YT_CMD					0x02
-//#define		STM_TX_CTRL_VIDEO_TX_CMD		0x03
-
-
-////HI35213521-->STM32
-//#define		HI3521_TX_GET_STATUS						0x04
-//#define		HI3521_RX_REPLY_STATUS					0x04
-//#define		HI3521_TX_CTRL_CMD							0x05
-/****************************************************************************************************/
+#define			UART_SET_CELL_BALANCE    	 	 0x05 					//控制平衡开关指令
 
 /********************************************************/
-
-//机器人主板与电源板内部通讯协议  版本1.1.1 
-
-#define			REPLY_GET_STATUS			 0x81 					//获取设备状态回复指令
-#define			REPLY_GET_PROTECT			 0x82 					//获取保护参数回复指令
-#define			REPLY_SET_PW					 0x83 					//控制电源状态回复指令
-
-#define			ACK			    	 				 0x00 					//通用应答指令
-#define			GET_STATUS			    	 0x01 					//获取设备状态指令
-#define			GET_PROTECT_CMD			   0x02 					//获取保护参数指令
-#define			SET_PW_STATUS			     0x03 					//控制电源状态指令
-#define			SET_CHARGE_STATUS      0x04 					//控制充电开关指令
-#define			SET_CELL_BALANCE    	 0x05 					//控制平衡开关指令
-
-
-
-/********************************************************/
+	
 
 //  帧格式内部数据包 __PACKED紧凑结构 为方便传输
 typedef struct __PACKED{
@@ -94,19 +51,13 @@ typedef struct __PACKED{
 
 //帧格式内部数据包 
 typedef struct {
-	u32 Packet_Length;		//包括从包头到校验和的所有字节长度，Data_Length为数据尺寸，Packet Length = Data_Length + 8
-												//8：Checksum + Packet_Length + Cmd + UART_HEAD2 + UART_HEAD1
+	u8 Packet_Length;		//包括从包头到校验和的所有字节长度，Data_Length为数据尺寸，Packet Length = Data_Length + 8
+												//5：Checksum + Packet_Length + Cmd + UART_HEAD2 + UART_HEAD1
 	u8  Cmd;							//定义具体业务报文命令
 	u8  Data[DATA_MAX];
 	u8  Checksum;					//包括包头到数据区所有数据的按字节的求和值，取低8位
 	
 }Power_UARTbuf_Typedef;
-
-
-
-
-/************************************************************************************/
-
 
 /************************************************************************************/
 //串口接收BUF
@@ -117,17 +68,8 @@ typedef struct{
 	u16		Datalen;
 	u8 		data[DATA_MAX+32];
 }RX_Buf_Typedef;
-/************************************************************************************/
 
 /************************************************************************************/
-typedef struct{
-	u8 Status;
-	u8 Expired_times;	//连续未收到数据包的次数
-	u32 SendTime;
-	u32 Last_Time;
-}Pluse_Info_Typedef;
-/************************************************************************************/
-
 
 #define GPIO_BAT_CHARGE_EN      GPIOD,GPIO_Pin_1     //充电使能
 #define GPIO_BREAK_MEN          GPIOE,GPIO_Pin_1     //抱闸开关；低电平使能
@@ -185,29 +127,41 @@ typedef struct {
 
 typedef struct {
 	u8		Power_SW_Status;  					//4 路开关控制（低4bit 按位，1 代表打开，0 代表关闭）
+	u8		Mst_Brake_Status_Flag;			//主电机抱闸状态
+	u8		Motor_Power_Status_Flag;		//电机电源状态
+	u8		Cam_Power_24V_Status_Flag;	//摄像头24V电源状态
+	u8		Cam_Power_12V_Status_Flag;	//摄像头12V电源状态
 } Power_Control_Status_Typedef;
 
+typedef struct {
+	u8		Bat_Charge_Enable_Flag;  					//Data[0]: 1 代表打开充电功能，0 代表关闭充电功能
+} Power_Charge_Status_Typedef;
+
+typedef struct {
+	u8		Cell_Balance_Enable_Flag;  					//：Data[0]: 0x01 代表打开单体平衡功能，0x00 代表关闭单体平衡功能。系统启动后默认关闭状态							
+} Power_Cell_Balance_Status_Typedef;
 
 extern 	BRD_Info_Typedef 								BRD_Info;
 extern	BAT_Protect_Info_Typedef				BAT_Protect_Info;
 extern  Power_Control_Status_Typedef 		Power_Control_Status; 
+extern	Power_Charge_Status_Typedef     Power_Charge_Status;
+extern	Power_Cell_Balance_Status_Typedef  Power_Cell_Balance_Status;
 
 extern BRD_Info_Typedef gBattery_Value;
 
 extern UARTbuf_Typedef UART_Rx_Buf;
 extern Power_UARTbuf_Typedef Power_UART_Rx_Buf;
-u32 crc32( u32 inCrc32, const void *buf, u32 bufLen );
+
 void UART_Send_Cmd(USART_TypeDef * UART , u16 CMD ,u32 Data_Length,u32 Param,u8 *data);
 void UART_Tx_Byte(USART_TypeDef* USARTx, uint8_t Data);
  
-extern RX_Buf_Typedef 			BRD_RX_Buf;
-extern Pluse_Info_Typedef		BRD_Pluse_Info;
-
 void  bsp_BRD_Init(void);
-void bsp_BRD_Pluse(void);
-u16 bsp_BRD_UART_Parse(void);
 
-u16 bsp_Power_BRD_UART_Parse(void);
+void bsp_Power_UART_TX(u8 Cmd,u8 Datalen,u8*data);
+
+void Send_USART_CMD(u8 cmd, u8* databuf, u8 length);
+
+void USART_CMD_Judgement(void);
 
 void STM_GET_POWER_Info(void);
 

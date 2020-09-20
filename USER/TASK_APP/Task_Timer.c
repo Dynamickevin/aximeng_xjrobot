@@ -418,8 +418,9 @@ void Task_Timer(void *pdata)
 				case AM2320_MSG: 		// 2s
 				{
 					//LED2(LED_ON);
-					AM2320_Get_Data();
+					//AM2320_Get_Data();
 					//stprintf(ID_DEBUG,"AM2320 \r\n");	
+					
 				}
 				break;
 				case SYS_LED_MSG: 		// 1s
@@ -432,6 +433,12 @@ void Task_Timer(void *pdata)
 					//DBG_PRINTF("Hello World");
 					//STM_TX_Robot_Info();
 					//debug_sprintf(ID_DEBUG,"1111");
+					bsp_Power_UART_TX(UART_GET_STATUS,0,0); 						//获取设备状态指令01
+					//bsp_Power_UART_TX(GET_PROTECT_CMD,0,0); 				//获取保护参数指令02
+					//bsp_Power_UART_TX(SET_PW_STATUS,0,0); 					//控制电源状态指令03
+					//bsp_Power_UART_TX(SET_CHARGE_STATUS,0,0); 			//控制充电开关指令04
+					//bsp_Power_UART_TX(SET_CELL_BALANCE,0,0); 			//控制平衡开关指令05
+					
 				}
 				break;
 				case BATTERY_MSG: 		// 256ms
@@ -456,6 +463,7 @@ void Task_Timer(void *pdata)
 				{
 					//LED2(LED_ON);
 					Sensor_Collect();
+					USART_CMD_Judgement();
 					break;
 				}
 				 
